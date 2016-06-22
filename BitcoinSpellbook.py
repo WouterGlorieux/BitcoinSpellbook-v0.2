@@ -72,11 +72,7 @@ def authenticate(headers, body):
 
 class mainPage(webapp2.RequestHandler):
     def get(self):
-        self.response.write(data.getProvidersList())
-        #self.response.write(data.Block(350000))
-        #self.response.write(data.LatestBlock())
-        #self.response.write(data.PrimeInputAddress('cb67d8608c18e7abba430faff5d7dc563da0d1a5c68cbfd2e091679ca2897ac9'))
-        #self.response.write('hello world')
+        self.response.write("You shouldn't be here, go away!")
 
 
 class block(webapp2.RequestHandler):
