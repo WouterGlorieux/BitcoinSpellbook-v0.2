@@ -1,0 +1,7 @@
+.idea
+*.pyc
+*.log
+providers.txt
+tester.py
+
+

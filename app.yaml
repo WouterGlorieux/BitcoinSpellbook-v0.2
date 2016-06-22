@@ -1,0 +1,55 @@
+application: bitcoinspellbook
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+
+- url: /robots\.txt
+  static_files: robots.txt
+  upload: robots\.txt
+
+- url: /data/block
+  script: BitcoinSpellbook.app
+
+- url: /data/latestBlock
+  script: BitcoinSpellbook.app
+
+- url: /data/primeInputAddress
+  script: BitcoinSpellbook.app
+
+- url: /data/transactions
+  script: BitcoinSpellbook.app
+
+- url: /data/balances
+  script: BitcoinSpellbook.app
+
+- url: /data/utxos
+  script: BitcoinSpellbook.app
+
+- url: /data/saveProvider
+  script: BitcoinSpellbook.app
+
+- url: /data/deleteProvider
+  script: BitcoinSpellbook.app
+
+- url: /data/getProviders
+  script: BitcoinSpellbook.app
+
+- url: /admin/initialize
+  script: BitcoinSpellbook.app
+  login: admin
+
+- url: /
+  script: BitcoinSpellbook.app
+
+
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: jinja2
+  version: latest
+- name: pycrypto
+  version: "2.6"
