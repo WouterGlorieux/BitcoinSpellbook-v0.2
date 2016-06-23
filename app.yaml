@@ -45,6 +45,11 @@ handlers:
   script: BitcoinSpellbook.app
   login: admin
 
+
+- url: /SIL/SIL
+  script: BitcoinSpellbook.app
+
+
 - url: /
   script: BitcoinSpellbook.app
 

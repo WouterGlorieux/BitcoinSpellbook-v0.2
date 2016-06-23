@@ -149,7 +149,7 @@ def query(queryType, param='', provider=''):
     return response
 
 
-def Block(blockHeight, provider=''):
+def block(blockHeight, provider=''):
     response = {'success': 0}
     if isinstance(blockHeight, int) and blockHeight >= 0:
         response = query('block', blockHeight, provider)
@@ -160,11 +160,11 @@ def Block(blockHeight, provider=''):
 
 
 
-def LatestBlock(provider=''):
+def latestBlock(provider=''):
     response = query('latestBlock', '', provider)
     return response
 
-def PrimeInputAddress(txid, provider=''):
+def primeInputAddress(txid, provider=''):
     response = {'success': 0}
     if validator.validTxid(txid):
         response = query('primeInputAddress', txid, provider)
@@ -174,7 +174,7 @@ def PrimeInputAddress(txid, provider=''):
     return response
 
 
-def Transactions(address, provider=''):
+def transactions(address, provider=''):
     response = {'success': 0}
     if validator.validAddress(address):
         response = query('transactions', address, provider)
@@ -183,7 +183,7 @@ def Transactions(address, provider=''):
 
     return response
 
-def Balances(addresses, provider=''):
+def balances(addresses, provider=''):
     response = {'success': 0}
     if validator.validAddresses(addresses):
         response = query('balances', addresses, provider)
@@ -192,7 +192,7 @@ def Balances(addresses, provider=''):
 
     return response
 
-def UTXOs(addresses, provider=''):
+def utxos(addresses, provider=''):
     response = {'success': 0}
     if validator.validAddresses(addresses):
         response = query('utxos', addresses, provider)

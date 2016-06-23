@@ -21,6 +21,8 @@ urlfetch.set_default_fetch_deadline(60)
 
 
 import Blockchaindata.Blockchaindata as data
+import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
+
 
 class Parameters(ndb.Model):
     #Model for 3rd party data providers parameters
@@ -85,7 +87,7 @@ class block(webapp2.RequestHandler):
         if self.request.get('height'):
             try:
                 blockHeight = int(self.request.get('height'))
-                response = data.Block(blockHeight, provider)
+                response = data.block(blockHeight, provider)
                 self.response.write(json.dumps(response, sort_keys=True))
 
             except ValueError:
@@ -102,7 +104,7 @@ class latestBlock(webapp2.RequestHandler):
         if self.request.get('provider'):
             provider = self.request.get('provider')
 
-        response = data.LatestBlock(provider)
+        response = data.latestBlock(provider)
         self.response.write(json.dumps(response, sort_keys=True))
 
 class primeInputAddress(webapp2.RequestHandler):
@@ -114,7 +116,7 @@ class primeInputAddress(webapp2.RequestHandler):
 
         if self.request.get('txid'):
             txid = self.request.get('txid')
-            response = data.PrimeInputAddress(txid, provider)
+            response = data.primeInputAddress(txid, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify a txid.'
@@ -129,7 +131,7 @@ class transactions(webapp2.RequestHandler):
 
         if self.request.get('address'):
             address = self.request.get('address')
-            response = data.Transactions(address, provider)
+            response = data.transactions(address, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify an address.'
@@ -145,7 +147,7 @@ class balances(webapp2.RequestHandler):
 
         if self.request.get('addresses'):
             addresses = self.request.get('addresses')
-            response = data.Balances(addresses, provider)
+            response = data.balances(addresses, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify one or more addresses.'
@@ -161,7 +163,7 @@ class utxos(webapp2.RequestHandler):
 
         if self.request.get('addresses'):
             addresses = self.request.get('addresses')
-            response = data.UTXOs(addresses, provider)
+            response = data.utxos(addresses, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify one or more addresses.'
@@ -250,6 +252,30 @@ class initialize(webapp2.RequestHandler):
 
         self.response.write(json.dumps(response))
 
+
+class SIL(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = SimplifiedInputsList.SIL(address, blockHeight)
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = SimplifiedInputsList.SIL(address)
+
+        else:
+            response['error'] = 'You must provide an address.'
+
+        self.response.write(json.dumps(response))
+
+
+
 app = webapp2.WSGIApplication([
     ('/', mainPage),
     ('/admin/initialize', initialize),
@@ -262,6 +288,7 @@ app = webapp2.WSGIApplication([
     ('/data/transactions', transactions),
     ('/data/balances', balances),
     ('/data/utxos', utxos),
+    ('/SIL/SIL', SIL),
 
 ], debug=True)
 
