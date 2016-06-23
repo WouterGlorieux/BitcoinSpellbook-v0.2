@@ -49,6 +49,17 @@ handlers:
 - url: /SIL/SIL
   script: BitcoinSpellbook.app
 
+- url: /linker/LBL
+  script: BitcoinSpellbook.app
+
+- url: /linker/LRL
+  script: BitcoinSpellbook.app
+
+- url: /linker/LSL
+  script: BitcoinSpellbook.app
+
+- url: /linker/LAL
+  script: BitcoinSpellbook.app
 
 - url: /
   script: BitcoinSpellbook.app

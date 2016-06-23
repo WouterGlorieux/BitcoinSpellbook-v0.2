@@ -31,3 +31,10 @@ def validTxid(txid):
         valid = False
 
     return valid
+
+def validXPUB(xpub):
+    valid =False
+    if xpub[:4] == "xpub":
+        valid = True
+
+    return valid

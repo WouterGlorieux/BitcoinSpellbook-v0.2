@@ -2,6 +2,7 @@
 
 from BlockchainDataWrapper import BlockchainDataWrapper
 from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
+from BlocklinkerWrapper import BlocklinkerWrapper
 
 class SpellbookWrapper():
 
@@ -13,3 +14,6 @@ class SpellbookWrapper():
 
     def SimplifiedInputsList(self):
         return SimplifiedInputsListWrapper(self.url)
+
+    def Blocklinker(self):
+        return BlocklinkerWrapper(self.url)

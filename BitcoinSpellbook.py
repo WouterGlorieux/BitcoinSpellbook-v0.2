@@ -22,7 +22,7 @@ urlfetch.set_default_fetch_deadline(60)
 
 import Blockchaindata.Blockchaindata as data
 import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
-
+import Blocklinker.Blocklinker as Blocklinker
 
 class Parameters(ndb.Model):
     #Model for 3rd party data providers parameters
@@ -275,6 +275,96 @@ class SIL(webapp2.RequestHandler):
         self.response.write(json.dumps(response))
 
 
+class LBL(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address') and self.request.get('xpub'):
+            address = self.request.get('address')
+            xpub = self.request.get('xpub')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LBL()
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = Blocklinker.Blocklinker(address, xpub).LBL()
+
+        else:
+            response['error'] = 'You must provide an address and an xpub key.'
+
+        self.response.write(json.dumps(response))
+
+
+class LRL(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address') and self.request.get('xpub'):
+            address = self.request.get('address')
+            xpub = self.request.get('xpub')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LRL()
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = Blocklinker.Blocklinker(address, xpub).LRL()
+
+        else:
+            response['error'] = 'You must provide an address and an xpub key.'
+
+        self.response.write(json.dumps(response))
+
+class LSL(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address') and self.request.get('xpub'):
+            address = self.request.get('address')
+            xpub = self.request.get('xpub')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LSL()
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = Blocklinker.Blocklinker(address, xpub).LSL()
+
+        else:
+            response['error'] = 'You must provide an address and an xpub key.'
+
+        self.response.write(json.dumps(response))
+
+class LAL(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address') and self.request.get('xpub'):
+            address = self.request.get('address')
+            xpub = self.request.get('xpub')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LAL()
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = Blocklinker.Blocklinker(address, xpub).LAL()
+
+        else:
+            response['error'] = 'You must provide an address and an xpub key.'
+
+        self.response.write(json.dumps(response))
+
+
 
 app = webapp2.WSGIApplication([
     ('/', mainPage),
@@ -289,6 +379,12 @@ app = webapp2.WSGIApplication([
     ('/data/balances', balances),
     ('/data/utxos', utxos),
     ('/SIL/SIL', SIL),
+    ('/linker/LBL', LBL),
+    ('/linker/LRL', LRL),
+    ('/linker/LSL', LSL),
+    ('/linker/LAL', LAL),
+
+
 
 ], debug=True)
 
