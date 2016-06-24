@@ -50,12 +50,12 @@ def TXS2SIL(txs, block=0):
                     recurring = True
 
             if recurring == False:
-                SIL.append( [tx['primeInputAddress'], tx['receivedValue'], tx['blockHeight'] ] )
+                SIL.append( [tx['primeInputAddress'], tx['receivedValue'], 0 ,tx['blockHeight'] ] )
 
     total = float(totalReceived(SIL))
 
-    for SIL_input in SIL:
-        SIL_input.append(SIL_input[1]/total)
+    for row in SIL:
+        row[2] = row[1]/total
 
     return SIL
 
