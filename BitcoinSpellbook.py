@@ -23,6 +23,7 @@ urlfetch.set_default_fetch_deadline(60)
 import Blockchaindata.Blockchaindata as data
 import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
 import Blocklinker.Blocklinker as Blocklinker
+import BlockRandom.BlockRandom as BlockRandom
 
 class Parameters(ndb.Model):
     #Model for 3rd party data providers parameters
@@ -365,6 +366,57 @@ class LAL(webapp2.RequestHandler):
         self.response.write(json.dumps(response))
 
 
+class proportionalRandom(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address'):
+            address = self.request.get('address')
+            blockHeight = 0
+            rngBlockHeight = 0
+            xpub = ''
+            source = 'SIL'
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            if self.request.get('rngBlockHeight'):
+                try:
+                    rngBlockHeight = int(self.request.get('rngBlockHeight'))
+                except ValueError:
+                    response['error'] = 'rngBlockHeight must be a positive integer.'
+
+            if self.request.get('xpub'):
+                xpub = self.request.get('xpub')
+
+            if self.request.get('source') and self.request.get('source') in ['SIL', 'LBL', 'LRL', 'LSL']:
+                source = self.request.get('source')
+
+            response = BlockRandom.Random(address, blockHeight, xpub).proportionalRandom(source, rngBlockHeight)
+
+        else:
+            response['error'] = 'You must provide an address.'
+
+        self.response.write(json.dumps(response))
+
+class randomFromBlock(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        rngBlockHeight = 0
+
+        if self.request.get('rngBlockHeight'):
+            try:
+                rngBlockHeight = int(self.request.get('rngBlockHeight'))
+            except ValueError:
+                response['error'] = 'rngBlockHeight must be a positive integer.'
+
+        response = BlockRandom.Random().fromBlock(rngBlockHeight)
+
+        self.response.write(json.dumps(response))
+
+
 
 app = webapp2.WSGIApplication([
     ('/', mainPage),
@@ -383,7 +435,8 @@ app = webapp2.WSGIApplication([
     ('/linker/LRL', LRL),
     ('/linker/LSL', LSL),
     ('/linker/LAL', LAL),
-
+    ('/random/proportional', proportionalRandom),
+    ('/random/block', randomFromBlock),
 
 
 ], debug=True)

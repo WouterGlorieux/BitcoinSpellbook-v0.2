@@ -61,6 +61,12 @@ handlers:
 - url: /linker/LAL
   script: BitcoinSpellbook.app
 
+- url: /random/proportional
+  script: BitcoinSpellbook.app
+
+- url: /random/block
+  script: BitcoinSpellbook.app
+
 - url: /
   script: BitcoinSpellbook.app
 

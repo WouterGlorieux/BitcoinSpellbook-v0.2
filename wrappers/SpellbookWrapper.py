@@ -3,6 +3,7 @@
 from BlockchainDataWrapper import BlockchainDataWrapper
 from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
 from BlocklinkerWrapper import BlocklinkerWrapper
+from BlockRandomWrapper import BlockRandomWrapper
 
 class SpellbookWrapper():
 
@@ -17,3 +18,6 @@ class SpellbookWrapper():
 
     def Blocklinker(self):
         return BlocklinkerWrapper(self.url)
+
+    def BlockRandom(self):
+        return BlockRandomWrapper(self.url)
