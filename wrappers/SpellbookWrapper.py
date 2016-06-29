@@ -4,6 +4,9 @@ from BlockchainDataWrapper import BlockchainDataWrapper
 from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
 from BlocklinkerWrapper import BlocklinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
+from BlockVoterWrapper import BlockVoterWrapper
+
+
 
 class SpellbookWrapper():
 
@@ -21,3 +24,6 @@ class SpellbookWrapper():
 
     def BlockRandom(self):
         return BlockRandomWrapper(self.url)
+
+    def BlockVoter(self):
+        return BlockVoterWrapper(self.url)

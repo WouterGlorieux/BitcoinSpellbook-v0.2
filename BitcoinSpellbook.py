@@ -24,6 +24,7 @@ import Blockchaindata.Blockchaindata as data
 import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
 import Blocklinker.Blocklinker as Blocklinker
 import BlockRandom.BlockRandom as BlockRandom
+import BlockVoter.BlockVoter as BlockVoter
 
 class Parameters(ndb.Model):
     #Model for 3rd party data providers parameters
@@ -417,6 +418,115 @@ class randomFromBlock(webapp2.RequestHandler):
         self.response.write(json.dumps(response))
 
 
+class proposal(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        address = ''
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+        proposal = ''
+        if self.request.get('proposal'):
+            proposal = self.request.get('proposal')
+
+        options = []
+        if self.request.get('options'):
+            options = self.request.get('options').split("|")
+
+        voteCost = 0
+        if self.request.get('voteCost'):
+            try:
+                voteCost = int(self.request.get('voteCost'))
+            except ValueError:
+                response['error'] = 'voteCost must be a positive integer.'
+
+        weights = 'Equal'
+        if self.request.get('weights'):
+            weights = self.request.get('weights')
+
+        registrationAddress = ''
+        if self.request.get('regAddress'):
+            registrationAddress = self.request.get('regAddress')
+
+        registrationBlockHeight = 0
+        if self.request.get('regBlockHeight'):
+            try:
+                registrationBlockHeight = int(self.request.get('regBlockHeight'))
+            except ValueError:
+                response['error'] = 'regBlockHeight must be a positive integer.'
+
+        registrationXPUB = ''
+        if self.request.get('regXPUB'):
+            registrationXPUB = self.request.get('regXPUB')
+
+
+        blockVoter = BlockVoter.BlockVoter(address, proposal, options, voteCost)
+        blockVoter.setWeights(weights, registrationAddress, registrationBlockHeight, registrationXPUB)
+
+        response = blockVoter.getProposal()
+
+
+        self.response.write(json.dumps(response))
+
+class results(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        address = ''
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+        proposal = ''
+        if self.request.get('proposal'):
+            proposal = self.request.get('proposal')
+
+        options = []
+        if self.request.get('options'):
+            options = self.request.get('options').split("|")
+
+        voteCost = 0
+        if self.request.get('voteCost'):
+            try:
+                voteCost = int(self.request.get('voteCost'))
+            except ValueError:
+                response['error'] = 'voteCost must be a positive integer.'
+
+        blockHeight = 0
+        if self.request.get('blockHeight'):
+            try:
+                blockHeight = int(self.request.get('blockHeight'))
+            except ValueError:
+                response['error'] = 'blockHeight must be a positive integer.'
+
+        weights = 'Equal'
+        if self.request.get('weights'):
+            weights = self.request.get('weights')
+
+        registrationAddress = ''
+        if self.request.get('regAddress'):
+            registrationAddress = self.request.get('regAddress')
+
+        registrationBlockHeight = 0
+        if self.request.get('regBlockHeight'):
+            try:
+                registrationBlockHeight = int(self.request.get('regBlockHeight'))
+            except ValueError:
+                response['error'] = 'regBlockHeight must be a positive integer.'
+
+        registrationXPUB = ''
+        if self.request.get('regXPUB'):
+            registrationXPUB = self.request.get('regXPUB')
+
+
+        blockVoter = BlockVoter.BlockVoter(address, proposal, options, voteCost)
+        blockVoter.setWeights(weights, registrationAddress, registrationBlockHeight, registrationXPUB)
+
+        response = blockVoter.getResults(blockHeight)
+
+        self.response.write(json.dumps(response))
+
+
 
 app = webapp2.WSGIApplication([
     ('/', mainPage),
@@ -437,6 +547,10 @@ app = webapp2.WSGIApplication([
     ('/linker/LAL', LAL),
     ('/random/proportional', proportionalRandom),
     ('/random/block', randomFromBlock),
+    ('/voter/proposal', proposal),
+    ('/voter/results', results),
+
+
 
 
 ], debug=True)

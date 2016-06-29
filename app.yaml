@@ -67,6 +67,12 @@ handlers:
 - url: /random/block
   script: BitcoinSpellbook.app
 
+- url: /voter/proposal
+  script: BitcoinSpellbook.app
+
+- url: /voter/results
+  script: BitcoinSpellbook.app
+
 - url: /
   script: BitcoinSpellbook.app
 
