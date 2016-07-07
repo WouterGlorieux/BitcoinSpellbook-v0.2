@@ -5,6 +5,7 @@ from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
 from BlocklinkerWrapper import BlocklinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
 from BlockVoterWrapper import BlockVoterWrapper
+from HDForwarderWrapper import HDForwarderWrapper
 
 
 
@@ -27,3 +28,6 @@ class SpellbookWrapper():
 
     def BlockVoter(self):
         return BlockVoterWrapper(self.url)
+
+    def HDForwarder(self):
+        return HDForwarderWrapper(self.url)

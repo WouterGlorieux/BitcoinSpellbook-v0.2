@@ -73,6 +73,25 @@ handlers:
 - url: /voter/results
   script: BitcoinSpellbook.app
 
+- url: /forwarder/getForwarders
+  script: BitcoinSpellbook.app
+
+- url: /forwarder/getForwarder
+  script: BitcoinSpellbook.app
+
+- url: /forwarder/checkAddress
+  script: BitcoinSpellbook.app
+
+- url: /forwarder/saveForwarder
+  script: BitcoinSpellbook.app
+
+- url: /forwarder/deleteForwarder
+  script: BitcoinSpellbook.app
+
+- url: /forwarder/doForwarding
+  script: BitcoinSpellbook.app
+
+
 - url: /
   script: BitcoinSpellbook.app
 

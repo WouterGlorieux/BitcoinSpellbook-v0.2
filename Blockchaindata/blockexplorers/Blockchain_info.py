@@ -235,7 +235,7 @@ class API:
                     logging.warning('Blockchain.info: unable to retrieve utxos')
                     response = {'success': 0, 'error': 'unable to retrieve utxos'}
 
-                if 'hash' in tx and tx['hash'] == data['unspent_outputs'][i]['tx_hash_big_endian']:
+                if 'block_height' in tx and 'hash' in tx and tx['hash'] == data['unspent_outputs'][i]['tx_hash_big_endian']:
                     utxo['block_height'] = tx['block_height']
                     for tx_output in tx['out']:
                         if tx_output['n'] == data['unspent_outputs'][i]['tx_output_n']:

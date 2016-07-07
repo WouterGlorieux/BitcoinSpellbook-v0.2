@@ -209,8 +209,10 @@ class API:
                         utxo['output'] = data[i]['hash'] + ":" + str(data[i]['index'])
                         utxo['value'] = data[i]['value']
 
+
                         if utxo['confirmations'] >= confirmations:
                             UTXOs.append(utxo)
+
 
                     if page < pages:
                         url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(LIMIT) + '&sort_dir=asc'

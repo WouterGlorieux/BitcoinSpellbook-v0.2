@@ -15,7 +15,7 @@ import hashlib
 import hmac
 import base64
 
-from google.appengine.ext import ndb
+
 from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
@@ -25,15 +25,9 @@ import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
 import Blocklinker.Blocklinker as Blocklinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
+import HDForwarder.HDForwarder as HDForwarder
 
-class Parameters(ndb.Model):
-    #Model for 3rd party data providers parameters
-    blocktrail_key = ndb.StringProperty(indexed=True, default="a8a84ed2929da8313d75d16e04be2a26c4cc4ea4")
-    insight_url = ndb.StringProperty(indexed=True, default="https://blockexplorer.com/api/")
-
-class APIKeys(ndb.Model):
-    api_key = ndb.StringProperty(indexed=True, default='')
-    api_secret = ndb.StringProperty(indexed=True, default='')
+import datastore.datastore as datastore
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -49,7 +43,7 @@ def authenticate(headers, body):
         API_key = headers['API_Key']
 
         authentication = None
-        APIKey = APIKeys.query(APIKeys.api_key == API_key).fetch(limit=1)
+        APIKey = datastore.APIKeys.query(datastore.APIKeys.api_key == API_key).fetch(limit=1)
         if len(APIKey) == 1:
             authentication = APIKey[0]
 
@@ -204,7 +198,7 @@ class saveProvider(webapp2.RequestHandler):
         else:
             response['error'] = authentication['error']
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class deleteProvider(webapp2.RequestHandler):
     def post(self):
@@ -226,7 +220,7 @@ class deleteProvider(webapp2.RequestHandler):
         else:
             response['error'] = authentication['error']
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class getProviders(webapp2.RequestHandler):
     def get(self):
@@ -237,12 +231,13 @@ class getProviders(webapp2.RequestHandler):
         except:
             response['error'] = 'Unable to retrieve providers.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class initialize(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
-        adminAPIKey = APIKeys.get_or_insert('Admin')
+
+        adminAPIKey = datastore.APIKeys.get_or_insert('Admin')
         adminAPIKey.api_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
         adminAPIKey.api_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
         adminAPIKey.put()
@@ -252,7 +247,7 @@ class initialize(webapp2.RequestHandler):
         response['api_secret'] = adminAPIKey.api_secret
         response['success'] = 1
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 class SIL(webapp2.RequestHandler):
@@ -274,7 +269,7 @@ class SIL(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 class LBL(webapp2.RequestHandler):
@@ -297,7 +292,7 @@ class LBL(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address and an xpub key.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 class LRL(webapp2.RequestHandler):
@@ -320,7 +315,7 @@ class LRL(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address and an xpub key.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class LSL(webapp2.RequestHandler):
     def get(self):
@@ -342,7 +337,7 @@ class LSL(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address and an xpub key.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class LAL(webapp2.RequestHandler):
     def get(self):
@@ -364,7 +359,7 @@ class LAL(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address and an xpub key.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 class proportionalRandom(webapp2.RequestHandler):
@@ -400,7 +395,7 @@ class proportionalRandom(webapp2.RequestHandler):
         else:
             response['error'] = 'You must provide an address.'
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class randomFromBlock(webapp2.RequestHandler):
     def get(self):
@@ -415,7 +410,7 @@ class randomFromBlock(webapp2.RequestHandler):
 
         response = BlockRandom.Random().fromBlock(rngBlockHeight)
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 class proposal(webapp2.RequestHandler):
@@ -467,7 +462,7 @@ class proposal(webapp2.RequestHandler):
         response = blockVoter.getProposal()
 
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
 
 class results(webapp2.RequestHandler):
     def get(self):
@@ -524,7 +519,158 @@ class results(webapp2.RequestHandler):
 
         response = blockVoter.getResults(blockHeight)
 
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class getForwarders(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        response = HDForwarder.getForwarders()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class getForwarder(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        response = HDForwarder.HDForwarder(name).get()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class checkAddress(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        address = ''
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+        response = HDForwarder.HDForwarder(name).checkAddress(address)
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class saveForwarder(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+
+                settings = {}
+
+                if self.request.get('xpub'):
+                    settings['xpub'] = self.request.get('xpub')
+
+                if self.request.get('description', None) is not None:
+                    settings['description'] = self.request.get('description')
+
+                if self.request.get('creator', None) is not None:
+                    settings['creator'] = self.request.get('creator')
+
+                if self.request.get('creatorEmail', None) is not None:
+                    settings['creatorEmail'] = self.request.get('creatorEmail')
+
+                if self.request.get('minimumAmount'):
+                    try:
+                        settings['minimumAmount'] = int(self.request.get('minimumAmount'))
+                    except ValueError:
+                        response['error'] = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+
+                if self.request.get('youtube', None) is not None:
+                    settings['youtube'] = self.request.get('youtube')
+
+                if self.request.get('visibility'):
+                    settings['visibility'] = self.request.get('visibility')
+
+                if self.request.get('status'):
+                    settings['status'] = self.request.get('status')
+
+                if self.request.get('feePercent'):
+                    try:
+                        settings['feePercent'] = float(self.request.get('feePercent'))
+                    except ValueError:
+                        response['error'] = 'Incorrect feePercent'
+
+                if self.request.get('feeAddress', None) is not None:
+                    settings['feeAddress'] = self.request.get('feeAddress')
+
+
+
+                if self.request.get('confirmAmount'):
+                    try:
+                        settings['confirmAmount'] = int(self.request.get('confirmAmount'))
+                    except ValueError:
+                        response['error'] = 'confirmAmount must be a positive integer or equal to 0 (in Satoshis)'
+
+                if self.request.get('addressType'):
+                    settings['addressType'] = self.request.get('addressType')
+
+                if self.request.get('walletIndex'):
+                    try:
+                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                    except ValueError:
+                        response['error'] = 'walletIndex must be a positive integer'
+
+                if self.request.get('privateKey', None) is not None:
+                    settings['privateKey'] = self.request.get('privateKey')
+
+                response = HDForwarder.HDForwarder(name).saveForwarder(settings)
+
+            else:
+                response['error'] = 'Invalid parameters'
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class deleteForwarder(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+                response = HDForwarder.HDForwarder(name).deleteForwarder()
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class doForwarding(webapp2.RequestHandler):
+    def get(self):
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        HDForwarder.DoForwarding(name)
+
+        response = {'success': 1}
+        self.response.write(json.dumps(response, sort_keys=True))
+
 
 
 
@@ -549,9 +695,12 @@ app = webapp2.WSGIApplication([
     ('/random/block', randomFromBlock),
     ('/voter/proposal', proposal),
     ('/voter/results', results),
-
-
-
+    ('/forwarder/getForwarders', getForwarders),
+    ('/forwarder/getForwarder', getForwarder),
+    ('/forwarder/checkAddress', checkAddress),
+    ('/forwarder/saveForwarder', saveForwarder),
+    ('/forwarder/deleteForwarder', deleteForwarder),
+    ('/forwarder/doForwarding', doForwarding),
 
 ], debug=True)
 

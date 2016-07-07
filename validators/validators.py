@@ -38,3 +38,61 @@ def validXPUB(xpub):
         valid = True
 
     return valid
+
+def validDescription(description):
+    valid = False
+
+    if isinstance(description, (str, unicode)) and len(description) <= 250:
+        valid = True
+
+    return valid
+
+def validCreator(creator):
+    valid = False
+
+    if isinstance(creator, (str, unicode)) and len(creator) <= 50:
+        valid = True
+
+    return valid
+
+def validEmail(email):
+    valid = False
+    if re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        valid = True
+
+    return valid
+
+def validAmount(amount):
+    valid = False
+
+    if isinstance(amount, int) and amount >= 0:
+        valid = True
+
+    return valid
+
+
+def validPercentage(percentage):
+    valid = False
+
+    if isinstance(percentage, float) and percentage >= 0.0 and percentage <= 100.0:
+        valid = True
+
+    return valid
+
+
+def validYoutube(youtube):
+    valid = False
+
+    if isinstance(youtube, (str, unicode)) and len(youtube) <= 11:
+        valid = True
+
+    return valid
+
+
+def validPrivateKey(privKey):
+    valid = False
+
+    if isinstance(privKey, (str, unicode)) and len(privKey) > 0:
+        valid = True
+
+    return valid
