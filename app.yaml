@@ -92,6 +92,30 @@ handlers:
   script: BitcoinSpellbook.app
 
 
+- url: /distributer/getDistributers
+  script: BitcoinSpellbook.app
+
+- url: /distributer/getDistributer
+  script: BitcoinSpellbook.app
+
+- url: /distributer/checkAddress
+  script: BitcoinSpellbook.app
+
+- url: /distributer/saveDistributer
+  script: BitcoinSpellbook.app
+
+- url: /distributer/deleteDistributer
+  script: BitcoinSpellbook.app
+
+
+- url: /distributer/updateDistribution
+  script: BitcoinSpellbook.app
+
+- url: /distributer/doDistributing
+  script: BitcoinSpellbook.app
+
+
+
 - url: /
   script: BitcoinSpellbook.app
 

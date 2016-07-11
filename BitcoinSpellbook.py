@@ -26,6 +26,7 @@ import Blocklinker.Blocklinker as Blocklinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
 import HDForwarder.HDForwarder as HDForwarder
+import DistributeBTC.DistributeBTC as DistributeBTC
 
 import datastore.datastore as datastore
 
@@ -236,6 +237,8 @@ class getProviders(webapp2.RequestHandler):
 class initialize(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
+
+        datastore.Parameters.get_or_insert('DefaultConfig')
 
         adminAPIKey = datastore.APIKeys.get_or_insert('Admin')
         adminAPIKey.api_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
@@ -543,7 +546,7 @@ class getForwarder(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class checkAddress(webapp2.RequestHandler):
+class checkForwarderAddress(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
 
@@ -673,6 +676,221 @@ class doForwarding(webapp2.RequestHandler):
 
 
 
+class getDistributers(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        response = DistributeBTC.getDistributers()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class getDistributer(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        response = DistributeBTC.Distributer(name).get()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class checkDistributerAddress(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        address = ''
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+        response = DistributeBTC.Distributer(name).checkAddress(address)
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class saveDistributer(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+
+                settings = {}
+
+                if self.request.get('distributionSource') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
+                    settings['distributionSource'] = self.request.get('distributionSource')
+
+                if self.request.get('registrationAddress', None) is not None:
+                    settings['registrationAddress'] = self.request.get('registrationAddress')
+
+                if self.request.get('registrationXPUB', None) is not None:
+                    settings['registrationXPUB'] = self.request.get('registrationXPUB')
+
+                if self.request.get('registrationBlockHeight'):
+                    try:
+                        settings['registrationBlockHeight'] = int(self.request.get('registrationBlockHeight'))
+                    except ValueError:
+                        response['error'] = 'registrationBlockHeight must be a positive integer or equal to 0'
+
+
+                if self.request.get('distribution', None) is not None:
+                    settings['distribution'] = self.request.get('distribution')
+
+
+                if self.request.get('minimumAmount'):
+                    try:
+                        settings['minimumAmount'] = int(self.request.get('minimumAmount'))
+                    except ValueError:
+                        response['error'] = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+
+                if self.request.get('threshold'):
+                    try:
+                        settings['threshold'] = int(self.request.get('threshold'))
+                    except ValueError:
+                        response['error'] = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
+
+
+                if self.request.get('visibility'):
+                    settings['visibility'] = self.request.get('visibility')
+
+                if self.request.get('status'):
+                    settings['status'] = self.request.get('status')
+
+
+                if self.request.get('description', None) is not None:
+                    settings['description'] = self.request.get('description')
+
+                if self.request.get('creator', None) is not None:
+                    settings['creator'] = self.request.get('creator')
+
+                if self.request.get('creatorEmail', None) is not None:
+                    settings['creatorEmail'] = self.request.get('creatorEmail')
+
+
+
+                if self.request.get('youtube', None) is not None:
+                    settings['youtube'] = self.request.get('youtube')
+
+
+                if self.request.get('feePercent'):
+                    try:
+                        settings['feePercent'] = float(self.request.get('feePercent'))
+                    except ValueError:
+                        response['error'] = 'Incorrect feePercent'
+
+                if self.request.get('feeAddress', None) is not None:
+                    settings['feeAddress'] = self.request.get('feeAddress')
+
+
+                if self.request.get('maxTransactionFee'):
+                    try:
+                        settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
+                    except ValueError:
+                        response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+
+
+                if self.request.get('addressType'):
+                    settings['addressType'] = self.request.get('addressType')
+
+                if self.request.get('walletIndex'):
+                    try:
+                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                    except ValueError:
+                        response['error'] = 'walletIndex must be a positive integer'
+
+                if self.request.get('privateKey', None) is not None:
+                    settings['privateKey'] = self.request.get('privateKey')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                response = DistributeBTC.Distributer(name).saveDistributer(settings)
+
+            else:
+                response['error'] = 'Invalid parameters'
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class deleteDistributer(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+                response = DistributeBTC.Distributer(name).deleteDistributer()
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class updateDistribution(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+                response = DistributeBTC.Distributer(name).updateDistribution()
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+
+
+class doDistributing(webapp2.RequestHandler):
+    def get(self):
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        DistributeBTC.DoDistributing(name)
+
+        response = {'success': 1}
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+
+
+
 
 app = webapp2.WSGIApplication([
     ('/', mainPage),
@@ -697,10 +915,19 @@ app = webapp2.WSGIApplication([
     ('/voter/results', results),
     ('/forwarder/getForwarders', getForwarders),
     ('/forwarder/getForwarder', getForwarder),
-    ('/forwarder/checkAddress', checkAddress),
+    ('/forwarder/checkAddress', checkForwarderAddress),
     ('/forwarder/saveForwarder', saveForwarder),
     ('/forwarder/deleteForwarder', deleteForwarder),
     ('/forwarder/doForwarding', doForwarding),
+    ('/distributer/getDistributers', getDistributers),
+    ('/distributer/getDistributer', getDistributer),
+    ('/distributer/checkAddress', checkDistributerAddress),
+    ('/distributer/saveDistributer', saveDistributer),
+    ('/distributer/deleteDistributer', deleteDistributer),
+    ('/distributer/updateDistribution', updateDistribution),
+    ('/distributer/doDistributing', doDistributing),
+
+
 
 ], debug=True)
 

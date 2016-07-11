@@ -71,6 +71,15 @@ def validAmount(amount):
     return valid
 
 
+def validBlockHeight(blockHeight):
+    valid = False
+
+    if isinstance(blockHeight, int) and blockHeight >= 0:
+        valid = True
+
+    return valid
+
+
 def validPercentage(percentage):
     valid = False
 
@@ -96,3 +105,26 @@ def validPrivateKey(privKey):
         valid = True
 
     return valid
+
+
+def validDistribution(distribution):
+    valid = False
+
+    if isinstance(distribution, list):
+        if len(distribution) >= 1:
+            for recipient in distribution:
+                if isinstance(recipient, list):
+                    if len(recipient) >= 2:
+                        if (isinstance(recipient[0], str) or isinstance(recipient[0], unicode)) and isinstance(recipient[1], int):
+                            valid = True
+                        else:
+                            valid = False
+                            break
+                    else:
+                        valid = False
+                        break
+
+
+    return valid
+
+
