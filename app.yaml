@@ -115,6 +115,30 @@ handlers:
   script: BitcoinSpellbook.app
 
 
+- url: /trigger/getTriggers
+  script: BitcoinSpellbook.app
+
+- url: /trigger/getTrigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/saveTrigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/deleteTrigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/saveAction
+  script: BitcoinSpellbook.app
+
+- url: /trigger/deleteAction
+  script: BitcoinSpellbook.app
+
+
+- url: /trigger/checkTriggers
+  script: BitcoinSpellbook.app
+
+
+
 
 - url: /
   script: BitcoinSpellbook.app

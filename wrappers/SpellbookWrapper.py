@@ -7,6 +7,7 @@ from BlockRandomWrapper import BlockRandomWrapper
 from BlockVoterWrapper import BlockVoterWrapper
 from HDForwarderWrapper import HDForwarderWrapper
 from DistributeBTCWrapper import DistributeBTCWrapper
+from BlockTriggerWrapper import BlockTriggerWrapper
 
 
 
@@ -35,3 +36,6 @@ class SpellbookWrapper():
 
     def DistributeBTC(self):
         return DistributeBTCWrapper(self.url)
+
+    def BlockTrigger(self):
+        return BlockTriggerWrapper(self.url)

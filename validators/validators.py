@@ -47,6 +47,25 @@ def validDescription(description):
 
     return valid
 
+def validText(text):
+    valid = False
+
+    if isinstance(text, (str, unicode)):
+        valid = True
+
+    return valid
+
+
+
+def validURL(url):
+    valid = False
+
+    if isinstance(url, (str, unicode)):
+        valid = True
+
+    return valid
+
+
 def validCreator(creator):
     valid = False
 

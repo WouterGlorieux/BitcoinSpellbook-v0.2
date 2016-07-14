@@ -27,6 +27,7 @@ import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
 import HDForwarder.HDForwarder as HDForwarder
 import DistributeBTC.DistributeBTC as DistributeBTC
+import BlockTrigger.BlockTrigger as BlockTrigger
 
 import datastore.datastore as datastore
 
@@ -814,18 +815,6 @@ class saveDistributer(webapp2.RequestHandler):
                     settings['privateKey'] = self.request.get('privateKey')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
                 response = DistributeBTC.Distributer(name).saveDistributer(settings)
 
             else:
@@ -891,6 +880,213 @@ class doDistributing(webapp2.RequestHandler):
 
 
 
+class getTriggers(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        response = BlockTrigger.getTriggers()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class getTrigger(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        response = BlockTrigger.BlockTrigger(name).get()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class saveTrigger(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+
+                settings = {}
+
+                if self.request.get('triggerType'):
+                    settings['triggerType'] = self.request.get('triggerType')
+
+
+                if self.request.get('address', None) is not None:
+                    settings['address'] = self.request.get('address')
+
+                if self.request.get('amount'):
+                    try:
+                        settings['amount'] = int(self.request.get('amount'))
+                    except ValueError:
+                        response['error'] = 'amount must be a positive integer or equal to 0 (in Satoshis)'
+
+                if self.request.get('confirmations'):
+                    try:
+                        settings['confirmations'] = int(self.request.get('confirmations'))
+                    except ValueError:
+                        response['error'] = 'confirmations must be a positive integer or equal to 0'
+
+                if self.request.get('triggered') == 'True':
+                    settings['triggered'] = True
+                elif self.request.get('triggered') == 'False':
+                    settings['triggered'] = False
+
+
+                if self.request.get('description', None) is not None:
+                    settings['description'] = self.request.get('description')
+
+                if self.request.get('creator', None) is not None:
+                    settings['creator'] = self.request.get('creator')
+
+                if self.request.get('creatorEmail', None) is not None:
+                    settings['creatorEmail'] = self.request.get('creatorEmail')
+
+
+                if self.request.get('youtube', None) is not None:
+                    settings['youtube'] = self.request.get('youtube')
+
+                if self.request.get('visibility'):
+                    settings['visibility'] = self.request.get('visibility')
+
+                if self.request.get('status'):
+                    settings['status'] = self.request.get('status')
+
+
+                response = BlockTrigger.BlockTrigger(name).saveTrigger(settings)
+
+            else:
+                response['error'] = 'Invalid parameters'
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class deleteTrigger(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+                response = BlockTrigger.BlockTrigger(name).deleteTrigger()
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class saveAction(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('triggerName') and self.request.get('actionName'):
+                triggerName = self.request.get('triggerName')
+                actionName = self.request.get('actionName')
+
+                settings = {}
+                if self.request.get('actionType'):
+                    settings['actionType'] = self.request.get('actionType')
+
+                if self.request.get('description', None) is not None:
+                    settings['description'] = self.request.get('description')
+
+                if self.request.get('revealText', None) is not None:
+                    settings['revealText'] = self.request.get('revealText')
+
+                if self.request.get('revealLinkText', None) is not None:
+                    settings['revealLinkText'] = self.request.get('revealLinkText')
+
+                if self.request.get('revealLinkURL', None) is not None:
+                    settings['revealLinkURL'] = self.request.get('revealLinkURL')
+
+                if self.request.get('mailTo', None) is not None:
+                    settings['mailTo'] = self.request.get('mailTo')
+
+                if self.request.get('mailSubject', None) is not None:
+                    settings['mailSubject'] = self.request.get('mailSubject')
+
+                if self.request.get('mailBody', None) is not None:
+                    settings['mailBody'] = self.request.get('mailBody')
+
+                if self.request.get('mailSent') == 'True':
+                    settings['mailSent'] = True
+                elif self.request.get('mailSent') == 'False':
+                    settings['mailSent'] = False
+
+                if self.request.get('webhook', None) is not None:
+                    settings['webhook'] = self.request.get('webhook')
+
+
+                response = BlockTrigger.BlockTrigger(triggerName).saveAction(actionName, settings)
+
+            else:
+                response['error'] = 'Invalid parameters'
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+class deleteAction(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('triggerName') and self.request.get('actionName'):
+                triggerName = self.request.get('triggerName')
+                actionName = self.request.get('actionName')
+
+                response = BlockTrigger.BlockTrigger(triggerName).deleteAction(actionName)
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class checkTriggers(webapp2.RequestHandler):
+    def get(self):
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        BlockTrigger.CheckTriggers(name)
+
+        response = {'success': 1}
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+
+
+
+
+
+
+
 
 app = webapp2.WSGIApplication([
     ('/', mainPage),
@@ -926,7 +1122,13 @@ app = webapp2.WSGIApplication([
     ('/distributer/deleteDistributer', deleteDistributer),
     ('/distributer/updateDistribution', updateDistribution),
     ('/distributer/doDistributing', doDistributing),
-
+    ('/trigger/getTriggers', getTriggers),
+    ('/trigger/getTrigger', getTrigger),
+    ('/trigger/saveTrigger', saveTrigger),
+    ('/trigger/deleteTrigger', deleteTrigger),
+    ('/trigger/saveAction', saveAction),
+    ('/trigger/deleteAction', deleteAction),
+    ('/trigger/checkTriggers', checkTriggers),
 
 
 ], debug=True)
