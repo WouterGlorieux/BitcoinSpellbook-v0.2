@@ -15,12 +15,13 @@ API_URL = 'https://blockexplorer.com/api'
 class API:
     def __init__(self, url=API_URL):
         self.url = url
+        self.error = ''
         pass
 
     def getTXS(self, address):
         response = {'success': 0}
         txs = []
-        LIMIT = 100 #number of tx given by insight is 100
+        LIMIT = 10 #number of tx given by insight is 10
 
         latestBlockHeight = -1
         try:
@@ -70,7 +71,7 @@ class API:
                 tx_out = {}
                 tx_out['address'] = out['scriptPubKey']['addresses'][0]
                 tx_out['value'] = int(Decimal(out['value']) * Decimal(1e8))
-                if 'spentTxId' in out:
+                if 'spentTxId' in out and out['spentTxId'] != None:
                     tx_out['spent'] = True
                 else:
                     tx_out['spent'] = False
@@ -114,7 +115,7 @@ class API:
                 latestBlock['time'] = data['block']['time']
                 latestBlock['merkleroot'] = data['block']['merkleroot']
                 latestBlock['size'] = data['block']['size']
-            response = {'success': 1, 'latestBlock': latestBlock}
+                response = {'success': 1, 'latestBlock': latestBlock}
 
         return response
 
@@ -176,17 +177,25 @@ class API:
                     txs = self.getTXS(address)
                     received = 0
                     sent = 0
-                    for tx in txs['TXS']:
-                        if tx['receiving'] == True and tx['confirmations'] > 0:
-                            received += tx['receivedValue']
+                    if 'success' in txs and txs['success'] == 1:
+                        for tx in txs['TXS']:
+                            if tx['receiving'] == True and tx['confirmations'] > 0:
+                                received += tx['receivedValue']
 
-                        elif tx['receiving'] == False and tx['confirmations'] > 0:
-                            sent += tx['sentValue']
+                            elif tx['receiving'] == False and tx['confirmations'] > 0:
+                                sent += tx['sentValue']
+
+                        balances[data['addrStr']]['received'] = received
+                        balances[data['addrStr']]['sent'] = sent
 
 
-                    balances[data['addrStr']]['received'] = received
-                    balances[data['addrStr']]['sent'] = sent
-                    response = {'success': 1, 'balances': balances}
+                    else:
+                        self.error = txs['error']
+
+            if self.error == '':
+                response = {'success': 1, 'balances': balances}
+            else:
+                response['error'] = self.error
 
         return response
 
@@ -260,7 +269,7 @@ class API:
                 utxo['block_height'] = latestBlockHeight - utxo['confirmations'] +1
 
             utxo['output'] = data[i]['txid'] + ":" + str(data[i]['vout'])
-            utxo['value'] = int(data[i]['amount'] * 1e8)
+            utxo['value'] = int(data[i]['satoshis'])
 
             if utxo['confirmations'] >= confirmations:
                 UTXOs.append(utxo)
