@@ -149,6 +149,7 @@ class API:
     #(Multiple addresses divided by |)
     def getBalances(self, addresses):
         response = {'success': 0}
+        self.error = ''
         data = {}
         balances = {}
         url = 'https://blockchain.info/nl/multiaddr?active=' + addresses
@@ -157,7 +158,7 @@ class API:
             data = json.loads(ret.read())
         except:
             logging.warning('Blockchain.info: unable to retrieve data for addresses ' + addresses)
-            response = {'success': 0, 'error': 'unable to retrieve data for addresses ' + addresses}
+            self.error = 'Unable to retrieve data for addresses ' + addresses
 
 
 
@@ -169,7 +170,37 @@ class API:
                 balances[address['address']]['received'] = address['total_received']
                 balances[address['address']]['sent'] = address['total_sent']
 
+        #reverse unconfirmed transactios for security reasons
+        if 'txs' in data:
+            for i in range(0, len(data['txs'])):
+                tx = data['txs'][i]
+                if 'block_height' not in tx:
+                    for address in addresses.split('|'):
+                        sendingTX = False
+                        receivingTX = False
+
+                        for j in range(0, len(tx['inputs'])):
+                            if tx['inputs'][j]['prev_out']['addr'] == address:
+                                sendingTX = True
+
+                        if sendingTX == True:
+                            balances[address]['sent'] += tx['result']
+                            balances[address]['balance'] -= tx['result']
+                        else:
+                            for j in range(0, len(tx['out'])):
+                                if tx['out'][j]['addr'] == address:
+                                    receivingTX = True
+
+                            if receivingTX == True:
+                                balances[address]['received'] -= tx['result']
+                                balances[address]['balance'] -= tx['result']
+
+
+
+        if self.error == '':
             response = {'success': 1, 'balances': balances}
+        else:
+            response['error'] = self.error
 
         return response
 
