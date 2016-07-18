@@ -194,6 +194,7 @@ class API:
                     logging.warning('Blocktrail.com: Unable to retrieve UTXOs')
                     response['error'] = 'Unable to retrieve UTXOs'
 
+                unconfirmedCounter = 0
                 for page in range(1, pages+1):
 
                     for i in range(0, len(data)):
@@ -212,6 +213,8 @@ class API:
 
                         if utxo['confirmations'] >= confirmations:
                             UTXOs.append(utxo)
+                        else:
+                            unconfirmedCounter += 1
 
 
                     if page < pages:
@@ -226,7 +229,7 @@ class API:
                             response['error'] = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
 
 
-                if nUTXO != len(UTXOs)-counter:
+                if nUTXO != len(UTXOs)-counter + unconfirmedCounter:
                     logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO))
                     response['error'] = 'Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO)
                 else:
