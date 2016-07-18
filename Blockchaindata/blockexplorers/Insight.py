@@ -28,16 +28,16 @@ class API:
             latestBlock = self.getLatestBlock()
             latestBlockHeight = latestBlock['latestBlock']['height']
         except:
-            logging.warning('Insight: Unable to retrieve latest block')
-            response = {'success': 0, 'error': 'Unable to retrieve latest block'}
+            logging.error('Insight: Unable to retrieve latest block')
+            self.error = 'Unable to retrieve latest block'
 
         url = self.url + '/addrs/' + address + '/txs'
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.warning('Insight: Unable to retrieve transactions')
-            response = {'success': 0, 'error': 'Unable to retrieve transactions'}
+            logging.error('Insight: Unable to retrieve transactions')
+            self.error = 'Unable to retrieve transactions'
 
         if 'totalItems' in data:
             transactions = data['items']
@@ -52,8 +52,8 @@ class API:
                         data = json.loads(ret.read())
                         transactions += data['items']
                     except:
-                        logging.warning('Insight: Unable to retrieve next page')
-                        response = {'success': 0, 'error': 'Unable to retrieve next page'}
+                        logging.error('Insight: Unable to retrieve next page')
+                        self.error = 'Unable to retrieve next page'
 
         for transaction in transactions:
 
@@ -86,10 +86,14 @@ class API:
             txs.insert(0, tx.toDict(address))
 
         if nTx != len(txs):
-            logging.warning('Insight: Warning: not all transactions are retreived! ' + str(len(txs)) + ' of ' +  str(nTx))
-            response = {'success': 0, 'error': 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx)}
+            logging.error('Insight: Warning: not all transactions are retreived! ' + str(len(txs)) + ' of ' +  str(nTx))
+            self.error = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx)
+
+        if self.error == '':
+            response['success'] = 1
+            response['TXS'] = txs
         else:
-            response = {'success': 1, 'TXS': txs}
+            response['error'] = self.error
 
         return response
 
@@ -102,8 +106,8 @@ class API:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.warning('Insight: Unable to retrieve latest block')
-            response = {'success': 0, 'error': 'Unable to retrieve latest block'}
+            logging.error('Insight: Unable to retrieve latest block')
+            self.error = 'Unable to retrieve latest block'
 
         if 'info' in data:
             latestBlock['height'] = data['info']['blocks']
@@ -112,14 +116,24 @@ class API:
                 data = self.getBlock(latestBlock['height'])
             except:
                 logging.warning('Insight: Unable to retrieve block')
-                response = {'success': 0, 'error': 'Unable to retrieve block'}
+                self.error = 'Unable to retrieve block'
 
             if 'success' in data and data['success'] == 1:
                 latestBlock['hash'] = data['block']['hash']
                 latestBlock['time'] = data['block']['time']
                 latestBlock['merkleroot'] = data['block']['merkleroot']
                 latestBlock['size'] = data['block']['size']
-                response = {'success': 1, 'latestBlock': latestBlock}
+            else:
+                self.error = 'Unable to retrieve block'
+        else:
+            self.error = 'Could not find info on latest block'
+
+
+        if self.error == '':
+            response['success'] = 1
+            response['latestBlock'] = latestBlock
+        else:
+            response['error'] = self.error
 
         return response
 
@@ -132,8 +146,8 @@ class API:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.warning('Insight: unable to retrieve block ' + str(height))
-            response = {'success': 0, 'error': 'unable to retrieve block ' + str(height)}
+            logging.error('Insight: unable to retrieve block ' + str(height))
+            self.eror = 'unable to retrieve block ' + str(height)
 
 
         if 'blockHash' in data:
@@ -145,14 +159,23 @@ class API:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 data = json.loads(ret.read())
             except:
-                logging.warning('Insight: Unable to retrieve block ' + block['hash'])
-                response = {'success': 0, 'error': 'Unable to retrieve block ' + block['hash']}
+                logging.error('Insight: Unable to retrieve block ' + block['hash'])
+                self.error ='Unable to retrieve block ' + block['hash']
 
             if 'hash' in data and data['hash'] == block['hash']:
                 block['time'] = data['time']
                 block['merkleroot'] = data['merkleroot']
                 block['size'] = data['size']
-            response = {'success': 1, 'block': block}
+        else:
+            self.error = 'Unable to retrieve block '+ str(height)
+
+
+        if self.error == '':
+            response['success'] = 1
+            response['block'] = block
+        else:
+            response['error'] = self.error
+
 
         return response
 
@@ -160,7 +183,7 @@ class API:
         response = {'success': 0}
 
         if len(addresses.split("|")) > 10:
-            response = {'success': 0, 'error': 'Max 10 addresses, api function for multiple address lookup not available at ' + self.url}
+            self.error = 'Max 10 addresses, api function for multiple address lookup not available at ' + self.url
         else:
             balances = {}
             for address in addresses.split("|"):
@@ -171,8 +194,8 @@ class API:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     data = json.loads(ret.read())
                 except:
-                    logging.warning('Insight: Unable to retrieve data for addresses ' + addresses)
-                    response = {'success': 0, 'error': 'Unable to retrieve data for addresses ' + addresses}
+                    logging.error('Insight: Unable to retrieve data for addresses ' + addresses)
+                    self.error = 'Unable to retrieve data for addresses ' + addresses
 
                 if 'addrStr' in data and data['addrStr'] == address:
                     balances[data['addrStr']] = {}
@@ -196,10 +219,11 @@ class API:
                     else:
                         self.error = txs['error']
 
-            if self.error == '':
-                response = {'success': 1, 'balances': balances}
-            else:
-                response['error'] = self.error
+        if self.error == '':
+            response['success'] = 1
+            response['balances'] = balances
+        else:
+            response['error'] = self.error
 
         return response
 
@@ -212,8 +236,8 @@ class API:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.warning('Insight: Unable to retrieve prime input address of tx ' + txid)
-            response = {'success': 0, 'error': 'Unable to retrieve prime input address of tx ' + txid}
+            logging.error('Insight: Unable to retrieve prime input address of tx ' + txid)
+            self.error ='Unable to retrieve prime input address of tx ' + txid
 
 
         tx_inputs = []
@@ -228,7 +252,13 @@ class API:
             if len(inputAddresses) > 0:
                 primeInputAddress = sorted(inputAddresses)[0]
 
-            response = {'success': 1, 'PrimeInputAddress': primeInputAddress}
+
+        if self.error == '':
+            response['success'] = 1
+            response['PrimeInputAddress'] = primeInputAddress
+        else:
+            response['error'] = self.error
+
 
         return response
 
@@ -242,8 +272,8 @@ class API:
             latestBlock = self.getLatestBlock()
             latestBlockHeight = latestBlock['latestBlock']['height']
         except:
-            logging.warning('Insight: Unable to retrieve latest block')
-            response = {'success': 0, 'error': 'Unable to retrieve latest block'}
+            logging.error('Insight: Unable to retrieve latest block')
+            self.error = 'Unable to retrieve latest block'
 
         UTXOs = []
         url = self.url +  '/addrs/' + addresses + '/utxo'
@@ -252,8 +282,8 @@ class API:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.warning('Insight: Unable to retrieve utxos')
-            response = {'success': 0, 'error': 'Unable to retrieve utxos'}
+            logging.error('Insight: Unable to retrieve utxos')
+            self.error = 'Unable to retrieve utxos'
 
         for i in range(0, len(data)):
             utxo = {}
@@ -265,8 +295,8 @@ class API:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 tx = json.loads(ret.read())
             except:
-                logging.warning('Insight: Unable to retrieve tx' + data[i]['txid'])
-                response = {'success': 0, 'error': 'Unable to retrieve tx' + data[i]['txid']}
+                logging.error('Insight: Unable to retrieve tx' + data[i]['txid'])
+                self.error = 'Unable to retrieve tx' + data[i]['txid']
 
             if 'txid' in tx and tx['txid'] == data[i]['txid']:
                 utxo['confirmations'] = int(tx['confirmations'])
@@ -278,5 +308,10 @@ class API:
             if utxo['confirmations'] >= confirmations:
                 UTXOs.append(utxo)
 
-            response = {'success': 1, 'UTXOs': UTXOs}
+        if self.error == '':
+            response['success'] = 1
+            response['UTXOs'] = UTXOs
+        else:
+            response['error'] = self.error
+
         return response
