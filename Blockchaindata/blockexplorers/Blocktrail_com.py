@@ -17,6 +17,7 @@ class API:
 
 
     def getTXS(self, address):
+        self.error = ''
         LIMIT = 200 #max 200 for Blocktrail.com
         pages = 0
         response = {'success': 0}
@@ -36,7 +37,7 @@ class API:
             data = []
             nTx = 0
             logging.warning('Blocktrail.com: unable to retrieve transactions')
-            response['error'] = 'Unable to retrieve transactions'
+            self.error = 'Unable to retrieve transactions'
 
         txs = []
 
@@ -76,13 +77,15 @@ class API:
                 except:
                     data = []
                     logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page))
-                    response['error'] = 'Unable to retrieve page ' + str(page)
+                    self.error = 'Unable to retrieve page ' + str(page)
 
         if nTx != len(txs):
             logging.warning('Blocktrail.com: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx))
             response['error'] = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx)
-        else:
+        elif self.error == '':
             response = {'success': 1, 'TXS': txs}
+        else:
+            response['error'] = self.error
 
         return response
 
