@@ -12,12 +12,12 @@ API_VERSION = 'v1'
 
 class API:
     def __init__(self, key='', secret=''):
+        self.error = ''
         self.key = key
         self.secret = secret
 
 
     def getTXS(self, address):
-        self.error = ''
         LIMIT = 200 #max 200 for Blocktrail.com
         pages = 0
         response = {'success': 0}
@@ -148,7 +148,7 @@ class API:
                     data = json.loads(ret.read())
                 except:
                     logging.warning('Blocktrail.com: Unable to retrieve data for address ' + address)
-                    response['error'] = 'Unable to retrieve data for address ' + address
+                    self.error = 'Unable to retrieve data for address ' + address
 
                 response['success'] = 0
                 if 'address' in data:
@@ -156,7 +156,13 @@ class API:
                     balances[data['address']]['balance'] = data['balance']
                     balances[data['address']]['received'] = data['received']
                     balances[data['address']]['sent'] = data['sent']
-                    response = {'success': 1, 'balances': balances}
+
+
+        if self.error == '':
+            response['success'] = 1
+            response['balances'] = balances
+        else:
+            response['error'] = self.error
 
         return response
 
@@ -164,7 +170,7 @@ class API:
         UTXOs = []
         response = {'success': 0}
         if len(addresses.split("|")) > 10:
-            response['error'] = 'Max 10 addresses, api function for multiple address utxo lookup not available at ' + API_URL
+            self.error = 'Max 10 addresses, api function for multiple address utxo lookup not available at ' + API_URL
         else:
 
             LIMIT = 200
@@ -173,7 +179,7 @@ class API:
                 latestBlock = self.getLatestBlock()['latestBlock']['height']
             except:
                 logging.warning('Blocktrail.com: Unable to retrieve latest block')
-                response['error'] = 'Unable to retrieve latest block'
+                self.error = 'Unable to retrieve latest block'
 
             counter = 0
             for address in addresses.split('|'):
@@ -195,7 +201,7 @@ class API:
                 except:
                     data = []
                     logging.warning('Blocktrail.com: Unable to retrieve UTXOs')
-                    response['error'] = 'Unable to retrieve UTXOs'
+                    self.error = 'Unable to retrieve UTXOs'
 
                 unconfirmedCounter = 0
                 for page in range(1, pages+1):
@@ -229,15 +235,21 @@ class API:
                         except:
                             data = []
                             logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page) + ' of UTXOs')
-                            response['error'] = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
+                            self.error = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
 
 
                 if nUTXO != len(UTXOs)-counter + unconfirmedCounter:
                     logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO))
-                    response['error'] = 'Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO)
+                    self.error = 'Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO)
                 else:
                     counter += nUTXO
-                    response = {'success': 1, 'UTXOs': UTXOs}
+
+
+        if self.error == '':
+            response['success'] = 1
+            response['UTXOs'] = UTXOs
+        else:
+            response['error'] = self.error
 
 
         return response
