@@ -60,7 +60,11 @@ class API:
             tx = TX.TX()
             tx.txid = transaction['txid']
             tx.confirmations = transaction['confirmations']
-            tx.blockHeight = latestBlockHeight - tx.confirmations + 1
+            if transaction['confirmations'] >= 1:
+                tx.blockHeight = latestBlockHeight - tx.confirmations + 1
+            else:
+                tx.blockHeight = None
+
             for input in transaction['vin']:
                 tx_in = {}
                 tx_in['address'] = input['addr']
