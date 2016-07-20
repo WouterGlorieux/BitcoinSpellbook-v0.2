@@ -8,7 +8,7 @@ import Blockchaindata.Blockchaindata as blockchaindata
 from Blocklinker import Blocklinker as Blocklinker
 
 import datastore.datastore as datastore
-import TxForge.TxForge as TxForge
+import TxFactory.TxFactory as TxFactory
 
 import time
 import bitcoin
@@ -331,7 +331,10 @@ class DoForwarding():
                         outputs = []
                         outputs.append({'address': to_addresses[0], 'value': amounts[0]})
                         logging.info("Returning " + str(amounts[0]) + " to " + to_addresses[0] + " transaction fee: " + str(TRANSACTION_FEE))
-                        success = TxForge.sendCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                        tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                        if tx != None:
+                           success = TxFactory.sendTransaction(tx)
+
                     else:
                         logging.error("Insufficient amount to send, please remove UTXO manually as soon as possible.")
 
@@ -362,7 +365,9 @@ class DoForwarding():
                         for i in range(0, len(amounts)):
                             outputs.append({'address': to_addresses[i], 'value': amounts[i]})
 
-                        success = TxForge.sendCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                        tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                        if tx != None:
+                           success = TxFactory.sendTransaction(tx)
                     else:
                         logging.error("Not enough balance left to send Transaction")
 

@@ -10,7 +10,7 @@ from SimplifiedInputsList import SimplifiedInputsList as SimplifiedInputsList
 
 
 import datastore.datastore as datastore
-import TxForge.TxForge as TxForge
+import TxFactory.TxFactory as TxFactory
 
 import time
 import bitcoin
@@ -425,7 +425,9 @@ class DoDistributing():
 
                     totalFee = totalInputValue - totalOutputValue
                     logging.info("Sending " + str(totalInputValue) + ' Satoshis to ' + str(len(optimalOutputs)) + ' recipients with a total fee of ' + str(totalFee))
-                    success = TxForge.sendCustomTransaction(privKeys, UTXOs, optimalOutputs, totalFee)
+                    tx = TxFactory.makeCustomTransaction(privKeys, UTXOs, optimalOutputs, totalFee)
+                    if tx != None:
+                        TxFactory.sendTransaction(tx)
                 else:
                     logging.error(self.error)
 
@@ -441,6 +443,7 @@ class DoDistributing():
             else:
                 self.error = 'Invalid distribution: ' + str(distribution)
 
+        return success
 
 
     def optimalOutputs(self, amount, distribution, distributer):
