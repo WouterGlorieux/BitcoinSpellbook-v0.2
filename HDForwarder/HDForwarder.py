@@ -282,13 +282,6 @@ class DoForwarding():
         else:
             self.error = 'Unable to retrieve UTXOs'
 
-        linker = Blocklinker.Blocklinker(forwarder.address, forwarder.xpub)
-        LAL_data = linker.LAL()
-        if 'success' in LAL_data and LAL_data['success'] == 1:
-            LAL = LAL_data['LAL']
-        else:
-            self.error = 'Unable to retrieve LAL for address ' + forwarder.address
-
 
         for UTXO in UTXOs:
             to_addresses = []
@@ -297,84 +290,94 @@ class DoForwarding():
             primeInputAddress_data = blockchaindata.primeInputAddress(UTXO['output'].split(":")[0])
             if 'success' in primeInputAddress_data and primeInputAddress_data['success'] == 1:
                 primeInputAddress = primeInputAddress_data['PrimeInputAddress']
+                if primeInputAddress != forwarder.address:
+
+                    linker = Blocklinker.Blocklinker(forwarder.address, forwarder.xpub)
+                    LAL_data = linker.LAL()
+                    if 'success' in LAL_data and LAL_data['success'] == 1:
+                        LAL = LAL_data['LAL']
+                    else:
+                        self.error = 'Unable to retrieve LAL for address ' + forwarder.address
+
+                    for i in range(0, len(LAL)):
+                        if LAL[i][0] == primeInputAddress:
+                            to_addresses.append(LAL[i][1])
+                            amounts.append(UTXO['value'])
+
+                    logging.info(forwarder.key.id() + ' : Starting forward from address '+ primeInputAddress + ', value: ' + str(amounts[0]) + ' Satoshis')
 
 
-                for i in range(0, len(LAL)):
-                    if LAL[i][0] == primeInputAddress:
-                        to_addresses.append(LAL[i][1])
-                        amounts.append(UTXO['value'])
-
-                logging.info(forwarder.key.id() + ' : Starting forward from address '+ primeInputAddress + ', value: ' + str(amounts[0]) + ' Satoshis')
-
-
-                privKeys = {}
-                if forwarder.addressType == 'PrivKey':
-                    privKeys = {forwarder.address: forwarder.privateKey}
-                elif forwarder.addressType == 'BIP44':
-                    parameters = datastore.Parameters.get_or_insert('DefaultConfig')
-                    if parameters and parameters.HDForwarder_walletseed != '' and parameters.HDForwarder_walletseed != None:
-                        xprivKeys = BIP44.getXPRIVKeys(parameters.HDForwarder_walletseed, "", 1)
-                        privKeys = BIP44.getPrivKey(xprivKeys[0], forwarder.walletIndex)
+                    privKeys = {}
+                    if forwarder.addressType == 'PrivKey':
+                        privKeys = {forwarder.address: forwarder.privateKey}
+                    elif forwarder.addressType == 'BIP44':
+                        parameters = datastore.Parameters.get_or_insert('DefaultConfig')
+                        if parameters and parameters.HDForwarder_walletseed != '' and parameters.HDForwarder_walletseed != None:
+                            xprivKeys = BIP44.getXPRIVKeys(parameters.HDForwarder_walletseed, "", 1)
+                            privKeys = BIP44.getPrivKey(xprivKeys[0], forwarder.walletIndex)
 
 
 
 
-                if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount+TRANSACTION_FEE:
-                    logging.warning(str(amounts[0]) + " is below minimum of " + str(forwarder.minimumAmount) + " + transaction fee of " + str(TRANSACTION_FEE) + "! returning btc to sender")
-                    to_addresses = [primeInputAddress]
+                    if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount+TRANSACTION_FEE:
+                        logging.warning(str(amounts[0]) + " is below minimum of " + str(forwarder.minimumAmount) + " + transaction fee of " + str(TRANSACTION_FEE) + "! returning btc to sender")
+                        to_addresses = [primeInputAddress]
 
-                    #if there is enough btc, subtract network fee, otherwise log a warning
-                    if amounts[0] > TRANSACTION_FEE:
-                        #subtract network fee in satoshis from first amount
+                        #if there is enough btc, subtract network fee, otherwise log a warning
+                        if amounts[0] > TRANSACTION_FEE:
+                            #subtract network fee in satoshis from first amount
+                            amounts[0] = amounts[0] - TRANSACTION_FEE
+
+                            outputs = []
+                            outputs.append({'address': to_addresses[0], 'value': amounts[0]})
+                            logging.info("Returning " + str(amounts[0]) + " to " + to_addresses[0] + " transaction fee: " + str(TRANSACTION_FEE))
+                            tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                            if tx != None:
+                               success = TxFactory.sendTransaction(tx)
+
+                        else:
+                            logging.error("Insufficient amount to send, please remove UTXO manually as soon as possible.")
+
+
+
+                    elif len(to_addresses) > 0:
+                        if forwarder.feePercent > 0.0 and forwarder.feeAddress != '':
+                            fee = int(amounts[0] * forwarder.feePercent/100)
+                            amounts = [amounts[0] - fee, fee]
+                            to_addresses.append(forwarder.feeAddress)
+                            logging.info("Forwarding Fee: " + str(amounts[1]) + " -> " + str(to_addresses[1]))
+
+                        if forwarder.confirmAmount > 0:
+                            amounts[0] -= forwarder.confirmAmount
+                            amounts.append(forwarder.confirmAmount)
+                            to_addresses.append(primeInputAddress)
+                            logging.info("Origin: " + str(forwarder.confirmAmount) + " -> " + primeInputAddress)
+
+
+                        #subtract transaction fee in satoshis from first amount
                         amounts[0] = amounts[0] - TRANSACTION_FEE
 
-                        outputs = []
-                        outputs.append({'address': to_addresses[0], 'value': amounts[0]})
-                        logging.info("Returning " + str(amounts[0]) + " to " + to_addresses[0] + " transaction fee: " + str(TRANSACTION_FEE))
-                        tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
-                        if tx != None:
-                           success = TxFactory.sendTransaction(tx)
+                        logging.info("Destination: " + str(amounts[0]) + " -> " + to_addresses[0])
+                        logging.info("Transaction fee: " + str(TRANSACTION_FEE))
 
-                    else:
-                        logging.error("Insufficient amount to send, please remove UTXO manually as soon as possible.")
+                        if amounts[0] > 0:
+                            outputs = []
+                            for i in range(0, len(amounts)):
+                                outputs.append({'address': to_addresses[i], 'value': amounts[i]})
 
-
-
-                elif len(to_addresses) > 0:
-                    if forwarder.feePercent > 0.0 and forwarder.feeAddress != '':
-                        fee = int(amounts[0] * forwarder.feePercent/100)
-                        amounts = [amounts[0] - fee, fee]
-                        to_addresses.append(forwarder.feeAddress)
-                        logging.info("Forwarding Fee: " + str(amounts[1]) + " -> " + str(to_addresses[1]))
-
-                    if forwarder.confirmAmount > 0:
-                        amounts[0] -= forwarder.confirmAmount
-                        amounts.append(forwarder.confirmAmount)
-                        to_addresses.append(primeInputAddress)
-                        logging.info("Origin: " + str(forwarder.confirmAmount) + " -> " + primeInputAddress)
+                            tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
+                            if tx != None:
+                               success = TxFactory.sendTransaction(tx)
+                        else:
+                            logging.error("Not enough balance left to send Transaction")
 
 
-                    #subtract transaction fee in satoshis from first amount
-                    amounts[0] = amounts[0] - TRANSACTION_FEE
+                        if success == True:
+                            logging.info("Success")
+                        else:
+                            logging.error("Failed to send transaction")
 
-                    logging.info("Destination: " + str(amounts[0]) + " -> " + to_addresses[0])
-                    logging.info("Transaction fee: " + str(TRANSACTION_FEE))
-
-                    if amounts[0] > 0:
-                        outputs = []
-                        for i in range(0, len(amounts)):
-                            outputs.append({'address': to_addresses[i], 'value': amounts[i]})
-
-                        tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
-                        if tx != None:
-                           success = TxFactory.sendTransaction(tx)
-                    else:
-                        logging.error("Not enough balance left to send Transaction")
-
-
-                    if success == True:
-                        logging.info("Success")
-                    else:
-                        logging.error("Failed to send transaction")
+                else:
+                    logging.warning('Found UTXO originating from the forwarder address itself, please remove UTXO manually as soon as possible')
 
         return success

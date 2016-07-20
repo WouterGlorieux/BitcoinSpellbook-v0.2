@@ -2,10 +2,10 @@ import logging
 import bitcoin
 
 
-from bitcoin.pyspecials import *
+
 from bitcoin.transaction import *
 
-def makeCustomTransaction(privkeys, inputs, outputs, fee=0):
+def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
     #input format= txid:i
     tx = None
     totalInputValue = 0
@@ -34,6 +34,10 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0):
 
         if allKeysPresent == True and allInputsConfirmed == True:
             tx = bitcoin.mktx(UTXOs, outputs)
+
+            if op_return_data != '' and len(op_return_data) <= 80:
+                tx = addOP_RETURN(op_return_data, tx)
+
             for i in range(0, len(UTXOs)):
                 tx = bitcoin.sign(tx, i, str(privkeys[UTXOs[i]['address']]))
 
@@ -45,11 +49,13 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0):
     return tx
 
 def sendTransaction(tx):
-    success = False
-    #bitcoin.pushtx(tx)
-    #success = True
-    return success
+    response = bitcoin.pushtx(tx)
+    return response
 
+
+
+def decodeOP_RETURN(hexdata):
+    return binascii.unhexlify(hexdata)
 
 #extra functions for op_return from a fork of pybitcointools
 #https://github.com/wizardofozzie/pybitcointools
@@ -94,7 +100,7 @@ def addOP_RETURN(msg, txhex=None):
         txo = deserialize(txhex)
         assert (len(outs) > 0) and sum(multiaccess(outs, 'value')) > 0 \
                 and not any([o for o in outs if o.get("script")[:2] == '6a']), "Tx limited to *1* OP_RETURN, and only whilst the other outputs send funds"
-        outs.append({
+        txo['outs'].append({
                     'script': hexdata,
                     'value': 0
                     })

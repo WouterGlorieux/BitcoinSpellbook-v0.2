@@ -13,6 +13,14 @@ indexes:
 - kind: Distributer
   ancestor: yes
   properties:
+  - name: status
+  - name: visibility
+  - name: date
+    direction: desc
+
+- kind: Distributer
+  ancestor: yes
+  properties:
   - name: walletIndex
     direction: desc
 
