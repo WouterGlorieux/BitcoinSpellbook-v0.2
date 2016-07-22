@@ -37,6 +37,9 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
 
             if op_return_data != '' and len(op_return_data) <= 80:
                 tx = addOP_RETURN(op_return_data, tx)
+            else:
+                logging.error('OP_RETURN data is longer than 80 characters')
+                return None
 
             for i in range(0, len(UTXOs)):
                 tx = bitcoin.sign(tx, i, str(privkeys[UTXOs[i]['address']]))
@@ -55,7 +58,29 @@ def sendTransaction(tx):
 
 
 def decodeOP_RETURN(hexdata):
-    return binascii.unhexlify(hexdata)
+    data = ''
+    checkLenght = 0
+    if hexdata[:2] == '6a':
+        if hexdata[2:4] == '4c':
+            data = hexdata[6:]
+            checkLenght = hexdata[4:6]
+        elif hexdata[2:4] == '4d':
+            data = hexdata[8:]
+            checkLenght = hexdata[4:8]
+        elif hexdata[2:4] == '4e':
+            data = hexdata[10:]
+            checkLenght = hexdata[4:10]
+        else:
+            data = hexdata[4:]
+            checkLenght = hexdata[2:4]
+
+        unhexData = binascii.unhexlify(data)
+
+        if len(unhexData) != int(checkLenght, 16):
+            logging.error('OP_RETURN data is not the correct lenght! ' + str(len(unhexData)) + ' -> should be ' + str(int(checkLenght, 16)) )
+            unhexData = None
+
+    return unhexData
 
 #extra functions for op_return from a fork of pybitcointools
 #https://github.com/wizardofozzie/pybitcointools
@@ -86,6 +111,7 @@ def wrap_script(hexdata):
 def addOP_RETURN(msg, txhex=None):
     """Makes OP_RETURN script from msg, embeds in Tx hex"""
     hexdata = binascii.hexlify(b'\x6a' + wrap_script(msg))
+
     if txhex is None:
         return hexdata
     else:

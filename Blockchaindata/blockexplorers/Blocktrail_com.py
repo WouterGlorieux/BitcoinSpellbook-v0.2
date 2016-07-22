@@ -1,7 +1,7 @@
 __author__ = 'Wouter'
 import urllib2
 import json
-
+import binascii
 from Blockchaindata import TX as TX
 
 import time
@@ -58,6 +58,8 @@ class API:
                     tx_out = {}
                     tx_out['address'] = tx_output['address']
                     tx_out['value'] = tx_output['value']
+                    if tx_output['script'][:9] == 'OP_RETURN':
+                        tx_out['OP_RETURN'] = binascii.unhexlify(tx_output['script'][10:])
 
                     if tx_output['spent_hash'] == None:
                         tx_out['spent'] = False

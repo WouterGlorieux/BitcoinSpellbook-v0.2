@@ -2,7 +2,7 @@ __author__ = 'Wouter'
 
 import urllib2
 import json
-
+import TxFactory.TxFactory as TxFactory
 from Blockchaindata import TX
 
 from pprint import pprint
@@ -73,7 +73,13 @@ class API:
 
             for out in transaction['vout']:
                 tx_out = {}
-                tx_out['address'] = out['scriptPubKey']['addresses'][0]
+                if 'addresses' in out['scriptPubKey']:
+                    tx_out['address'] = out['scriptPubKey']['addresses'][0]
+                else:
+                    tx_out['address'] = None
+                    if out['scriptPubKey']['hex'][:2] == '6a':
+                        tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(out['scriptPubKey']['hex'])
+
                 tx_out['value'] = int(Decimal(out['value']) * Decimal(1e8))
                 if 'spentTxId' in out and out['spentTxId'] != None:
                     tx_out['spent'] = True
