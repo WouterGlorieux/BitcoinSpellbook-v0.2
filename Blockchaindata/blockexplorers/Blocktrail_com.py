@@ -3,7 +3,7 @@ import urllib2
 import json
 import binascii
 from Blockchaindata import TX as TX
-
+import TxFactory.TxFactory as TxFactory
 import time
 import datetime
 import logging
@@ -58,8 +58,8 @@ class API:
                     tx_out = {}
                     tx_out['address'] = tx_output['address']
                     tx_out['value'] = tx_output['value']
-                    if tx_output['script'][:9] == 'OP_RETURN':
-                        tx_out['OP_RETURN'] = binascii.unhexlify(tx_output['script'][10:])
+                    if tx_output['script_hex'][:2] == '6a':
+                        tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(tx_output['script_hex'])
 
                     if tx_output['spent_hash'] == None:
                         tx_out['spent'] = False
@@ -184,6 +184,7 @@ class API:
                 self.error = 'Unable to retrieve latest block'
 
             counter = 0
+            unconfirmedCounter = 0
             for address in addresses.split('|'):
                 response['success'] = 0
                 url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&limit=' + str(LIMIT) + '&sort_dir=asc'
@@ -205,7 +206,7 @@ class API:
                     logging.warning('Blocktrail.com: Unable to retrieve UTXOs')
                     self.error = 'Unable to retrieve UTXOs'
 
-                unconfirmedCounter = 0
+
                 for page in range(1, pages+1):
 
                     for i in range(0, len(data)):
