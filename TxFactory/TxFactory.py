@@ -22,6 +22,8 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
     diff = totalInputValue - totalOutputValue
     if fee != diff:
         logging.error("Fee incorrect! aborting transaction! " + str(fee) + " != " + str(diff))
+    elif fee < 0:
+        logging.error('Fee cannot be lower than zero! aborting transaction! fee: ' + str(fee))
     else:
         allKeysPresent = True
         allInputsConfirmed = True
@@ -53,7 +55,8 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
 
 def sendTransaction(tx):
     success = False
-    response = bitcoin.blockr_pushtx(tx)
+    response = {}
+    #response = bitcoin.blockr_pushtx(tx)
 
     if 'status' in response and response['status'] == 'success':
         success = True

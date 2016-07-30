@@ -47,6 +47,15 @@ def validDescription(description):
 
     return valid
 
+def validOP_RETURN(message):
+    valid = False
+
+    if isinstance(message, (str, unicode)) and 0 < len(message) <= 80:
+        valid = True
+
+    return valid
+
+
 def validText(text):
     valid = False
 
@@ -102,7 +111,7 @@ def validBlockHeight(blockHeight):
 def validPercentage(percentage):
     valid = False
 
-    if isinstance(percentage, float) and percentage >= 0.0 and percentage <= 100.0:
+    if isinstance(percentage, float) and 0.0 <= percentage <= 100.0:
         valid = True
 
     return valid
@@ -147,3 +156,22 @@ def validDistribution(distribution):
     return valid
 
 
+def validOutputs(outputs):
+    valid = False
+
+    if isinstance(outputs, list):
+        if len(outputs) >= 1:
+            for recipient in outputs:
+                if isinstance(recipient, (tuple, list)):
+                    if len(recipient) == 2:
+                        if validAddress(recipient[0]) and isinstance(recipient[1], int) and recipient[1] > 0:
+                            valid = True
+                        else:
+                            valid = False
+                            break
+                    else:
+                        valid = False
+                        break
+
+
+    return valid

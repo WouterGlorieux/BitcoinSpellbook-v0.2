@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
+import datastore.datastore as datastore
 import blockexplorers.Blocktrail_com as Blocktrail_com
 import blockexplorers.Blockchain_info as Blockchain_info
 import blockexplorers.Insight as Insight
@@ -14,16 +15,11 @@ import blockexplorers.Insight as Insight
 from validators import validators as validator
 
 
-class Providers(ndb.Model):
-    #Model for 3rd party data providers parameters
-    priority = ndb.IntegerProperty(indexed=True, default=0)
-    providerType = ndb.StringProperty(indexed=True, choices=['Blocktrail.com', 'Blockchain.info', 'Insight'], default='Blocktrail.com')
-    blocktrail_key = ndb.StringProperty(indexed=False, default="")
-    insight_url = ndb.StringProperty(indexed=False, default="")
+
 
 
 def getProviderAPI(name):
-    provider = Providers.get_by_id(name)
+    provider = datastore.Providers.get_by_id(name)
 
     if provider and provider.providerType == 'Blocktrail.com':
         providerAPI = Blocktrail_com.API(provider.blocktrail_key)
@@ -37,7 +33,7 @@ def getProviderAPI(name):
     return providerAPI
 
 def getProviderNames():
-    providers_query = Providers.query().order(Providers.priority)
+    providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
     providerNames = []
@@ -48,7 +44,7 @@ def getProviderNames():
 
 
 def getProvidersList():
-    providers_query = Providers.query().order(Providers.priority)
+    providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
     providersList = []
@@ -68,7 +64,7 @@ def getProvidersList():
 
 def saveProvider(name, priority, providerType, param=''):
 
-    provider = Providers.get_or_insert(name)
+    provider = datastore.Providers.get_or_insert(name)
     provider.priority = priority
     provider.providerType = providerType
 
@@ -94,7 +90,7 @@ def saveProvider(name, priority, providerType, param=''):
 
 def deleteProvider(name):
     try:
-        provider = Providers.get_by_id(name)
+        provider = datastore.Providers.get_by_id(name)
         provider.key.delete()
         return True
     except:

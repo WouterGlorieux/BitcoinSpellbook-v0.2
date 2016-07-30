@@ -15,6 +15,9 @@ import hashlib
 import hmac
 import base64
 
+import urllib2
+import logging
+
 
 from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
@@ -28,6 +31,7 @@ import BlockVoter.BlockVoter as BlockVoter
 import HDForwarder.HDForwarder as HDForwarder
 import DistributeBTC.DistributeBTC as DistributeBTC
 import BlockTrigger.BlockTrigger as BlockTrigger
+import BlockWriter.BlockWriter as BlockWriter
 
 import datastore.datastore as datastore
 
@@ -252,6 +256,29 @@ class initialize(webapp2.RequestHandler):
         response['success'] = 1
 
         self.response.write(json.dumps(response, sort_keys=True))
+
+
+class updateRecommendedFee(webapp2.RequestHandler):
+    def get(self):
+        parameters = datastore.Parameters.get_by_id('DefaultConfig')
+        blocktrailKey = datastore.Providers.get_by_id('Blocktrail.com').blocktrail_key
+        data = {}
+
+        url = 'https://api.blocktrail.com/v1/BTC/fee-per-kb?api_key=' + blocktrailKey
+        try:
+            data = json.loads(urllib2.urlopen(urllib2.Request(url)).read())
+        except:
+            logging.error('Failed to update optimal fee per KB from Blocktrail.com')
+
+        if 'optimal' in data:
+            parameters.optimalFeePerKB = data['optimal']
+            parameters.put()
+
+
+
+
+
+
 
 
 class SIL(webapp2.RequestHandler):
@@ -1082,6 +1109,138 @@ class checkTriggers(webapp2.RequestHandler):
 
 
 
+class getWriters(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        response = BlockWriter.getWriters()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class getWriter(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        response = BlockWriter.Writer(name).get()
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class saveWriter(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+
+                settings = {}
+
+                if self.request.get('outputs', None) is not None:
+                    settings['outputs'] = self.request.get('outputs')
+
+                if self.request.get('message', None) is not None:
+                    settings['message'] = self.request.get('message')
+
+
+                if self.request.get('visibility'):
+                    settings['visibility'] = self.request.get('visibility')
+
+                if self.request.get('status'):
+                    settings['status'] = self.request.get('status')
+
+
+                if self.request.get('description', None) is not None:
+                    settings['description'] = self.request.get('description')
+
+                if self.request.get('creator', None) is not None:
+                    settings['creator'] = self.request.get('creator')
+
+                if self.request.get('creatorEmail', None) is not None:
+                    settings['creatorEmail'] = self.request.get('creatorEmail')
+
+                if self.request.get('youtube', None) is not None:
+                    settings['youtube'] = self.request.get('youtube')
+
+
+                if self.request.get('feePercent'):
+                    try:
+                        settings['feePercent'] = float(self.request.get('feePercent'))
+                    except ValueError:
+                        response['error'] = 'Incorrect feePercent'
+
+                if self.request.get('feeAddress', None) is not None:
+                    settings['feeAddress'] = self.request.get('feeAddress')
+
+
+                if self.request.get('maxTransactionFee'):
+                    try:
+                        settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
+                    except ValueError:
+                        response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+
+
+                if self.request.get('addressType'):
+                    settings['addressType'] = self.request.get('addressType')
+
+                if self.request.get('walletIndex'):
+                    try:
+                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                    except ValueError:
+                        response['error'] = 'walletIndex must be a positive integer'
+
+                if self.request.get('privateKey', None) is not None:
+                    settings['privateKey'] = self.request.get('privateKey')
+
+
+                response = BlockWriter.Writer(name).saveWriter(settings)
+
+            else:
+                response['error'] = 'Invalid parameters'
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class deleteWriter(webapp2.RequestHandler):
+    def post(self):
+        response = {'success': 0}
+
+        authenticationOK = False
+        authentication = authenticate(self.request.headers, self.request.body)
+        if 'success' in authentication and authentication['success'] == 1:
+            authenticationOK = True
+
+        if authenticationOK:
+            if self.request.get('name'):
+                name = self.request.get('name')
+                response = BlockWriter.Writer(name).deleteWriter()
+        else:
+            response['error'] = authentication['error']
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+class doWriting(webapp2.RequestHandler):
+    def get(self):
+        name = ''
+        if self.request.get('name'):
+            name = self.request.get('name')
+
+        BlockWriter.DoWriting(name)
+
+        response = {'success': 1}
+        self.response.write(json.dumps(response, sort_keys=True))
+
 
 
 
@@ -1091,6 +1250,8 @@ class checkTriggers(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', mainPage),
     ('/admin/initialize', initialize),
+    ('/admin/updateRecommendedFee', updateRecommendedFee),
+
     ('/data/saveProvider', saveProvider),
     ('/data/deleteProvider', deleteProvider),
     ('/data/getProviders', getProviders),
@@ -1100,21 +1261,27 @@ app = webapp2.WSGIApplication([
     ('/data/transactions', transactions),
     ('/data/balances', balances),
     ('/data/utxos', utxos),
+
     ('/SIL/SIL', SIL),
+
     ('/linker/LBL', LBL),
     ('/linker/LRL', LRL),
     ('/linker/LSL', LSL),
     ('/linker/LAL', LAL),
+
     ('/random/proportional', proportionalRandom),
     ('/random/block', randomFromBlock),
+
     ('/voter/proposal', proposal),
     ('/voter/results', results),
+
     ('/forwarder/getForwarders', getForwarders),
     ('/forwarder/getForwarder', getForwarder),
     ('/forwarder/checkAddress', checkForwarderAddress),
     ('/forwarder/saveForwarder', saveForwarder),
     ('/forwarder/deleteForwarder', deleteForwarder),
     ('/forwarder/doForwarding', doForwarding),
+
     ('/distributer/getDistributers', getDistributers),
     ('/distributer/getDistributer', getDistributer),
     ('/distributer/checkAddress', checkDistributerAddress),
@@ -1122,6 +1289,7 @@ app = webapp2.WSGIApplication([
     ('/distributer/deleteDistributer', deleteDistributer),
     ('/distributer/updateDistribution', updateDistribution),
     ('/distributer/doDistributing', doDistributing),
+
     ('/trigger/getTriggers', getTriggers),
     ('/trigger/getTrigger', getTrigger),
     ('/trigger/saveTrigger', saveTrigger),
@@ -1130,6 +1298,11 @@ app = webapp2.WSGIApplication([
     ('/trigger/deleteAction', deleteAction),
     ('/trigger/checkTriggers', checkTriggers),
 
+    ('/writer/getWriters', getWriters),
+    ('/writer/getWriter', getWriter),
+    ('/writer/saveWriter', saveWriter),
+    ('/writer/deleteWriter', deleteWriter),
+    ('/writer/doWriting', doWriting),
 
 ], debug=True)
 

@@ -45,6 +45,10 @@ handlers:
   script: BitcoinSpellbook.app
   login: admin
 
+- url: /admin/updateRecommendedFee
+  script: BitcoinSpellbook.app
+  login: admin
+
 
 - url: /SIL/SIL
   script: BitcoinSpellbook.app
@@ -139,6 +143,20 @@ handlers:
 
 
 
+- url: /writer/getWriters
+  script: BitcoinSpellbook.app
+
+- url: /writer/getWriter
+  script: BitcoinSpellbook.app
+
+- url: /writer/saveWriter
+  script: BitcoinSpellbook.app
+
+- url: /writer/deleteWriter
+  script: BitcoinSpellbook.app
+
+- url: /writer/doWriting
+  script: BitcoinSpellbook.app
 
 - url: /
   script: BitcoinSpellbook.app

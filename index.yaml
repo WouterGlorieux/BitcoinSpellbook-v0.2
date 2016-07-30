@@ -52,3 +52,11 @@ indexes:
   - name: visibility
   - name: date
     direction: desc
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: status
+  - name: visibility
+  - name: date
+    direction: desc

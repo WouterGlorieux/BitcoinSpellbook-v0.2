@@ -8,6 +8,7 @@ from BlockVoterWrapper import BlockVoterWrapper
 from HDForwarderWrapper import HDForwarderWrapper
 from DistributeBTCWrapper import DistributeBTCWrapper
 from BlockTriggerWrapper import BlockTriggerWrapper
+from BlockWriterWrapper import BlockWriterWrapper
 
 
 
@@ -39,3 +40,6 @@ class SpellbookWrapper():
 
     def BlockTrigger(self):
         return BlockTriggerWrapper(self.url)
+
+    def BlockWriter(self):
+        return BlockWriterWrapper(self.url)
