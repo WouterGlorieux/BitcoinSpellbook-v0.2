@@ -162,6 +162,9 @@ handlers:
 - url: /writer/doWriting
   script: BitcoinSpellbook.app
 
+- url: /profile/profile
+  script: BitcoinSpellbook.app
+
 - url: /
   script: BitcoinSpellbook.app
 

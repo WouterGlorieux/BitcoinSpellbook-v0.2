@@ -9,6 +9,7 @@ from HDForwarderWrapper import HDForwarderWrapper
 from DistributeBTCWrapper import DistributeBTCWrapper
 from BlockTriggerWrapper import BlockTriggerWrapper
 from BlockWriterWrapper import BlockWriterWrapper
+from BlockProfileWrapper import BlockProfileWrapper
 
 
 
@@ -43,3 +44,6 @@ class SpellbookWrapper():
 
     def BlockWriter(self):
         return BlockWriterWrapper(self.url)
+
+    def BlockProfile(self):
+        return BlockProfileWrapper(self.url)

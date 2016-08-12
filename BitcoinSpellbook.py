@@ -32,6 +32,7 @@ import HDForwarder.HDForwarder as HDForwarder
 import DistributeBTC.DistributeBTC as DistributeBTC
 import BlockTrigger.BlockTrigger as BlockTrigger
 import BlockWriter.BlockWriter as BlockWriter
+import BlockProfile.BlockProfile as BlockProfile
 
 import datastore.datastore as datastore
 
@@ -1272,6 +1273,26 @@ class doWriting(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
+class Profile(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+            if self.request.get('blockHeight'):
+                try:
+                    blockHeight = int(self.request.get('blockHeight'))
+                    response = BlockProfile.Profile(address, blockHeight)
+                except ValueError:
+                    response['error'] = 'blockHeight must be a positive integer.'
+
+            else:
+                response = BlockProfile.Profile(address)
+
+        else:
+            response['error'] = 'You must provide an address.'
+
+        self.response.write(json.dumps(response, sort_keys=True))
 
 
 
@@ -1334,6 +1355,8 @@ app = webapp2.WSGIApplication([
     ('/writer/saveWriter', saveWriter),
     ('/writer/deleteWriter', deleteWriter),
     ('/writer/doWriting', doWriting),
+
+    ('/profile/profile', Profile),
 
 ], debug=True)
 
