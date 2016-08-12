@@ -1,5 +1,8 @@
-
+from google.appengine.api import mail
 from google.appengine.ext import ndb
+from BIP44 import BIP44
+import logging
+
 
 MAX_TRANSACTION_FEE = 10000 #in Satoshis
 BLOCKWRITER_EXTRA_VALUE_ADDRESS = '1Branzwx1RceFrHsjSQK1sHzyeRB7BMoWT'
@@ -138,9 +141,8 @@ class Writer(ndb.Model):
     addressType = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     walletIndex = ndb.IntegerProperty(indexed=True, default=0)
     privateKey = ndb.StringProperty(indexed=False, default='')
-    status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled', 'Cooldown'], default='Pending')
+    status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled', 'Complete'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
-    cooldownEnd = ndb.DateTimeProperty(auto_now_add=True)
 
     creator = ndb.StringProperty(default='')
     creatorEmail = ndb.StringProperty(default='')
@@ -156,3 +158,64 @@ class Writer(ndb.Model):
 def writers_key():
     #Constructs a Datastore key for a Writer entity
     return ndb.Key('BlockWriter', 'BlockWriter')
+
+class WalletAddress(ndb.Model):
+    module = ndb.StringProperty(indexed=True, choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'], default=None)
+    address = ndb.StringProperty(indexed=True)
+    i = ndb.IntegerProperty(indexed=True)
+    k = ndb.IntegerProperty(indexed=True, default=0)
+    status = ndb.StringProperty(indexed=True, choices=['Available', 'InUse', 'Cooldown', 'Unavailable'], default='InUse')
+    balance = ndb.IntegerProperty(default=0)
+    received = ndb.IntegerProperty(default=0)
+    sent = ndb.IntegerProperty(default=0)
+    cooldownEnd = ndb.DateTimeProperty(auto_now_add=True)
+
+
+def address_key():
+    #Constructs a Datastore key for a WalletAddress entity
+    return ndb.Key('WalletAddress', 'WalletAddress')
+
+def initializeWalletAddress(module, i):
+    if module in ['BlockWriter', 'BlockForwarder', 'BlockDistributer']:
+        parameters = Parameters.get_by_id('DefaultConfig')
+        if parameters:
+            xpubKey = ''
+            if module == 'BlockWriter' and parameters.BlockWriter_walletseed not in ['', None]:
+                xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
+            elif module == 'BlockForwarder' and parameters.HDForwarder_walletseed not in ['', None]:
+                xpubKey = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed, "", 1)[0]
+            elif module == 'BlockDistributer' and parameters.DistributeBTC_walletseed not in ['', None]:
+                xpubKey = BIP44.getXPUBKeys(parameters.DistributeBTC_walletseed, "", 1)[0]
+
+            if xpubKey != '':
+                wallet_address = WalletAddress.get_or_insert("%s_%i" % (module, i), parent=address_key())
+                wallet_address.module = module
+                wallet_address.address = BIP44.getAddressFromXPUB(xpubKey, i)
+                wallet_address.i = i
+                wallet_address.k = 0
+                if i == 0:
+                    wallet_address.status = 'Unavailable'
+                wallet_address.put()
+
+                return wallet_address.address
+
+def consistencyCheck(module):
+    success = True
+    if module == 'BlockWriter':
+        writers_query = Writer.query(Writer.status == 'Active', Writer.walletIndex != 0, ancestor=writers_key()).order(Writer.walletIndex)
+        writers = writers_query.fetch()
+
+        if len(writers) > 0:
+            tmpIndex = 0
+            for i in range(0, len(writers)):
+                if writers[i].walletIndex == tmpIndex:
+                    message = 'Consistency check failed: multiple active writers with same walletIndex! walletIndex = %i' % tmpIndex
+                    logging.error(message)
+                    parameters = Parameters.get_by_id('DefaultConfig')
+                    mail.send_mail(parameters.mailFrom, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
+                    success = False
+
+                tmpIndex = writers[i].walletIndex
+
+
+    return success

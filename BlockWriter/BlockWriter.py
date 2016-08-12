@@ -19,21 +19,51 @@ urlfetch.set_default_fetch_deadline(60)
 REQUIRED_CONFIRMATIONS = 3 #must be at least 3
 TRANSACTION_FEE = 10000 #in Satoshis
 
-def getNextIndex():
-    writers_query = datastore.Writer.query(ancestor=datastore.writers_key()).order(-datastore.Writer.walletIndex)
+def getAvailableAddressIndex():
+    checkActiveAddresses()
+    wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.module == 'BlockWriter',
+                                                         datastore.WalletAddress.status == 'Available',
+                                                         ancestor=datastore.address_key()).order(datastore.WalletAddress.i)
+    wallet_address = wallet_address_query.fetch(limit=1)
+
+    if len(wallet_address) == 1:
+        index = wallet_address[0].i
+        wallet_address[0].status = 'InUse'
+        wallet_address[0].put()
+    else:
+        wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.module == 'BlockWriter',
+                                                             ancestor=datastore.address_key()).order(-datastore.WalletAddress.i)
+        wallet_address = wallet_address_query.fetch(limit=1)
+        if len(wallet_address) == 1:
+            index = wallet_address[0].i+1
+        else:
+            index = 1
+
+        address = datastore.initializeWalletAddress('BlockWriter', index)
+        logging.info("Initializing new wallet address for module BlockWriter: %i %s" % (index, address))
+
+    return index
+
+def checkActiveAddresses():
+    writers_query = datastore.Writer.query(datastore.Writer.addressType == 'BIP44',
+                                           datastore.Writer.status == 'Active',
+                                           ancestor=datastore.writers_key()).order(datastore.Writer.walletIndex)
     writers = writers_query.fetch()
 
-    if len(writers) > 0:
-        i = writers[0].walletIndex + 1
-    else:
-        i = 1
+    for writer in writers:
+        wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.walletIndex, parent=datastore.address_key())
+        if wallet_address and wallet_address.status != 'InUse':
+            logging.warning("Found active writer with address not InUse status! %i %s" % (wallet_address.i, wallet_address.address))
+            wallet_address.status = 'InUse'
+            wallet_address.put()
 
-    return i
+
+
 
 def writerToDict(writer):
     writerDict = {}
 
-    writerDict['name'] = writer.key.id()
+    writerDict['name'] = str(writer.key.id())
     writerDict['address'] = writer.address
     writerDict['outputs'] = writer.outputs
     writerDict['message'] = writer.message
@@ -113,10 +143,20 @@ class Writer():
     @ndb.transactional(xg=True)
     def __init__(self, name):
         self.error = ''
-        if isinstance(name, (str, unicode)) and len(name) > 0:
+
+        try:
+            self.name = int(name)
+        except:
             self.name = name
+
+        if isinstance(self.name, (str, unicode)) and len(name) > 0:
+            logging.info('string name found')
+        elif isinstance(self.name, (int, long)) and self.name > 0:
+            logging.info('numeric name found')
         else:
-            self.error = 'Name cannot be empty'
+            writer = datastore.Writer(parent=datastore.writers_key())
+            writer.put()
+            self.name = writer.key.id()
 
 
     def get(self):
@@ -138,7 +178,7 @@ class Writer():
 
         if self.error == '':
             parameters = datastore.Parameters.get_by_id('DefaultConfig')
-            writer = datastore.Writer.get_or_insert(self.name, parent=datastore.writers_key())
+            writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
 
             if 'message' in settings and validator.validOP_RETURN(settings['message']):
                 writer.message = settings['message']
@@ -238,7 +278,7 @@ class Writer():
                 parameters = datastore.Parameters.get_by_id('DefaultConfig')
                 if parameters and parameters.BlockWriter_walletseed != "":
                     if writer.walletIndex == 0:
-                        writer.walletIndex = getNextIndex()
+                        writer.walletIndex = getAvailableAddressIndex()
 
                     xpub = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed)[0]
                     writer.address = BIP44.getAddressFromXPUB(xpub, writer.walletIndex)
@@ -247,6 +287,8 @@ class Writer():
             else:
                 self.error = 'No private key supplied'
 
+            if not datastore.consistencyCheck('BlockWriter'):
+                self.error = 'Unable to assign address.'
 
             if self.error == '':
                 writer.put()
@@ -349,9 +391,13 @@ class DoWriting():
 
             if success:
                 logging.info("Success")
-                writer.status = 'Cooldown'
-                writer.cooldownEnd = datetime.datetime.now() + datetime.timedelta(days=7)
+                writer.status = 'Complete'
                 writer.put()
+                wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.walletIndex, parent=datastore.address_key())
+                if wallet_address:
+                    wallet_address.status = 'Cooldown'
+                    wallet_address.cooldownEnd = datetime.datetime.now() + datetime.timedelta(days=7)
+                    wallet_address.put()
             else:
                 logging.error("Failed to send transaction")
 

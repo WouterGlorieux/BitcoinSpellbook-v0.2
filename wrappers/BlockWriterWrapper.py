@@ -30,7 +30,7 @@ class BlockWriterWrapper():
 
         return response
 
-    def getWriter(self, name):
+    def getWriter(self, name=''):
         response = {'success': 0}
         parameters = {}
         parameters['name'] = name

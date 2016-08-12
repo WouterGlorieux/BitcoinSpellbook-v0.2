@@ -53,6 +53,51 @@ indexes:
   - name: date
     direction: desc
 
+- kind: WalletAddress
+  ancestor: yes
+  properties:
+  - name: module
+  - name: i
+    direction: desc
+
+- kind: WalletAddress
+  ancestor: yes
+  properties:
+  - name: module
+  - name: status
+  - name: i
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: addressType
+  - name: date
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: addressType
+  - name: status
+  - name: walletIndex
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: addressType
+  - name: walletIndex
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: date
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: module
+  - name: status
+  - name: i
+
 - kind: Writer
   ancestor: yes
   properties:
@@ -60,3 +105,9 @@ indexes:
   - name: visibility
   - name: date
     direction: desc
+
+- kind: Writer
+  ancestor: yes
+  properties:
+  - name: status
+  - name: walletIndex
