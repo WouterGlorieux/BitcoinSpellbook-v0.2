@@ -55,7 +55,7 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
 
 def sendTransaction(tx):
     success = False
-    response = {}
+    response = {'status': 'success'}
     #response = bitcoin.blockr_pushtx(tx)
 
     if 'status' in response and response['status'] == 'success':
