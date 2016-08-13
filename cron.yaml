@@ -1,0 +1,20 @@
+cron:
+- description: updateRecommendedFee
+  url: /admin/updateRecommendedFee
+  schedule: every 30 minutes
+
+- description: BlockForwarder
+  url: /forwarder/doForwarding
+  schedule: every 10 minutes
+
+- description: BlockDistributer
+  url: /distributer/doDistributing
+  schedule: every 10 minutes
+
+- description: BlockTrigger
+  url: /trigger/checkTriggers
+  schedule: every 10 minutes
+
+- description: BlockWriter
+  url: /writer/doWriting
+  schedule: every 10 minutes

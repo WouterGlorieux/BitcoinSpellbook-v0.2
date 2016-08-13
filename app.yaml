@@ -98,6 +98,7 @@ handlers:
 
 - url: /forwarder/doForwarding
   script: BitcoinSpellbook.app
+  login: admin
 
 
 - url: /distributer/getDistributers
@@ -121,6 +122,7 @@ handlers:
 
 - url: /distributer/doDistributing
   script: BitcoinSpellbook.app
+  login: admin
 
 
 - url: /trigger/getTriggers
@@ -144,6 +146,7 @@ handlers:
 
 - url: /trigger/checkTriggers
   script: BitcoinSpellbook.app
+  login: admin
 
 
 
