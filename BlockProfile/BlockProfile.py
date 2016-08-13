@@ -44,13 +44,10 @@ def TXS2profile(txs, block=0):
                     primeInputAddress = tx['primeInputAddress']
                     blockHeight = tx['blockHeight']
                     data = [blockHeight, output['OP_RETURN']]
-                    logging.info('found op return: %s from %s' % (data, primeInputAddress))
-
                     if primeInputAddress in profile:
                         profile[primeInputAddress].append(data)
                     else:
                         profile[primeInputAddress] = [data]
-
 
     return profile
 
