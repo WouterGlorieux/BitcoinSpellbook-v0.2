@@ -55,8 +55,14 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
 
 def sendTransaction(tx):
     success = False
-    response = {'status': 'success'}
-    #response = bitcoin.blockr_pushtx(tx)
+    response = {}
+    try:
+        retval = bitcoin.blockr_pushtx(tx)
+        logging.info("TX broadcast succeeded, Blockr response: %s" % str(retval))
+        response = json.loads(retval)
+    except Exception as e:
+        logging.error("TX broadcast failed: %s" % str(e))
+
 
     if 'status' in response and response['status'] == 'success':
         success = True

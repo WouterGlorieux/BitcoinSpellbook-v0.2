@@ -329,8 +329,13 @@ class DoWriting():
         else:
             writers_query = datastore.Writer.query(datastore.Writer.status == 'Active')
             writers = writers_query.fetch()
+            if writers:
+                logging.info("Found %i active writers:" % len(writers))
+                for writer in writers:
+                    logging.info("Writer address: %s Message: %s" % (writer.address, writer.message))
 
             for writer in writers:
+                logging.info("Starting writer %s" % writer.address)
                 self.run(writer)
 
 
