@@ -5,7 +5,7 @@ import logging
 
 
 MAX_TRANSACTION_FEE = 10000 #in Satoshis
-BLOCKWRITER_EXTRA_VALUE_ADDRESS = '1Branzwx1RceFrHsjSQK1sHzyeRB7BMoWT'
+
 
 class APIKeys(ndb.Model):
     api_key = ndb.StringProperty(indexed=True, default='')
@@ -135,7 +135,7 @@ class Writer(ndb.Model):
     maxTransactionFee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
     transactionFee = ndb.IntegerProperty(default=0)
     totalAmount = ndb.IntegerProperty(default=0)
-    extraValueAddress = ndb.StringProperty(indexed=True, default=BLOCKWRITER_EXTRA_VALUE_ADDRESS)
+    extraValueAddress = ndb.StringProperty(indexed=True, default='')
 
     address = ndb.StringProperty(indexed=True, default='')
     addressType = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')

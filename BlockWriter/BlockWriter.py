@@ -274,6 +274,7 @@ class Writer():
 
             if writer.addressType == 'PrivKey' and writer.privateKey != '':
                 writer.address = bitcoin.privtoaddr(writer.privateKey)
+                writer.extraValueAddress = writer.address
             elif writer.addressType == 'BIP44':
                 parameters = datastore.Parameters.get_by_id('DefaultConfig')
                 if parameters and parameters.BlockWriter_walletseed != "":
@@ -282,6 +283,7 @@ class Writer():
 
                     xpub = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed)[0]
                     writer.address = BIP44.getAddressFromXPUB(xpub, writer.walletIndex)
+                    writer.extraValueAddress = writer.address
                 else:
                     self.error = 'Unable to retrieve wallet seed'
             else:
