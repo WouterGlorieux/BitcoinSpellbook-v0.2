@@ -1,4 +1,3 @@
-__author__ = 'Wouter'
 
 import urllib2
 import json
