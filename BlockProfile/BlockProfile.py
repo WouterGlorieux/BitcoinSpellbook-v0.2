@@ -43,8 +43,8 @@ def TXS2profile(txs, address, block=0):
                 if 'OP_RETURN' in output:
                     primeInputAddress = tx['primeInputAddress']
                     blockHeight = tx['blockHeight']
+                    profile[primeInputAddress] = {'lastUpdate': blockHeight}
                     message = output['OP_RETURN']
-                    data = [blockHeight, message]
                     if validator.validOP_RETURN(message) and validator.validBlockProfileMessage(message):
                         for message_part in message.split("|"):
                             (from_index, to_index, variable_name, variable_value) = components(message_part)
@@ -54,7 +54,7 @@ def TXS2profile(txs, address, block=0):
                                 from_address = 'SELF'
                             to_address = tx['outputs'][int(to_index)]['address']
 
-                            if primeInputAddress in profile and to_address == address:
+                            if to_address == address:
                                 if from_address in profile[primeInputAddress]:
                                     if variable_name in profile[primeInputAddress][from_address]:
                                         #variable already exists, overwrite or adjust value
@@ -63,8 +63,7 @@ def TXS2profile(txs, address, block=0):
                                         profile[primeInputAddress][from_address][variable_name] = variable_value
                                 else:
                                     profile[primeInputAddress][from_address] = {variable_name: variable_value}
-                            elif to_address == address:
-                                profile[primeInputAddress] = {from_address: {variable_name: variable_value}}
+
 
     return profile
 
