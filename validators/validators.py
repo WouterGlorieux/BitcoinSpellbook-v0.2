@@ -2,7 +2,8 @@ import re
 
 def validAddress(address):
     valid = False
-    if re.match("^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$", address):
+
+    if re.match("^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$", address):
         valid = True
 
     return valid
@@ -54,6 +55,17 @@ def validOP_RETURN(message):
         valid = True
 
     return valid
+
+def validBlockProfileMessage(message):
+    valid = False
+    allValid = True
+    for message_part in message.split("|"):
+        if re.match("^[0-9]*@[0-9]+:[a-zA-Z0-9]+=[a-zA-Z0-9 ]+$", message_part):
+            valid = True
+        else:
+            allValid = False
+
+    return valid and allValid
 
 
 def validText(text):
