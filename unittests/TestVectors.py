@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #example test vector
 # [input, expected_output, description]
 
@@ -16,7 +19,6 @@ address_test_vectors = [
     ['', False, 'empty string'],
     [None, False, 'None value'],
 ]
-
 
 addresses_test_vectors = [
     ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y|1SansacmMr38bdzGkzruDVajEsZuiZHx9', True, "valid addresses"],
@@ -83,7 +85,6 @@ op_return_test_vectors = [
     ['', False, 'empty string'],
     [None, False, 'None value'],
 ]
-
 
 text_test_vectors = [
     ['qsddsqfazer', True, 'valid text'],
