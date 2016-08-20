@@ -1,41 +1,51 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import re
+
+ALL_CHARACTERS_REGEX = "^[a-zA-Z0-9àáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$"
+YOUTUBE_REGEX = "^(http(s?):\/\/)?(www\.)?youtu(be)?\.([a-z])+\/(watch(.*?)(\?|\&)v=)?(.*?)(&(.)*)?$"
+YOUTUBE_ID_REGEX = "^[a-zA-Z0-9_-]{11}$"
+URL_REGEX = "((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)"
+ADDRESS_REGEX = "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$"
+TXID_REGEX = "^[a-f0-9]{64}$"
+BLOCKPROFILE_REGEX = "^[0-9]*@[0-9]+:[a-zA-Z0-9]+=[a-zA-Z0-9 ]+$"
+EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
+
 
 def validAddress(address):
     valid = False
 
-    if re.match("^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$", address):
+    if isinstance(address, (str, unicode)) and re.match(ADDRESS_REGEX, address):
         valid = True
 
     return valid
 
 def validAddresses(addresses):
     valid = False
-    for address in addresses.split("|"):
-        if validAddress(address):
-            valid = True
-        else:
-            valid = False
-            break
+
+    if isinstance(addresses, (str, unicode)):
+        for address in addresses.split("|"):
+            if validAddress(address):
+                valid = True
+            else:
+                valid = False
+                break
 
     return valid
 
 
 def validTxid(txid):
     valid = False
-    try:
-        int(txid, 16)
-        valid = True
-    except ValueError:
-        valid = False
 
-    if len(txid) != 64:
-        valid = False
+    if isinstance(txid, (str, unicode)) and re.match(TXID_REGEX, txid):
+        valid = True
 
     return valid
 
 def validXPUB(xpub):
     valid =False
-    if xpub[:4] == "xpub":
+    if isinstance(xpub, (str, unicode)) and xpub[:4] == "xpub":
         valid = True
 
     return valid
@@ -59,11 +69,12 @@ def validOP_RETURN(message):
 def validBlockProfileMessage(message):
     valid = False
     allValid = True
-    for message_part in message.split("|"):
-        if re.match("^[0-9]*@[0-9]+:[a-zA-Z0-9]+=[a-zA-Z0-9 ]+$", message_part):
-            valid = True
-        else:
-            allValid = False
+    if isinstance(message, (str, unicode)):
+        for message_part in message.split("|"):
+            if re.match(BLOCKPROFILE_REGEX, message_part):
+                valid = True
+            else:
+                allValid = False
 
     return valid and allValid
 
@@ -81,7 +92,7 @@ def validText(text):
 def validURL(url):
     valid = False
 
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, (str, unicode)) and re.match(URL_REGEX, url):
         valid = True
 
     return valid
@@ -90,14 +101,14 @@ def validURL(url):
 def validCreator(creator):
     valid = False
 
-    if isinstance(creator, (str, unicode)) and len(creator) <= 50:
+    if isinstance(creator, (str, unicode)) and re.match(ALL_CHARACTERS_REGEX, creator):
         valid = True
 
     return valid
 
 def validEmail(email):
     valid = False
-    if re.match(r"[^@]+@[^@]+\.[^@]+", email):
+    if isinstance(email, (str, unicode)) and re.match(EMAIL_REGEX, email):
         valid = True
 
     return valid
@@ -123,7 +134,7 @@ def validBlockHeight(blockHeight):
 def validPercentage(percentage):
     valid = False
 
-    if isinstance(percentage, float) and 0.0 <= percentage <= 100.0:
+    if isinstance(percentage, (int, float)) and 0.0 <= percentage <= 100.0:
         valid = True
 
     return valid
@@ -132,11 +143,19 @@ def validPercentage(percentage):
 def validYoutube(youtube):
     valid = False
 
-    if isinstance(youtube, (str, unicode)) and len(youtube) <= 11:
+    if isinstance(youtube, (str, unicode)) and re.match(YOUTUBE_REGEX, youtube):
         valid = True
 
     return valid
 
+
+def validYoutubeID(youtube):
+    valid = False
+
+    if isinstance(youtube, (str, unicode)) and re.match(YOUTUBE_ID_REGEX, youtube):
+        valid = True
+
+    return valid
 
 def validPrivateKey(privKey):
     valid = False
