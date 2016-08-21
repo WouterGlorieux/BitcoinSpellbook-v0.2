@@ -67,7 +67,7 @@ def getForwarders():
 
     return response
 
-class HDForwarder():
+class BlockForward():
     @ndb.transactional(xg=True)
 
     def __init__(self, name):
@@ -216,11 +216,11 @@ class HDForwarder():
                 forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
             elif forwarder.addressType == 'BIP44':
                 parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.HDForwarder_walletseed != "":
+                if parameters and parameters.BlockForward_walletseed != "":
                     if forwarder.walletIndex == 0:
                         forwarder.walletIndex = getNextIndex()
 
-                    xpub = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed)[0]
+                    xpub = BIP44.getXPUBKeys(parameters.BlockForward_walletseed)[0]
                     forwarder.address = BIP44.getAddressFromXPUB(xpub, forwarder.walletIndex)
                 else:
                     self.error = 'Unable to retrieve wallet seed'
@@ -312,8 +312,8 @@ class DoForwarding():
                         privKeys = {forwarder.address: forwarder.privateKey}
                     elif forwarder.addressType == 'BIP44':
                         parameters = datastore.Parameters.get_or_insert('DefaultConfig')
-                        if parameters and parameters.HDForwarder_walletseed != '' and parameters.HDForwarder_walletseed != None:
-                            xprivKeys = BIP44.getXPRIVKeys(parameters.HDForwarder_walletseed, "", 1)
+                        if parameters and parameters.BlockForward_walletseed != '' and parameters.BlockForward_walletseed != None:
+                            xprivKeys = BIP44.getXPRIVKeys(parameters.BlockForward_walletseed, "", 1)
                             privKeys = BIP44.getPrivKey(xprivKeys[0], forwarder.walletIndex)
 
 

@@ -10,7 +10,7 @@ import hmac
 import base64
 
 
-class HDForwarderWrapper():
+class BlockForwardWrapper():
     def __init__(self, url):
         self.url = url
 

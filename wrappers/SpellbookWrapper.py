@@ -5,7 +5,7 @@ from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
 from BlocklinkerWrapper import BlocklinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
 from BlockVoterWrapper import BlockVoterWrapper
-from HDForwarderWrapper import HDForwarderWrapper
+from BlockForwardWrapper import BlockForwardWrapper
 from BlockDistributeWrapper import BlockDistributeWrapper
 from BlockTriggerWrapper import BlockTriggerWrapper
 from BlockWriterWrapper import BlockWriterWrapper
@@ -33,8 +33,8 @@ class SpellbookWrapper():
     def BlockVoter(self):
         return BlockVoterWrapper(self.url)
 
-    def HDForwarder(self):
-        return HDForwarderWrapper(self.url)
+    def BlockForward(self):
+        return BlockForwardWrapper(self.url)
 
     def BlockDistribute(self):
         return BlockDistributeWrapper(self.url)

@@ -28,7 +28,7 @@ import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
 import Blocklinker.Blocklinker as Blocklinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
-import HDForwarder.HDForwarder as HDForwarder
+import BlockForward.BlockForward as BlockForward
 import BlockDistribute.BlockDistribute as BlockDistribute
 import BlockTrigger.BlockTrigger as BlockTrigger
 import BlockWriter.BlockWriter as BlockWriter
@@ -285,8 +285,8 @@ class initializeWallet(webapp2.RequestHandler):
                 xpubKey = ''
                 if module == 'BlockWriter' and parameters.BlockWriter_walletseed not in ['', None]:
                     xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
-                elif module == 'BlockForwarder' and parameters.HDForwarder_walletseed not in ['', None]:
-                    xpubKey = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed, "", 1)[0]
+                elif module == 'BlockForwarder' and parameters.BlockForward_walletseed not in ['', None]:
+                    xpubKey = BIP44.getXPUBKeys(parameters.BlockForward_walletseed, "", 1)[0]
                 elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
                     xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
 
@@ -587,7 +587,7 @@ class results(webapp2.RequestHandler):
 class getForwarders(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
-        response = HDForwarder.getForwarders()
+        response = BlockForward.getForwarders()
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -600,7 +600,7 @@ class getForwarder(webapp2.RequestHandler):
         if self.request.get('name'):
             name = self.request.get('name')
 
-        response = HDForwarder.HDForwarder(name).get()
+        response = BlockForward.BlockForward(name).get()
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -617,7 +617,7 @@ class checkForwarderAddress(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-        response = HDForwarder.HDForwarder(name).checkAddress(address)
+        response = BlockForward.BlockForward(name).checkAddress(address)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -693,7 +693,7 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')
 
-                response = HDForwarder.HDForwarder(name).saveForwarder(settings)
+                response = BlockForward.BlockForward(name).saveForwarder(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -715,7 +715,7 @@ class deleteForwarder(webapp2.RequestHandler):
         if authenticationOK:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = HDForwarder.HDForwarder(name).deleteForwarder()
+                response = BlockForward.BlockForward(name).deleteForwarder()
         else:
             response['error'] = authentication['error']
 
@@ -728,7 +728,7 @@ class doForwarding(webapp2.RequestHandler):
         if self.request.get('name'):
             name = self.request.get('name')
 
-        HDForwarder.DoForwarding(name)
+        BlockForward.DoForwarding(name)
 
         response = {'success': 1}
         self.response.write(json.dumps(response, sort_keys=True))

@@ -13,7 +13,7 @@ class APIKeys(ndb.Model):
 
 
 class Parameters(ndb.Model):
-    HDForwarder_walletseed = ndb.StringProperty(indexed=False, default="")
+    BlockForward_walletseed = ndb.StringProperty(indexed=False, default="")
     BlockDistribute_walletseed = ndb.StringProperty(indexed=False, default="")
     BlockWriter_walletseed = ndb.StringProperty(indexed=False, default="")
     mailFrom = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
@@ -54,7 +54,7 @@ class Forwarder(ndb.Model):
 
 def forwarders_key():
     #Constructs a Datastore key for a Forwarder entity
-    return ndb.Key('HDForwarder', 'HDForwarder')
+    return ndb.Key('BlockForward', 'BlockForward')
 
 
 class Distributer(ndb.Model):
@@ -182,8 +182,8 @@ def initializeWalletAddress(module, i):
             xpubKey = ''
             if module == 'BlockWriter' and parameters.BlockWriter_walletseed not in ['', None]:
                 xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
-            elif module == 'BlockForwarder' and parameters.HDForwarder_walletseed not in ['', None]:
-                xpubKey = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed, "", 1)[0]
+            elif module == 'BlockForwarder' and parameters.BlockForward_walletseed not in ['', None]:
+                xpubKey = BIP44.getXPUBKeys(parameters.BlockForward_walletseed, "", 1)[0]
             elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
                 xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
 
