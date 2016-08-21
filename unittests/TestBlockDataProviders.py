@@ -1,14 +1,16 @@
 
-
-from wrappers import SpellbookWrapper
+import sys
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from wrappers import SpellbookWrapper as SpellbookWrapper
 import difflib
 
 
 
 #local parameters, these will need to be changed
-url = 'http://localhost:33080'
-key = '2B5PVW4I6O6TN5SJ'
-secret = '3I97DV6TQOWF6DD1'
+url = 'http://localhost:34080'
+key = 'GW8S1SV40FG4TPDI'
+secret = 'EI5IJJBTVL6YGWNE'
 
 #test parameters
 address = '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8'
@@ -42,6 +44,13 @@ def difference(a, b):
 
 
 api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
+
+
+api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
+print api.saveProvider('Blocktrail.com', 0, 'Blocktrail.com', 'a8a84ed2929da8313d75d16e04be2a26c4cc4ea4', key, secret)
+print api.saveProvider('Blockchain.info', 1, 'Blockchain.info', '', key, secret)
+print api.saveProvider('Blockexplorer.com', 2, 'Insight', 'https://www.blockexplorer.com/api', key, secret)
+print api.saveProvider('Bitpay.com', 3, 'Insight', 'https://insight.bitpay.com/api', key, secret)
 
 
 print '=============get providers========================'
