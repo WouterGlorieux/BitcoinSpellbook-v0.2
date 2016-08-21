@@ -6,7 +6,7 @@ from BlocklinkerWrapper import BlocklinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
 from BlockVoterWrapper import BlockVoterWrapper
 from HDForwarderWrapper import HDForwarderWrapper
-from DistributeBTCWrapper import DistributeBTCWrapper
+from BlockDistributeWrapper import BlockDistributeWrapper
 from BlockTriggerWrapper import BlockTriggerWrapper
 from BlockWriterWrapper import BlockWriterWrapper
 from BlockProfileWrapper import BlockProfileWrapper
@@ -36,8 +36,8 @@ class SpellbookWrapper():
     def HDForwarder(self):
         return HDForwarderWrapper(self.url)
 
-    def DistributeBTC(self):
-        return DistributeBTCWrapper(self.url)
+    def BlockDistribute(self):
+        return BlockDistributeWrapper(self.url)
 
     def BlockTrigger(self):
         return BlockTriggerWrapper(self.url)

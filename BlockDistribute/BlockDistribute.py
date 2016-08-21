@@ -258,11 +258,11 @@ class Distributer():
                 distributer.address = bitcoin.privtoaddr(distributer.privateKey)
             elif distributer.addressType == 'BIP44':
                 parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.DistributeBTC_walletseed != "":
+                if parameters and parameters.BlockDistribute_walletseed != "":
                     if distributer.walletIndex == 0:
                         distributer.walletIndex = getNextIndex()
 
-                    xpub = BIP44.getXPUBKeys(parameters.DistributeBTC_walletseed)[0]
+                    xpub = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed)[0]
                     distributer.address = BIP44.getAddressFromXPUB(xpub, distributer.walletIndex)
                 else:
                     self.error = 'Unable to retrieve wallet seed'
@@ -409,8 +409,8 @@ class DoDistributing():
 
                 elif distributer.addressType == 'BIP44':
                     parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                    if parameters and parameters.DistributeBTC_walletseed != '' and parameters.DistributeBTC_walletseed != None:
-                        xprivKeys = BIP44.getXPRIVKeys(parameters.DistributeBTC_walletseed, "", 1)
+                    if parameters and parameters.BlockDistribute_walletseed != '' and parameters.BlockDistribute_walletseed != None:
+                        xprivKeys = BIP44.getXPRIVKeys(parameters.BlockDistribute_walletseed, "", 1)
                         privKeys = BIP44.getPrivKey(xprivKeys[0], distributer.walletIndex)
 
 

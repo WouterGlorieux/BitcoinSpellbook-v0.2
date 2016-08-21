@@ -14,7 +14,7 @@ class APIKeys(ndb.Model):
 
 class Parameters(ndb.Model):
     HDForwarder_walletseed = ndb.StringProperty(indexed=False, default="")
-    DistributeBTC_walletseed = ndb.StringProperty(indexed=False, default="")
+    BlockDistribute_walletseed = ndb.StringProperty(indexed=False, default="")
     BlockWriter_walletseed = ndb.StringProperty(indexed=False, default="")
     mailFrom = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
     optimalFeePerKB = ndb.IntegerProperty(indexed=False, default=0)
@@ -83,7 +83,7 @@ class Distributer(ndb.Model):
 
 def distributers_key():
     #Constructs a Datastore key for a Distributer entity
-    return ndb.Key('DistributeBTC', 'DistributeBTC')
+    return ndb.Key('BlockDistribute', 'BlockDistribute')
 
 
 class Trigger(ndb.Model):
@@ -184,8 +184,8 @@ def initializeWalletAddress(module, i):
                 xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
             elif module == 'BlockForwarder' and parameters.HDForwarder_walletseed not in ['', None]:
                 xpubKey = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed, "", 1)[0]
-            elif module == 'BlockDistributer' and parameters.DistributeBTC_walletseed not in ['', None]:
-                xpubKey = BIP44.getXPUBKeys(parameters.DistributeBTC_walletseed, "", 1)[0]
+            elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
+                xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
 
             if xpubKey != '':
                 wallet_address = WalletAddress.get_or_insert("%s_%i" % (module, i), parent=address_key())

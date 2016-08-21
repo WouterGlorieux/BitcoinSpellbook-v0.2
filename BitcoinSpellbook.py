@@ -29,7 +29,7 @@ import Blocklinker.Blocklinker as Blocklinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
 import HDForwarder.HDForwarder as HDForwarder
-import DistributeBTC.DistributeBTC as DistributeBTC
+import BlockDistribute.BlockDistribute as BlockDistribute
 import BlockTrigger.BlockTrigger as BlockTrigger
 import BlockWriter.BlockWriter as BlockWriter
 import BlockProfile.BlockProfile as BlockProfile
@@ -287,8 +287,8 @@ class initializeWallet(webapp2.RequestHandler):
                     xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
                 elif module == 'BlockForwarder' and parameters.HDForwarder_walletseed not in ['', None]:
                     xpubKey = BIP44.getXPUBKeys(parameters.HDForwarder_walletseed, "", 1)[0]
-                elif module == 'BlockDistributer' and parameters.DistributeBTC_walletseed not in ['', None]:
-                    xpubKey = BIP44.getXPUBKeys(parameters.DistributeBTC_walletseed, "", 1)[0]
+                elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
+                    xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
 
                 if self.request.get('n'):
                     try:
@@ -738,7 +738,7 @@ class doForwarding(webapp2.RequestHandler):
 class getDistributers(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
-        response = DistributeBTC.getDistributers()
+        response = BlockDistribute.getDistributers()
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -751,7 +751,7 @@ class getDistributer(webapp2.RequestHandler):
         if self.request.get('name'):
             name = self.request.get('name')
 
-        response = DistributeBTC.Distributer(name).get()
+        response = BlockDistribute.Distributer(name).get()
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -768,7 +768,7 @@ class checkDistributerAddress(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-        response = DistributeBTC.Distributer(name).checkAddress(address)
+        response = BlockDistribute.Distributer(name).checkAddress(address)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -873,7 +873,7 @@ class saveDistributer(webapp2.RequestHandler):
                     settings['privateKey'] = self.request.get('privateKey')
 
 
-                response = DistributeBTC.Distributer(name).saveDistributer(settings)
+                response = BlockDistribute.Distributer(name).saveDistributer(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -895,7 +895,7 @@ class deleteDistributer(webapp2.RequestHandler):
         if authenticationOK:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = DistributeBTC.Distributer(name).deleteDistributer()
+                response = BlockDistribute.Distributer(name).deleteDistributer()
         else:
             response['error'] = authentication['error']
 
@@ -914,7 +914,7 @@ class updateDistribution(webapp2.RequestHandler):
         if authenticationOK:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = DistributeBTC.Distributer(name).updateDistribution()
+                response = BlockDistribute.Distributer(name).updateDistribution()
         else:
             response['error'] = authentication['error']
 
@@ -929,7 +929,7 @@ class doDistributing(webapp2.RequestHandler):
         if self.request.get('name'):
             name = self.request.get('name')
 
-        DistributeBTC.DoDistributing(name)
+        BlockDistribute.DoDistributing(name)
 
         response = {'success': 1}
         self.response.write(json.dumps(response, sort_keys=True))
