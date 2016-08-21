@@ -261,7 +261,7 @@ class initialize(webapp2.RequestHandler):
 
 class updateRecommendedFee(webapp2.RequestHandler):
     def get(self):
-        parameters = datastore.Parameters.get_by_id('DefaultConfig')
+        parameters = datastore.Parameters.get_or_insert('DefaultConfig')
         blocktrailKey = datastore.Providers.get_by_id('Blocktrail.com').blocktrail_key
         data = {}
 
