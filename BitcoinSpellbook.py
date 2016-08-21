@@ -23,7 +23,7 @@ from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
 
-import Blockchaindata.Blockchaindata as data
+import BlockData.BlockData as data
 import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
 import BlockLinker.BlockLinker as BlockLinker
 import BlockRandom.BlockRandom as BlockRandom

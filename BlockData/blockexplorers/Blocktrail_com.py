@@ -2,7 +2,7 @@ __author__ = 'Wouter'
 import urllib2
 import json
 import binascii
-from Blockchaindata import TX as TX
+from BlockData import TX as TX
 import TxFactory.TxFactory as TxFactory
 import time
 import datetime

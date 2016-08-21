@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from validators import validators as validator
 from BIP44 import BIP44 as BIP44
-import Blockchaindata.Blockchaindata as blockchaindata
+import BlockData.BlockData as BlockData
 
 import datastore.datastore as datastore
 import TxFactory.TxFactory as TxFactory
@@ -350,7 +350,7 @@ class DoWriting():
             logging.error('Invalid outputs: ' + str(writer.outputs))
             return None
 
-        utxos_data = blockchaindata.utxos(writer.address)
+        utxos_data = BlockData.utxos(writer.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
             UTXOs = utxos_data['UTXOs']
         else:

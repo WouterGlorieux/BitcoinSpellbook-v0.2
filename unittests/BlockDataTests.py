@@ -7,10 +7,10 @@ from wrappers import SpellbookWrapper
 
 logging.basicConfig(filename='unittests.log',level=logging.DEBUG)
 
-class BlockchainDataTests(unittest.TestCase):
+class BlockDataTests(unittest.TestCase):
 
-    def test_BlockchainData_GenesisBlock(self):
-        api = SpellbookWrapper.SpellbookWrapper().BlockchainData()
+    def test_BlockData_GenesisBlock(self):
+        api = SpellbookWrapper.SpellbookWrapper().BlockData()
         for provider in PROVIDERS:
             data = api.block(0, provider)
 

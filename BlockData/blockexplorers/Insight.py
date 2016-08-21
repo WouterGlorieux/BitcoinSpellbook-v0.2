@@ -3,7 +3,7 @@ __author__ = 'Wouter'
 import urllib2
 import json
 import TxFactory.TxFactory as TxFactory
-from Blockchaindata import TX
+from BlockData import TX
 
 from pprint import pprint
 from decimal import *

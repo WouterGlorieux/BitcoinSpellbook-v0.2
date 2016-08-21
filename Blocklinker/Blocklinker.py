@@ -1,5 +1,5 @@
 
-from Blockchaindata import Blockchaindata
+from BlockData import BlockData
 from SimplifiedInputsList import SimplifiedInputsList
 import bitcoin
 
@@ -28,7 +28,7 @@ class BlockLinker():
 
                 self.addressList = getAddressesFromXPUB(self.xpub, len(self.SIL))
 
-                balances_data = Blockchaindata.balances(concatAddresses(self.addressList))
+                balances_data = BlockData.balances(concatAddresses(self.addressList))
                 if 'success' in balances_data and balances_data['success'] == 1:
                     self.balances = balances_data['balances']
                 else:

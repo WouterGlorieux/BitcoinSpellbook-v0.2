@@ -3,7 +3,7 @@
 
 
 from validators import validators as validator
-import Blockchaindata.Blockchaindata as blockchaindata
+import BlockData.BlockData as BlockData
 import datastore.datastore as datastore
 
 import time
@@ -313,7 +313,7 @@ class CheckTriggers():
     def run(self, trigger):
         if trigger.triggered == False:
             if trigger.triggerType == 'BlockHeight':
-                latestBlock_data = blockchaindata.latestBlock()
+                latestBlock_data = BlockData.latestBlock()
                 if 'success' in latestBlock_data and latestBlock_data['success'] == 1:
                     latestBlockHeight = latestBlock_data['latestBlock']['height']
                     if trigger.blockHeight + trigger.confirmations <= latestBlockHeight:
@@ -325,7 +325,7 @@ class CheckTriggers():
                     logging.error('Unable to retrieve latest blockHeight')
 
             elif trigger.triggerType in ['Balance', 'Received', 'Sent']:
-                balance_data = blockchaindata.balances(trigger.address)
+                balance_data = BlockData.balances(trigger.address)
 
                 if 'success' in balance_data and balance_data['success'] == 1:
                     balances = balance_data['balances'][trigger.address]

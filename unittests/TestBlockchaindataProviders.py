@@ -41,7 +41,7 @@ def difference(a, b):
 
 
 
-api = SpellbookWrapper.SpellbookWrapper(url).BlockchainData()
+api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
 
 
 print '=============get providers========================'

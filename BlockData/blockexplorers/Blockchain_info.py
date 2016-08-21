@@ -3,7 +3,7 @@ import urllib2
 import json
 import logging
 import TxFactory.TxFactory as TxFactory
-from Blockchaindata import TX as TX
+from BlockData import TX as TX
 
 from pprint import pprint
 

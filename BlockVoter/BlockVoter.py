@@ -1,6 +1,6 @@
 
 
-from Blockchaindata import Blockchaindata
+from BlockData import BlockData
 from SimplifiedInputsList import SimplifiedInputsList
 from BlockLinker import BlockLinker
 from validators import validators as validator
@@ -112,7 +112,7 @@ class BlockVoter():
         digits = len(str(len(self.options)))
 
         if blockHeight==0:
-            latestBlock_data = Blockchaindata.latestBlock()
+            latestBlock_data = BlockData.latestBlock()
             if 'success' in latestBlock_data and latestBlock_data['success'] == 1:
                 blockHeight = latestBlock_data['latestBlock']['height']
             else:
@@ -134,7 +134,7 @@ class BlockVoter():
                 self.error = weights_data['error']
 
         TXS = []
-        TXS_data = Blockchaindata.transactions(self.address)
+        TXS_data = BlockData.transactions(self.address)
 
         if 'success' in TXS_data and TXS_data['success'] == 1:
             TXS = TXS_data['TXS']

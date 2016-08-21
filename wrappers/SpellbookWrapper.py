@@ -1,6 +1,6 @@
 
 
-from BlockchainDataWrapper import BlockchainDataWrapper
+from BlockDataWrapper import BlockDataWrapper
 from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
 from BlockLinkerWrapper import BlockLinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
@@ -18,8 +18,8 @@ class SpellbookWrapper():
     def __init__(self, url='http://bitcoinspellbook.appspot.com'):
         self.url = url
 
-    def BlockchainData(self):
-        return BlockchainDataWrapper(self.url)
+    def BlockData(self):
+        return BlockDataWrapper(self.url)
 
     def SimplifiedInputsList(self):
         return SimplifiedInputsListWrapper(self.url)

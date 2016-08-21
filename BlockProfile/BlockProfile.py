@@ -1,6 +1,6 @@
 import re
 import logging
-from Blockchaindata import Blockchaindata
+from BlockData import BlockData
 from validators import validators as validator
 
 
@@ -10,14 +10,14 @@ def Profile(address, block=0):
 
     if validator.validAddress(address):
         if block == 0:
-            latestBlock = Blockchaindata.latestBlock()
+            latestBlock = BlockData.latestBlock()
 
             if 'success' in latestBlock and latestBlock['success'] == 1:
                 block = latestBlock['latestBlock']['height']
             else:
                 response['error'] = 'Unable to retrieve latest block'
 
-        txsData = Blockchaindata.transactions(address)
+        txsData = BlockData.transactions(address)
         if 'success' in txsData and txsData['success'] == 1:
             txs = txsData['TXS']
             profile = TXS2profile(txs, address, block)

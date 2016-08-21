@@ -4,7 +4,7 @@
 
 from validators import validators as validator
 from BIP44 import BIP44 as BIP44
-import Blockchaindata.Blockchaindata as blockchaindata
+import BlockData.BlockData as BlockData
 from BlockLinker import BlockLinker as BlockLinker
 from SimplifiedInputsList import SimplifiedInputsList as SimplifiedInputsList
 
@@ -371,7 +371,7 @@ class DoDistributing():
 
     def run(self, distributer):
         success = False
-        utxos_data = blockchaindata.utxos(distributer.address)
+        utxos_data = BlockData.utxos(distributer.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
             UTXOs = utxos_data['UTXOs']
         else:
@@ -616,7 +616,7 @@ class DoDistributing(webapp2.RequestHandler):
     def distribute(self, distributer):
 
         data = {}
-        url = 'https://blockchaindata.appspot.com/utxos?confirmations=' + str(REQUIRED_CONFIRMATIONS) + '&addresses=' + str(distributer.address)
+        url = 'https://BlockData.appspot.com/utxos?confirmations=' + str(REQUIRED_CONFIRMATIONS) + '&addresses=' + str(distributer.address)
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())

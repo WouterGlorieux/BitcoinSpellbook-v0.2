@@ -4,7 +4,7 @@
 
 from validators import validators as validator
 from BIP44 import BIP44 as BIP44
-import Blockchaindata.Blockchaindata as blockchaindata
+import BlockData.BlockData as BlockData
 from BlockLinker import BlockLinker as BlockLinker
 
 import datastore.datastore as datastore
@@ -276,7 +276,7 @@ class DoForwarding():
 
     def run(self, forwarder):
         success = False
-        utxos_data = blockchaindata.utxos(forwarder.address)
+        utxos_data = BlockData.utxos(forwarder.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
             UTXOs = utxos_data['UTXOs']
         else:
@@ -287,7 +287,7 @@ class DoForwarding():
             to_addresses = []
             amounts = []
 
-            primeInputAddress_data = blockchaindata.primeInputAddress(UTXO['output'].split(":")[0])
+            primeInputAddress_data = BlockData.primeInputAddress(UTXO['output'].split(":")[0])
             if 'success' in primeInputAddress_data and primeInputAddress_data['success'] == 1:
                 primeInputAddress = primeInputAddress_data['PrimeInputAddress']
                 if primeInputAddress != forwarder.address:

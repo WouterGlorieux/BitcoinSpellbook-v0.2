@@ -1,6 +1,6 @@
 
 from validators import validators as validator
-from Blockchaindata import Blockchaindata
+from BlockData import BlockData
 from SimplifiedInputsList import SimplifiedInputsList
 from BlockLinker import BlockLinker
 
@@ -57,9 +57,9 @@ class Random():
         rand = 0.0
 
         if rngBlockHeight != 0:
-            block_data = Blockchaindata.block(rngBlockHeight)
+            block_data = BlockData.block(rngBlockHeight)
         else:
-            block_data = Blockchaindata.latestBlock()
+            block_data = BlockData.latestBlock()
 
         if 'success' in block_data and block_data['success'] == 1:
             if rngBlockHeight != 0:
