@@ -2,7 +2,7 @@
 from validators import validators as validator
 from Blockchaindata import Blockchaindata
 from SimplifiedInputsList import SimplifiedInputsList
-from Blocklinker import Blocklinker
+from BlockLinker import BlockLinker
 
 
 class Random():
@@ -88,11 +88,11 @@ class Random():
             if source == 'SIL':
                 data = SimplifiedInputsList.SIL(self.address, self.blockHeight)
             elif source == 'LBL':
-                data = Blocklinker.Blocklinker(self.address, self.xpub, self.blockHeight).LBL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.blockHeight).LBL()
             elif source == 'LRL':
-                data = Blocklinker.Blocklinker(self.address, self.xpub, self.blockHeight).LRL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.blockHeight).LRL()
             elif source == 'LBL':
-                data = Blocklinker.Blocklinker(self.address, self.xpub, self.blockHeight).LSL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.blockHeight).LSL()
             else:
                 self.error = 'Unknown distribution source'
 

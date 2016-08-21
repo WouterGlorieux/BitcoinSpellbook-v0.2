@@ -25,7 +25,7 @@ urlfetch.set_default_fetch_deadline(60)
 
 import Blockchaindata.Blockchaindata as data
 import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
-import Blocklinker.Blocklinker as Blocklinker
+import BlockLinker.BlockLinker as BlockLinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
 import BlockForward.BlockForward as BlockForward
@@ -344,12 +344,12 @@ class LBL(webapp2.RequestHandler):
             if self.request.get('blockHeight'):
                 try:
                     blockHeight = int(self.request.get('blockHeight'))
-                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LBL()
+                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LBL()
                 except ValueError:
                     response['error'] = 'blockHeight must be a positive integer.'
 
             else:
-                response = Blocklinker.Blocklinker(address, xpub).LBL()
+                response = BlockLinker.BlockLinker(address, xpub).LBL()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -367,12 +367,12 @@ class LRL(webapp2.RequestHandler):
             if self.request.get('blockHeight'):
                 try:
                     blockHeight = int(self.request.get('blockHeight'))
-                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LRL()
+                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LRL()
                 except ValueError:
                     response['error'] = 'blockHeight must be a positive integer.'
 
             else:
-                response = Blocklinker.Blocklinker(address, xpub).LRL()
+                response = BlockLinker.BlockLinker(address, xpub).LRL()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -389,12 +389,12 @@ class LSL(webapp2.RequestHandler):
             if self.request.get('blockHeight'):
                 try:
                     blockHeight = int(self.request.get('blockHeight'))
-                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LSL()
+                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LSL()
                 except ValueError:
                     response['error'] = 'blockHeight must be a positive integer.'
 
             else:
-                response = Blocklinker.Blocklinker(address, xpub).LSL()
+                response = BlockLinker.BlockLinker(address, xpub).LSL()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -411,12 +411,12 @@ class LAL(webapp2.RequestHandler):
             if self.request.get('blockHeight'):
                 try:
                     blockHeight = int(self.request.get('blockHeight'))
-                    response = Blocklinker.Blocklinker(address, xpub, blockHeight).LAL()
+                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LAL()
                 except ValueError:
                     response['error'] = 'blockHeight must be a positive integer.'
 
             else:
-                response = Blocklinker.Blocklinker(address, xpub).LAL()
+                response = BlockLinker.BlockLinker(address, xpub).LAL()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'

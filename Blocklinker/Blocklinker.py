@@ -6,7 +6,7 @@ import bitcoin
 
 from validators import validators as validator
 
-class Blocklinker():
+class BlockLinker():
 
     def __init__(self, address, xpub, blockHeight=0):
 

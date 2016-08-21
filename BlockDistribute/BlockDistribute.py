@@ -5,7 +5,7 @@
 from validators import validators as validator
 from BIP44 import BIP44 as BIP44
 import Blockchaindata.Blockchaindata as blockchaindata
-from Blocklinker import Blocklinker as Blocklinker
+from BlockLinker import BlockLinker as BlockLinker
 from SimplifiedInputsList import SimplifiedInputsList as SimplifiedInputsList
 
 
@@ -313,7 +313,7 @@ class Distributer():
                         self.error = 'Unable to retrieve SIL'
 
                 elif distributer.distributionSource in ['LBL', 'LRL', 'LSL']:
-                    linker = Blocklinker.Blocklinker(distributer.registrationAddress, distributer.registrationXPUB, distributer.registrationBlockHeight)
+                    linker = BlockLinker.BlockLinker(distributer.registrationAddress, distributer.registrationXPUB, distributer.registrationBlockHeight)
 
                     if distributer.distributionSource == 'LBL':
                         linker_data = linker.LBL()

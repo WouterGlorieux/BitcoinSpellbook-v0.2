@@ -2,7 +2,7 @@
 
 from Blockchaindata import Blockchaindata
 from SimplifiedInputsList import SimplifiedInputsList
-from Blocklinker import Blocklinker
+from BlockLinker import BlockLinker
 from validators import validators as validator
 
 import hashlib
@@ -122,11 +122,11 @@ class BlockVoter():
             if self.weights == 'SIL':
                 weights_data = SimplifiedInputsList.SIL(self.registrationAddress, self.registrationBlockHeight)
             elif self.weights == 'LBL':
-                weights_data = Blocklinker.Blocklinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LBL()
+                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LBL()
             elif self.weights == 'LRL':
-                weights_data = Blocklinker.Blocklinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LRL()
+                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LRL()
             elif self.weights == 'LSL':
-                weights_data = Blocklinker.Blocklinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LSL()
+                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LSL()
 
             if 'success' in weights_data and weights_data['success'] == 1:
                 self.weightValues = weights_data[self.weights]

@@ -5,7 +5,7 @@
 from validators import validators as validator
 from BIP44 import BIP44 as BIP44
 import Blockchaindata.Blockchaindata as blockchaindata
-from Blocklinker import Blocklinker as Blocklinker
+from BlockLinker import BlockLinker as BlockLinker
 
 import datastore.datastore as datastore
 import TxFactory.TxFactory as TxFactory
@@ -101,7 +101,7 @@ class BlockForward():
                 if forwarder.address == address:
                     forwardingRelation['relation'] = 'forwarding address'
                 else:
-                    linker = Blocklinker.Blocklinker(forwarder.address, forwarder.xpub)
+                    linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
                     LAL_data = linker.LAL()
                     if 'success' in LAL_data and LAL_data['success'] == 1:
                         LAL = LAL_data['LAL']
@@ -292,7 +292,7 @@ class DoForwarding():
                 primeInputAddress = primeInputAddress_data['PrimeInputAddress']
                 if primeInputAddress != forwarder.address:
 
-                    linker = Blocklinker.Blocklinker(forwarder.address, forwarder.xpub)
+                    linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
                     LAL_data = linker.LAL()
                     if 'success' in LAL_data and LAL_data['success'] == 1:
                         LAL = LAL_data['LAL']
