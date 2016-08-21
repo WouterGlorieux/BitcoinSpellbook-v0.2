@@ -1,6 +1,6 @@
 
 from BlockData import BlockData
-from SimplifiedInputsList import SimplifiedInputsList
+from BlockInputs import BlockInputs
 import bitcoin
 
 
@@ -21,7 +21,7 @@ class BlockLinker():
         self.error = ''
 
         if validator.validAddress(self.address) and validator.validXPUB(self.xpub):
-            SIL_data = SimplifiedInputsList.SIL(self.address, self.blockHeight)
+            SIL_data = BlockInputs.SIL(self.address, self.blockHeight)
 
             if 'success' in SIL_data and SIL_data['success'] == 1:
                 self.SIL = SIL_data['SIL']

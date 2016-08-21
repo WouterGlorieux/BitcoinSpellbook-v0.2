@@ -1,7 +1,7 @@
 
 from validators import validators as validator
 from BlockData import BlockData
-from SimplifiedInputsList import SimplifiedInputsList
+from BlockInputs import BlockInputs
 from BlockLinker import BlockLinker
 
 
@@ -86,7 +86,7 @@ class Random():
         if self.error == '':
             data = {}
             if source == 'SIL':
-                data = SimplifiedInputsList.SIL(self.address, self.blockHeight)
+                data = BlockInputs.SIL(self.address, self.blockHeight)
             elif source == 'LBL':
                 data = BlockLinker.BlockLinker(self.address, self.xpub, self.blockHeight).LBL()
             elif source == 'LRL':

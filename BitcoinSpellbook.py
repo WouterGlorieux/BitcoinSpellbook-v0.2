@@ -24,7 +24,7 @@ urlfetch.set_default_fetch_deadline(60)
 
 
 import BlockData.BlockData as data
-import SimplifiedInputsList.SimplifiedInputsList as SimplifiedInputsList
+import BlockInputs.BlockInputs as BlockInputs
 import BlockLinker.BlockLinker as BlockLinker
 import BlockRandom.BlockRandom as BlockRandom
 import BlockVoter.BlockVoter as BlockVoter
@@ -321,12 +321,12 @@ class SIL(webapp2.RequestHandler):
             if self.request.get('blockHeight'):
                 try:
                     blockHeight = int(self.request.get('blockHeight'))
-                    response = SimplifiedInputsList.SIL(address, blockHeight)
+                    response = BlockInputs.SIL(address, blockHeight)
                 except ValueError:
                     response['error'] = 'blockHeight must be a positive integer.'
 
             else:
-                response = SimplifiedInputsList.SIL(address)
+                response = BlockInputs.SIL(address)
 
         else:
             response['error'] = 'You must provide an address.'

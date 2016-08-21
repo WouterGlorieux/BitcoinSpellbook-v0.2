@@ -1,7 +1,7 @@
 
 
 from BlockData import BlockData
-from SimplifiedInputsList import SimplifiedInputsList
+from BlockInputs import BlockInputs
 from BlockLinker import BlockLinker
 from validators import validators as validator
 
@@ -120,7 +120,7 @@ class BlockVoter():
 
         if self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
             if self.weights == 'SIL':
-                weights_data = SimplifiedInputsList.SIL(self.registrationAddress, self.registrationBlockHeight)
+                weights_data = BlockInputs.SIL(self.registrationAddress, self.registrationBlockHeight)
             elif self.weights == 'LBL':
                 weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LBL()
             elif self.weights == 'LRL':

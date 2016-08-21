@@ -6,7 +6,7 @@ from validators import validators as validator
 from BIP44 import BIP44 as BIP44
 import BlockData.BlockData as BlockData
 from BlockLinker import BlockLinker as BlockLinker
-from SimplifiedInputsList import SimplifiedInputsList as SimplifiedInputsList
+from BlockInputs import BlockInputs as BlockInputs
 
 
 import datastore.datastore as datastore
@@ -305,7 +305,7 @@ class Distributer():
             if distributer:
                 distribution = distributer.distribution
                 if distributer.distributionSource == 'SIL':
-                    SIL_data = SimplifiedInputsList.SIL(distributer.registrationAddress, distributer.registrationBlockHeight)
+                    SIL_data = BlockInputs.SIL(distributer.registrationAddress, distributer.registrationBlockHeight)
                     if 'success' in SIL_data and SIL_data['success'] == 1:
                         distribution = SIL_data['SIL']
 

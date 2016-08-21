@@ -1,7 +1,7 @@
 
 
 from BlockDataWrapper import BlockDataWrapper
-from SimplifiedInputsListWrapper import SimplifiedInputsListWrapper
+from BlockInputsWrapper import BlockInputsWrapper
 from BlockLinkerWrapper import BlockLinkerWrapper
 from BlockRandomWrapper import BlockRandomWrapper
 from BlockVoterWrapper import BlockVoterWrapper
@@ -21,8 +21,8 @@ class SpellbookWrapper():
     def BlockData(self):
         return BlockDataWrapper(self.url)
 
-    def SimplifiedInputsList(self):
-        return SimplifiedInputsListWrapper(self.url)
+    def BlockInputs(self):
+        return BlockInputsWrapper(self.url)
 
     def BlockLinker(self):
         return BlockLinkerWrapper(self.url)

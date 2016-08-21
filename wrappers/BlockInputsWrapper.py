@@ -8,7 +8,7 @@ import urllib
 
 
 
-class SimplifiedInputsListWrapper():
+class BlockInputsWrapper():
     def __init__(self, url):
         self.url = url
 
