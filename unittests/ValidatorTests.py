@@ -57,7 +57,7 @@ class ValidatorTests(unittest.TestCase):
                              "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
         print 'OK'
 
-    def test_ValidBlockProfileMessage(self):
+    def test_valid_blockprofile_message(self):
         print 'testing valid_blockprofile_message...',
         for vector in TestVectors.profile_message_test_vectors:
             self.assertEqual(validators.validBlockProfileMessage(vector[0]), vector[1],
@@ -99,13 +99,6 @@ class ValidatorTests(unittest.TestCase):
                              "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
         print 'OK'
 
-    def test_valid_amount(self):
-        print 'testing valid_amount...',
-        for vector in TestVectors.amount_test_vectors:
-            self.assertEqual(validators.validAmount(vector[0]), vector[1],
-                             "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
-        print 'OK'
-
     def test_valid_block_height(self):
         print 'testing valid_block_height...',
         for vector in TestVectors.block_height_test_vectors:
@@ -134,7 +127,6 @@ class ValidatorTests(unittest.TestCase):
                              "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
         print 'OK'
 
-
     def test_valid_private_key(self):
         print 'testing valid_private_key...',
         for vector in TestVectors.private_key_test_vectors:
@@ -155,4 +147,3 @@ class ValidatorTests(unittest.TestCase):
             self.assertEqual(validators.validOutputs(vector[0]), vector[1],
                              "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
         print 'OK'
-
