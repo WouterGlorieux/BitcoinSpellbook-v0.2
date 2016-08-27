@@ -9,8 +9,11 @@ import hashlib
 
 MINIMUM_VOTE_COST = 40000
 
+
 class BlockVoter():
-    def __init__(self, address, proposal, options=[], voteCost=MINIMUM_VOTE_COST):
+    def __init__(self, address, proposal, options=None, vote_cost=MINIMUM_VOTE_COST):
+        if not options:
+            options = []
         self.error = ''
 
         if address != '' and validator.validAddress(address):
@@ -28,31 +31,30 @@ class BlockVoter():
         else:
             self.error = 'Options must be of type: List'
 
-        if isinstance(voteCost, int) and voteCost >= MINIMUM_VOTE_COST:
-            self.voteCost = voteCost
+        if isinstance(vote_cost, int) and vote_cost >= MINIMUM_VOTE_COST:
+            self.voteCost = vote_cost
         else:
-            self.error = 'Invalid voteCost, must be minimum ' + str(MINIMUM_VOTE_COST) + ' Satoshis'
+            self.error = 'Invalid vote_cost, must be minimum ' + str(MINIMUM_VOTE_COST) + ' Satoshis'
 
         self.weights = ''
-        self.registrationAddress = ''
-        self.registrationBlockHeight = 0
-        self.registrationXPUB = ''
+        self.registration_address = ''
+        self.registration_block_height = 0
+        self.registration_xpub = ''
 
-        self.weightValues = []
+        self.weight_values = []
 
-
-    def setWeights(self, weights='Equal', registrationAddress="", registrationBlockHeight=0, registrationXPUB=""):
+    def setWeights(self, weights='Equal', registration_address="", registration_block_height=0, registration_xpub=""):
         if weights in ['Value', 'Equal', 'SIL', 'LBL', 'LRL', 'LSL']:
             self.weights = weights
 
-            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registrationAddress):
+            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
 
-                if isinstance(registrationBlockHeight, int) and registrationBlockHeight >= 0:
-                    self.registrationAddress = registrationAddress
-                    self.registrationBlockHeight = registrationBlockHeight
+                if isinstance(registration_block_height, int) and registration_block_height >= 0:
+                    self.registration_address = registration_address
+                    self.registration_block_height = registration_block_height
 
-                    if weights in ['LBL', 'LRL', 'LSL'] and validator.validXPUB(registrationXPUB):
-                        self.registrationXPUB = registrationXPUB
+                    if weights in ['LBL', 'LRL', 'LSL'] and validator.validXPUB(registration_xpub):
+                        self.registration_xpub = registration_xpub
                     elif weights in ['LBL', 'LRL', 'LSL']:
                         self.error = 'Invalid registration XPUB'
                 else:
@@ -62,39 +64,36 @@ class BlockVoter():
                 self.error = 'Invalid registration address'
 
     def getOptions(self):
-        optionsDict = {}
+        options_dict = {}
         for i in range(0, len(self.options)):
-            option = {}
-            option['description'] = self.options[i]
-            option['amount'] = self.voteCost + i
+            option = {'description': self.options[i],
+                      'amount': self.voteCost + i}
             option['QR'] = "http://www.btcfrog.com/qr/bitcoinPNG.php?address=" + str(self.address) + "&amount=" + str(option['amount']/1e8) + "&error=H"
-            optionsDict[i] = option
+            options_dict[i] = option
 
-        return sorted(optionsDict.iteritems())
+        return sorted(options_dict.iteritems())
 
     def getProposalHash(self):
-        proposalData = self.address + self.proposal + str(self.options)
-        proposalHash = hashlib.sha256(proposalData).hexdigest()
-        return proposalHash
-
+        proposal_data = self.address + self.proposal + str(self.options)
+        proposal_hash = hashlib.sha256(proposal_data).hexdigest()
+        return proposal_hash
 
     def getProposal(self):
         response = {'success': 0}
         if self.error == '':
-            proposal = {}
-            proposal['address'] = self.address
-            proposal['proposal'] = self.proposal
-            proposal['options'] = self.getOptions()
-            proposal['voteCost'] = self.voteCost
+            proposal = {'address': self.address,
+                        'proposal': self.proposal,
+                        'options': self.getOptions(),
+                        'voteCost': self.voteCost}
 
             if self.weights != '':
                 proposal['weights'] = self.weights
-            if self.registrationAddress != '':
-                proposal['regAddress'] = self.registrationAddress
-            if self.registrationXPUB != '':
-                proposal['regXPUB'] = self.registrationXPUB
-            if self.registrationBlockHeight != 0:
-                proposal['regBlockHeight'] = self.registrationBlockHeight
+            if self.registration_address != '':
+                proposal['regAddress'] = self.registration_address
+            if self.registration_xpub != '':
+                proposal['regXPUB'] = self.registration_xpub
+            if self.registration_block_height != 0:
+                proposal['regBlockHeight'] = self.registration_block_height
 
             proposal['proposalHash'] = self.getProposalHash()
 
@@ -105,65 +104,68 @@ class BlockVoter():
 
         return response
 
-
-    def getResults(self, blockHeight=0):
+    def getResults(self, block_height=0):
         response = {'success': 0}
 
         digits = len(str(len(self.options)))
 
-        if blockHeight==0:
-            latestBlock_data = BlockData.latestBlock()
-            if 'success' in latestBlock_data and latestBlock_data['success'] == 1:
-                blockHeight = latestBlock_data['latestBlock']['height']
+        if block_height == 0:
+            latest_block_data = BlockData.latestBlock()
+            if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                block_height = latest_block_data['latestBlock']['height']
             else:
-                self.error = latestBlock_data['error']
+                self.error = latest_block_data['error']
 
         if self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
             if self.weights == 'SIL':
-                weights_data = BlockInputs.SIL(self.registrationAddress, self.registrationBlockHeight)
+                weights_data = BlockInputs.SIL(self.registration_address, self.registration_block_height)
             elif self.weights == 'LBL':
-                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LBL()
+                weights_data = BlockLinker.BlockLinker(self.registration_address,
+                                                       self.registration_xpub,
+                                                       self.registration_block_height).LBL()
             elif self.weights == 'LRL':
-                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LRL()
+                weights_data = BlockLinker.BlockLinker(self.registration_address,
+                                                       self.registration_xpub,
+                                                       self.registration_block_height).LRL()
             elif self.weights == 'LSL':
-                weights_data = BlockLinker.BlockLinker(self.registrationAddress, self.registrationXPUB, self.registrationBlockHeight).LSL()
+                weights_data = BlockLinker.BlockLinker(self.registration_address,
+                                                       self.registration_xpub,
+                                                       self.registration_block_height).LSL()
 
             if 'success' in weights_data and weights_data['success'] == 1:
-                self.weightValues = weights_data[self.weights]
+                self.weight_values = weights_data[self.weights]
             else:
                 self.error = weights_data['error']
 
-        TXS = []
-        TXS_data = BlockData.transactions(self.address)
+        txs = []
+        txs_data = BlockData.transactions(self.address)
 
-        if 'success' in TXS_data and TXS_data['success'] == 1:
-            TXS = TXS_data['TXS']
+        if 'success' in txs_data and txs_data['success'] == 1:
+            txs = txs_data['TXS']
         else:
             self.error = 'Unable to retrieve transactions for address ' + self.address
 
-
-        votes = self.convertTXS2Votes(TXS, blockHeight, digits)
+        votes = self.convertTXS2Votes(txs, block_height, digits)
         results = self.calcResults(votes)
-
 
         if self.error == '':
             response['votes'] = votes
             response['results'] = results
             response['options'] = self.getOptions()
             response['voteCost'] = self.voteCost
-            response['block_height'] = blockHeight
+            response['block_height'] = block_height
             response['proposal'] = self.proposal
             response['address'] = self.address
             response['proposalHash'] = self.getProposalHash()
 
             if self.weights != '':
                 response['weights'] = self.weights
-            if self.registrationAddress != '':
-                response['regAddress'] = self.registrationAddress
-            if self.registrationBlockHeight != '':
-                response['regBlockHeight'] = self.registrationBlockHeight
-            if self.registrationXPUB != '':
-                response['regXPUB'] = self.registrationXPUB
+            if self.registration_address != '':
+                response['regAddress'] = self.registration_address
+            if self.registration_block_height != '':
+                response['regBlockHeight'] = self.registration_block_height
+            if self.registration_xpub != '':
+                response['regXPUB'] = self.registration_xpub
 
             response['success'] = 1
 
@@ -172,15 +174,14 @@ class BlockVoter():
 
         return response
 
-
-    def convertTXS2Votes(self, TXS, blockHeight, significantDigits=1):
+    def convertTXS2Votes(self, txs, block_height, significant_digits=1):
         votes = {}
         if self.error == '':
-            for i in range(0, len(TXS)):
-                if TXS[i]['block_height'] <= blockHeight and TXS[i]['receiving'] == True:
-                    voter = TXS[i]['primeInputAddress']
-                    vote = str(TXS[i]['receivedValue'])[-significantDigits:]
-                    value = TXS[i]['receivedValue'] - int(vote)
+            for i in range(0, len(txs)):
+                if txs[i]['block_height'] <= block_height and txs[i]['receiving'] is True:
+                    voter = txs[i]['primeInputAddress']
+                    vote = str(txs[i]['receivedValue'])[-significant_digits:]
+                    value = txs[i]['receivedValue'] - int(vote)
 
                     if (self.weights == 'Value' and value >= self.voteCost) or value == self.voteCost:
                         if voter in votes:
@@ -190,7 +191,6 @@ class BlockVoter():
                             votes[voter] = {'lastVote': vote, 'value': value}
 
         return votes
-
 
     def calcResults(self, votes):
         results = {}
@@ -215,7 +215,7 @@ class BlockVoter():
 
             elif self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
                 value = 0
-                for tx_input in self.weightValues:
+                for tx_input in self.weight_values:
                     if tx_input[0] == voter:
                         value = tx_input[1]
                         break
@@ -226,7 +226,3 @@ class BlockVoter():
                     results[option] = value
 
         return results
-
-
-
-
