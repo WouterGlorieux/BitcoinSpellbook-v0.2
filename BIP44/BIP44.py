@@ -3,8 +3,18 @@ from binascii import hexlify, unhexlify
 import json
 import urllib2
 from pprint import pprint
+import time
 
 HARDENED = 2**31
+
+
+def _bundle_addresses(addresses):
+    bundle = ''
+    for address in addresses:
+        bundle += address + '|'
+
+    bundle = bundle[:-1]
+    return bundle
 
 
 class Wallet():
@@ -29,7 +39,7 @@ class Wallet():
             while i < self.n:
                 chuck = addressList[i:i+bundle_size]
 
-                url = 'https://blockchain.info/multiaddr?active=' + _bundle_addresses(chuck)
+                url = 'https://blockchain.info/multiaddr?active={0}'.format(_bundle_addresses(chuck))
                 ret = urllib2.urlopen(urllib2.Request(url))
                 data = json.loads(ret.read())
 
@@ -44,6 +54,7 @@ class Wallet():
                                                                             "account": self.account}
 
                 i += bundle_size
+                time.sleep(1)
 
             k += 1
 
@@ -56,6 +67,8 @@ class Wallet():
         print 'Total value:', total_value/1e8, 'BTC'
 
         return unspent_outputs
+
+
 
     def sweep(self, to_address):
         pass
@@ -195,11 +208,4 @@ def showDetails(mnemonic, passphrase="", i=1):
     return xpubs
 
 
-def _bundle_addresses(addresses):
-    bundle = ''
-    for address in addresses:
-        bundle += address + '|'
-
-    bundle = bundle[:-1]
-    return bundle
 
