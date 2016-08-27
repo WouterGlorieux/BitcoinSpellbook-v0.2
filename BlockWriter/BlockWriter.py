@@ -16,8 +16,9 @@ from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
 
-REQUIRED_CONFIRMATIONS = 3 #must be at least 3
-TRANSACTION_FEE = 10000 #in Satoshis
+REQUIRED_CONFIRMATIONS = 3  # must be at least 3
+TRANSACTION_FEE = 10000  # in Satoshis
+
 
 def getAvailableAddressIndex():
     checkActiveAddresses()
@@ -44,6 +45,7 @@ def getAvailableAddressIndex():
 
     return index
 
+
 def checkActiveAddresses():
     writers_query = datastore.Writer.query(datastore.Writer.addressType == 'BIP44',
                                            datastore.Writer.status == 'Active',
@@ -58,47 +60,40 @@ def checkActiveAddresses():
             wallet_address.put()
 
 
-
-
 def writerToDict(writer):
-    writerDict = {}
-
-    writerDict['name'] = str(writer.key.id())
-    writerDict['address'] = writer.address
-    writerDict['outputs'] = writer.outputs
-    writerDict['message'] = writer.message
-    writerDict['amount'] = writer.amount
-    writerDict['recommendedFee'] = writer.recommendedFee
-    writerDict['maxTransactionFee'] = writer.maxTransactionFee
-    writerDict['transactionFee'] = writer.transactionFee
-    writerDict['totalAmount'] = writer.totalAmount
-
-    writerDict['status'] = writer.status
-    writerDict['visibility'] = writer.visibility
+    writer_dict = {'name': str(writer.key.id()),
+                   'address': writer.address,
+                   'outputs': writer.outputs,
+                   'message': writer.message,
+                   'amount': writer.amount,
+                   'recommendedFee': writer.recommendedFee,
+                   'maxTransactionFee': writer.maxTransactionFee,
+                   'transactionFee': writer.transactionFee,
+                   'totalAmount': writer.totalAmount,
+                   'status': writer.status,
+                   'visibility': writer.visibility}
 
     if writer.description:
-        writerDict['description'] = writer.description
+        writer_dict['description'] = writer.description
 
     if writer.creator:
-        writerDict['creator'] = writer.creator
+        writer_dict['creator'] = writer.creator
 
     if writer.creatorEmail:
-        writerDict['creatorEmail'] = writer.creatorEmail
+        writer_dict['creatorEmail'] = writer.creatorEmail
 
     if writer.youtube:
-        writerDict['youtube'] = writer.youtube
+        writer_dict['youtube'] = writer.youtube
 
     if writer.feeAddress:
-        writerDict['feeAddress'] = writer.feeAddress
+        writer_dict['feeAddress'] = writer.feeAddress
 
     if writer.feePercent:
-        writerDict['feePercent'] = writer.feePercent
+        writer_dict['feePercent'] = writer.feePercent
 
+    writer_dict['date'] = int(time.mktime(writer.date.timetuple()))
 
-
-    writerDict['date'] = int(time.mktime(writer.date.timetuple()))
-
-    return writerDict
+    return writer_dict
 
 
 def getWriters():
@@ -117,27 +112,28 @@ def getWriters():
 
 
 def estimateTXsize(outputs, message):
-    dummyOutputs = []
-    totalOutputValue = 0
+    dummy_outputs = []
+    total_output_value = 0
     for output in outputs:
-        dummyOutputs.append({'address': output[0], 'value': output[1]})
-        totalOutputValue += output[1]
+        dummy_outputs.append({'address': output[0], 'value': output[1]})
+        total_output_value += output[1]
 
-    dummyInputs = [{u'address': u'1C7X7j98ge3mMkGLwpxaVfChuNoMMCERP7',
-             u'block_height': 421304,
-             u'confirmations': 1209,
-             u'output': u'6304cda7fcd3507dd4bcc5e41a249f8b11bb6a4d53f43b9b6a5da49352dd899c:1',
-             u'value': totalOutputValue + 15000}]
+    dummy_inputs = [{u'address': u'1C7X7j98ge3mMkGLwpxaVfChuNoMMCERP7',
+                     u'block_height': 421304,
+                     u'confirmations': 1209,
+                     u'output': u'6304cda7fcd3507dd4bcc5e41a249f8b11bb6a4d53f43b9b6a5da49352dd899c:1',
+                     u'value': total_output_value + 15000}]
 
-    privKeys = {'1C7X7j98ge3mMkGLwpxaVfChuNoMMCERP7': 'L2i45ALZv9Zpx2Mvmz27ASpMWzNY5877f6cLCkbcymXPYvbfs2cA'}
-    fee = dummyInputs[0]['value'] - totalOutputValue
-    tx = TxFactory.makeCustomTransaction(privKeys, dummyInputs, dummyOutputs, fee, message)
+    private_keys = {'1C7X7j98ge3mMkGLwpxaVfChuNoMMCERP7': 'L2i45ALZv9Zpx2Mvmz27ASpMWzNY5877f6cLCkbcymXPYvbfs2cA'}
+    fee = dummy_inputs[0]['value'] - total_output_value
+    tx = TxFactory.makeCustomTransaction(private_keys, dummy_inputs, dummy_outputs, fee, message)
 
-    txSize = 0
+    tx_size = 0
     if tx is not None:
-        txSize = len(tx)/2
+        tx_size = len(tx)/2
 
-    return txSize
+    return tx_size
+
 
 class Writer():
     @ndb.transactional(xg=True)
@@ -158,7 +154,6 @@ class Writer():
             writer.put()
             self.name = writer.key.id()
 
-
     def get(self):
         response = {'success': 0}
         if self.error == '':
@@ -172,8 +167,9 @@ class Writer():
 
         return response
 
-
-    def saveWriter(self, settings={}):
+    def saveWriter(self, settings=None):
+        if not settings:
+            settings = {}
         response = {'success': 0}
 
         if self.error == '':
@@ -185,15 +181,14 @@ class Writer():
             elif 'message' in settings:
                 self.error = 'Invalid message'
 
-
             if 'outputs' in settings and validator.validOutputs(eval(settings['outputs'])):
                 writer.outputs = eval(settings['outputs'])
 
-                totalOutputValue = 0
+                total_output_value = 0
                 for output in writer.outputs:
-                    totalOutputValue += output[1]
+                    total_output_value += output[1]
 
-                writer.amount = totalOutputValue
+                writer.amount = total_output_value
                 writer.recommendedFee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimalFeePerKB)
 
                 if writer.recommendedFee > writer.maxTransactionFee:
@@ -206,7 +201,6 @@ class Writer():
             elif 'outputs' in settings:
                 self.error = 'Invalid outputs: ' + settings['outputs'] + ' (must be a list of address-value tuples)'
 
-
             if 'status' in settings and settings['status'] in ['Pending', 'Active', 'Disabled', 'Cooldown']:
                 writer.status = settings['status']
             elif 'status' in settings:
@@ -216,7 +210,6 @@ class Writer():
                 writer.visibility = settings['visibility']
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
-
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 writer.description = settings['description']
@@ -238,7 +231,6 @@ class Writer():
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
-
             if 'feePercent' in settings and validator.validPercentage(settings['feePercent']):
                 writer.feePercent = settings['feePercent']
             elif 'feePercent' in settings:
@@ -249,12 +241,10 @@ class Writer():
             elif 'feeAddress' in settings:
                 self.error = 'Invalid feeAddress'
 
-
             if 'maxTransactionFee' in settings and validator.validAmount(settings['maxTransactionFee']):
                 writer.maxTransactionFee = settings['maxTransactionFee']
             elif 'maxTransactionFee' in settings:
                 self.error = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
-
 
             if 'addressType' in settings and settings['addressType'] in ['PrivKey', 'BIP44']:
                 writer.addressType = settings['addressType']
@@ -270,7 +260,6 @@ class Writer():
                 writer.privateKey = settings['privateKey']
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
-
 
             if writer.addressType == 'PrivKey' and writer.privateKey != '':
                 writer.address = bitcoin.privtoaddr(writer.privateKey)
@@ -334,7 +323,6 @@ class DoWriting():
                 logging.info("Starting writer %s" % writer.address)
                 self.run(writer)
 
-
     def run(self, writer):
         success = False
 
@@ -348,44 +336,44 @@ class DoWriting():
 
         utxos_data = BlockData.utxos(writer.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
-            UTXOs = utxos_data['UTXOs']
+            utxos = utxos_data['UTXOs']
         else:
             logging.error('Unable to retrieve UTXOs for address ' + writer.address)
             return None
 
-        totalInputValue = 0
-        for UTXO in UTXOs:
-            totalInputValue += UTXO['value']
+        total_input_value = 0
+        for UTXO in utxos:
+            total_input_value += UTXO['value']
 
-        if totalInputValue >= writer.totalAmount:
-            logging.info('Detected ' + str(totalInputValue) + ' Satoshis on address ' + writer.address)
+        if total_input_value >= writer.totalAmount:
+            logging.info('Detected ' + str(total_input_value) + ' Satoshis on address ' + writer.address)
             logging.info('Starting OP_RETURN transaction with message: ' + writer.message)
 
-            totalOutputValue = 0
+            total_output_value = 0
             outputs = []
             for output in writer.outputs:
-                totalOutputValue += output[1]
+                total_output_value += output[1]
                 outputs.append({'address': output[0], 'value': output[1]})
 
             #check for extra value
-            if totalInputValue > writer.totalAmount:
-                extraValue = totalInputValue-writer.totalAmount
-                totalOutputValue += extraValue
-                logging.info('Extra value detected: '+ str(extraValue) + ', sending it to ' + writer.extraValueAddress)
-                outputs.append({'address': writer.extraValueAddress, 'value': extraValue})
+            if total_input_value > writer.totalAmount:
+                extra_value = total_input_value-writer.totalAmount
+                total_output_value += extra_value
+                logging.info('Extra value detected: ' + str(extra_value) + ', sending it to ' + writer.extraValueAddress)
+                outputs.append({'address': writer.extraValueAddress, 'value': extra_value})
 
             logging.info("outputs: " + str(outputs))
-            transactionFee = totalInputValue - totalOutputValue
-            logging.info('transaction fee: ' + str(transactionFee))
+            transaction_fee = total_input_value - total_output_value
+            logging.info('transaction fee: ' + str(transaction_fee))
 
-            privKeys = {}
+            private_keys = {}
             if writer.addressType == 'PrivKey':
-                privKeys = {writer.address: writer.privateKey}
+                private_keys = {writer.address: writer.privateKey}
             elif writer.addressType == 'BIP44':
-                privKeys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.walletIndex)
+                private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.walletIndex)
 
-            logging.info("Sending " + str(totalInputValue) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transactionFee) + ' with OP_RETURN message: ' + writer.message)
-            tx = TxFactory.makeCustomTransaction(privKeys, UTXOs, outputs, transactionFee, writer.message)
+            logging.info("Sending " + str(total_input_value) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transaction_fee) + ' with OP_RETURN message: ' + writer.message)
+            tx = TxFactory.makeCustomTransaction(private_keys, utxos, outputs, transaction_fee, writer.message)
             if tx is not None:
                 success = TxFactory.sendTransaction(tx)
 
