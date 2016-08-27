@@ -2,33 +2,34 @@
 from BlockData import BlockData
 from BlockInputs import BlockInputs
 import bitcoin
-
+from BIP44 import BIP44 as BIP44
 
 from validators import validators as validator
 
+
 class BlockLinker():
 
-    def __init__(self, address, xpub, blockHeight=0):
+    def __init__(self, address, xpub, block_height=0):
 
         self.address = address
         self.xpub = xpub
-        self.blockHeight = blockHeight
+        self.block_height = block_height
 
         self.SIL = []
         self.balances = {}
-        self.addressList = []
+        self.address_list = []
 
         self.error = ''
 
         if validator.validAddress(self.address) and validator.validXPUB(self.xpub):
-            SIL_data = BlockInputs.SIL(self.address, self.blockHeight)
+            SIL_data = BlockInputs.SIL(self.address, self.block_height)
 
             if 'success' in SIL_data and SIL_data['success'] == 1:
                 self.SIL = SIL_data['SIL']
 
-                self.addressList = getAddressesFromXPUB(self.xpub, len(self.SIL))
+                self.address_list = BIP44.getAddressesFromXPUB(self.xpub, len(self.SIL))
 
-                balances_data = BlockData.balances(concatAddresses(self.addressList))
+                balances_data = BlockData.balances(concatAddresses(self.address_list))
                 if 'success' in balances_data and balances_data['success'] == 1:
                     self.balances = balances_data['balances']
                 else:
@@ -41,16 +42,14 @@ class BlockLinker():
         elif not validator.validXPUB(self.xpub):
             self.error = 'Invalid xpub: ' + self.xpub
 
-
-
     def LBL(self):
         response = {'success': 0}
         LBL = []
         if self.error == '':
             for i in range(0, len(self.SIL)):
-                LBL.append([self.SIL[i][0], self.balances[self.addressList[i]]['balance']])
+                LBL.append([self.SIL[i][0], self.balances[self.address_list[i]]['balance']])
 
-            total = float(totalValue(LBL))
+            total = float(total_value(LBL))
             for row in LBL:
                 row.append(row[1]/total)
 
@@ -59,10 +58,6 @@ class BlockLinker():
         else:
             response['error'] = self.error
 
-
-
-
-
         return response
 
     def LRL(self):
@@ -70,9 +65,9 @@ class BlockLinker():
         LRL = []
         if self.error == '':
             for i in range(0, len(self.SIL)):
-                LRL.append([self.SIL[i][0], self.balances[self.addressList[i]]['received']])
+                LRL.append([self.SIL[i][0], self.balances[self.address_list[i]]['received']])
 
-            total = float(totalValue(LRL))
+            total = float(total_value(LRL))
             for row in LRL:
                 row.append(row[1]/total)
 
@@ -88,9 +83,9 @@ class BlockLinker():
         LSL = []
         if self.error == '':
             for i in range(0, len(self.SIL)):
-                LSL.append([self.SIL[i][0], self.balances[self.addressList[i]]['sent']])
+                LSL.append([self.SIL[i][0], self.balances[self.address_list[i]]['sent']])
 
-            total = float(totalValue(LSL))
+            total = float(total_value(LSL))
             for row in LSL:
                 row.append(row[1]/total)
 
@@ -106,7 +101,7 @@ class BlockLinker():
         LAL = []
         if self.error == '':
             for i in range(0, len(self.SIL)):
-                LAL.append([self.SIL[i][0], self.addressList[i]])
+                LAL.append([self.SIL[i][0], self.address_list[i]])
 
             response['LAL'] = LAL
             response['success'] = 1
@@ -115,40 +110,20 @@ class BlockLinker():
 
         return response
 
-def totalValue(linkedList):
+
+def total_value(linked_list):
     total = 0
-    for row in linkedList:
+    for row in linked_list:
         total += row[1]
 
     return total
 
 
-
-#getAddressesFromXPUB will return an array of addresses generated from an XPUB key
-#optional parameters:
-#i          the amount of addresses to be generated
-#addrType   0: Receiving addresses, 1: Change addresses, ...
-def getAddressesFromXPUB(xpub, i=10, addrType=0):
-    addressList = []
-    pub0 = bitcoin.bip32_ckd(xpub, addrType)
-
-    for i in range (0, i):
-        publicKey = bitcoin.bip32_ckd(pub0, i)
-        hexKey = bitcoin.encode_pubkey(bitcoin.bip32_extract_key(publicKey), 'hex_compressed')
-        address_fromPub =  bitcoin.pubtoaddr(hexKey)
-        addressList.append(address_fromPub)
-
-    return addressList
-
-
 #this function will concatenate all adresses and put '|' between them
 def concatAddresses(addresses):
-    addrString = ''
+    address_string = ''
     for address in addresses:
-        addrString += address + '|'
+        address_string += address + '|'
 
-    addrString = addrString[:-1]
-    return addrString
-
-
-
+    address_string = address_string[:-1]
+    return address_string
