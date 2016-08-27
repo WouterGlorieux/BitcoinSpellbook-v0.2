@@ -21,6 +21,7 @@ def validAddress(address):
 
     return valid
 
+
 def validAddresses(addresses):
     valid = False
 
@@ -43,12 +44,14 @@ def validTxid(txid):
 
     return valid
 
+
 def validXPUB(xpub):
-    valid =False
+    valid = False
     if isinstance(xpub, (str, unicode)) and xpub[:4] == "xpub":
         valid = True
 
     return valid
+
 
 def validDescription(description):
     valid = False
@@ -58,6 +61,7 @@ def validDescription(description):
 
     return valid
 
+
 def validOP_RETURN(message):
     valid = False
 
@@ -65,6 +69,7 @@ def validOP_RETURN(message):
         valid = True
 
     return valid
+
 
 def validBlockProfileMessage(message):
     valid = False
@@ -88,7 +93,6 @@ def validText(text):
     return valid
 
 
-
 def validURL(url):
     valid = False
 
@@ -106,12 +110,14 @@ def validCreator(creator):
 
     return valid
 
+
 def validEmail(email):
     valid = False
     if isinstance(email, (str, unicode)) and re.match(EMAIL_REGEX, email):
         valid = True
 
     return valid
+
 
 def validAmount(amount):
     valid = False
@@ -122,10 +128,10 @@ def validAmount(amount):
     return valid
 
 
-def validBlockHeight(blockHeight):
+def validBlockHeight(block_height):
     valid = False
 
-    if isinstance(blockHeight, int) and blockHeight >= 0:
+    if isinstance(block_height, int) and block_height >= 0:
         valid = True
 
     return valid
@@ -157,10 +163,11 @@ def validYoutubeID(youtube):
 
     return valid
 
-def validPrivateKey(privKey):
+
+def validPrivateKey(private_key):
     valid = False
 
-    if isinstance(privKey, (str, unicode)) and len(privKey) > 0:
+    if isinstance(private_key, (str, unicode)) and len(private_key) > 0:
         valid = True
 
     return valid
@@ -182,8 +189,6 @@ def validDistribution(distribution):
                     else:
                         valid = False
                         break
-
-
     return valid
 
 
@@ -203,6 +208,4 @@ def validOutputs(outputs):
                     else:
                         valid = False
                         break
-
-
     return valid
