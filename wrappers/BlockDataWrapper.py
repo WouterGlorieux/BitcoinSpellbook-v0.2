@@ -14,22 +14,22 @@ class BlockDataWrapper():
     def __init__(self, url):
         self.url = url
 
-
-    def utxos(self, addresses=[], provider=''):
+    def utxos(self, addresses=None, provider=''):
+        if not addresses:
+            addresses = []
         response = {'success': 0}
-        parameters = {}
-        parameters['provider'] = provider
+        parameters = {'provider': provider}
 
-        if addresses != []:
-            strAddresses = ""
+        if addresses:
+            str_addresses = ""
             for address in addresses:
-                strAddresses += address + "|"
+                str_addresses += address + "|"
 
-            strAddresses = strAddresses[:-1]
-            parameters['addresses'] = strAddresses
+            str_addresses = str_addresses[:-1]
+            parameters['addresses'] = str_addresses
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/utxos?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/utxos?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -39,23 +39,22 @@ class BlockDataWrapper():
 
         return response
 
-
-
-    def balances(self, addresses=[], provider=''):
+    def balances(self, addresses=None, provider=''):
+        if not addresses:
+            addresses = []
         response = {'success': 0}
-        parameters = {}
-        parameters['provider'] = provider
+        parameters = {'provider': provider}
 
-        if addresses != []:
-            strAddresses = ""
+        if addresses:
+            str_addresses = ""
             for address in addresses:
-                strAddresses += address + "|"
+                str_addresses += address + "|"
 
-            strAddresses = strAddresses[:-1]
-            parameters['addresses'] = strAddresses
+            str_addresses = str_addresses[:-1]
+            parameters['addresses'] = str_addresses
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/balances?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/balances?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -67,12 +66,11 @@ class BlockDataWrapper():
 
     def transactions(self, address, provider=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['provider'] = provider
+        parameters = {'address': address,
+                      'provider': provider}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/transactions?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/transactions?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -84,12 +82,11 @@ class BlockDataWrapper():
 
     def block(self, height, provider=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['height'] = str(height)
-        parameters['provider'] = provider
+        parameters = {'height': str(height),
+                      'provider': provider}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/data/block?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/block?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -101,11 +98,10 @@ class BlockDataWrapper():
 
     def latestBlock(self, provider=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['provider'] = provider
+        parameters = {'provider': provider}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/data/latestBlock?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/latestBlock?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -115,44 +111,40 @@ class BlockDataWrapper():
 
         return response
 
-
     def primeInputAddress(self, txid, provider=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['txid'] = txid
-        parameters['provider'] = provider
+        parameters = {'txid': txid,
+                      'provider': provider}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/data/primeInputAddress?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/primeInputAddress?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
         except:
-           response['error'] = 'Unable to retrieve prime input address'
+            response['error'] = 'Unable to retrieve prime input address'
 
         return response
 
-
-    def saveProvider(self, name, priority, providerType, param="", API_key='', API_secret=''):
+    def saveProvider(self, name, priority, provider_type, param="", api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
-        parameters['priority'] = priority
-        parameters['providerType'] = providerType
+        parameters = {'name': name,
+                      'priority': priority,
+                      'provider_type': provider_type}
 
-        if providerType == 'Blocktrail.com' or 'Insight':
+        if provider_type == 'Blocktrail.com' or 'Insight':
             parameters['param'] = param
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/saveProvider?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/saveProvider?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(API_secret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API_Key': API_key,
+            'API_Key': api_key,
             'API_Sign': base64.b64encode(signature.digest())
         }
 
@@ -165,21 +157,19 @@ class BlockDataWrapper():
 
         return response
 
-
-    def deleteProvider(self, name, API_key='', API_secret=''):
+    def deleteProvider(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/deleteProvider?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/deleteProvider?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(API_secret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API_Key': API_key,
+            'API_Key': api_key,
             'API_Sign': base64.b64encode(signature.digest())
         }
 
@@ -196,8 +186,8 @@ class BlockDataWrapper():
         response = {'success': 0}
         parameters = {}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url +"/data/getProviders?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/data/getProviders?" + query_string
 
         try:
             request = urllib2.Request(url=url)
