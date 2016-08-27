@@ -755,17 +755,17 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('distributionSource') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
                     settings['distributionSource'] = self.request.get('distributionSource')
 
-                if self.request.get('registrationAddress', None) is not None:
-                    settings['registrationAddress'] = self.request.get('registrationAddress')
+                if self.request.get('registration_address', None) is not None:
+                    settings['registration_address'] = self.request.get('registration_address')
 
-                if self.request.get('registrationXPUB', None) is not None:
-                    settings['registrationXPUB'] = self.request.get('registrationXPUB')
+                if self.request.get('registration_xpub', None) is not None:
+                    settings['registration_xpub'] = self.request.get('registration_xpub')
 
-                if self.request.get('registrationBlockHeight'):
+                if self.request.get('registration_block_height'):
                     try:
-                        settings['registrationBlockHeight'] = int(self.request.get('registrationBlockHeight'))
+                        settings['registration_block_height'] = int(self.request.get('registration_block_height'))
                     except ValueError:
-                        response['error'] = 'registrationBlockHeight must be a positive integer or equal to 0'
+                        response['error'] = 'registration_block_height must be a positive integer or equal to 0'
 
 
                 if self.request.get('distribution', None) is not None:

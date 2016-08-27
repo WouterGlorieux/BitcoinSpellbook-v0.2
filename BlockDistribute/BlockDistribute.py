@@ -40,9 +40,9 @@ def distributerToDict(distributer):
     distributer_dict = {'name': distributer.key.id(),
                         'address': distributer.address,
                         'distributionSource': distributer.distributionSource,
-                        'registrationAddress': distributer.registrationAddress,
-                        'registrationBlockHeight': distributer.registrationBlockHeight,
-                        'registrationXPUB': distributer.registrationXPUB,
+                        'registration_address': distributer.registrationAddress,
+                        'registration_block_height': distributer.registrationBlockHeight,
+                        'registration_xpub': distributer.registrationXPUB,
                         'distribution': distributer.distribution,
                         'minimumAmount': distributer.minimumAmount,
                         'threshold': distributer.threshold,
@@ -143,20 +143,20 @@ class Distributer():
             elif 'distributionSource' in settings:
                 self.error = 'Invalid distributionSource'
 
-            if 'registrationAddress' in settings and (validator.validAddress(settings['registrationAddress']) or settings['registrationAddress'] == ''):
-                distributer.registrationAddress = settings['registrationAddress']
-            elif 'registrationAddress' in settings:
-                self.error = 'Invalid registrationAddress'
+            if 'registration_address' in settings and (validator.validAddress(settings['registration_address']) or settings['registration_address'] == ''):
+                distributer.registrationAddress = settings['registration_address']
+            elif 'registration_address' in settings:
+                self.error = 'Invalid registration_address'
 
-            if 'registrationXPUB' in settings and (validator.validXPUB(settings['registrationXPUB']) or settings['registrationXPUB'] == ''):
-                distributer.registrationXPUB = settings['registrationXPUB']
-            elif 'registrationXPUB' in settings:
-                self.error = 'Invalid registrationXPUB'
+            if 'registration_xpub' in settings and (validator.validXPUB(settings['registration_xpub']) or settings['registration_xpub'] == ''):
+                distributer.registrationXPUB = settings['registration_xpub']
+            elif 'registration_xpub' in settings:
+                self.error = 'Invalid registration_xpub'
 
-            if 'registrationBlockHeight' in settings and (validator.validBlockHeight(settings['registrationBlockHeight'])):
-                distributer.registrationBlockHeight = settings['registrationBlockHeight']
-            elif 'registrationBlockHeight' in settings:
-                self.error = 'Invalid registrationBlockHeight: ' + str(settings['registrationBlockHeight'])
+            if 'registration_block_height' in settings and (validator.validBlockHeight(settings['registration_block_height'])):
+                distributer.registrationBlockHeight = settings['registration_block_height']
+            elif 'registration_block_height' in settings:
+                self.error = 'Invalid registration_block_height: ' + str(settings['registration_block_height'])
 
             if 'distribution' in settings and validator.validDistribution(eval(settings['distribution'])):
                 distributer.distribution = eval(settings['distribution'])
