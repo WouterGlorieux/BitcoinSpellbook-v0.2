@@ -215,7 +215,7 @@ class Distributer():
             elif 'creatorEmail' in settings:
                 self.error = 'Invalid email address'
 
-            if 'youtube' in settings and validator.validYoutube(settings['youtube']):
+            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
                 distributer.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'

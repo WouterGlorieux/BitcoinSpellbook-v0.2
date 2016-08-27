@@ -155,7 +155,7 @@ class BlockTrigger():
             elif 'creatorEmail' in settings:
                 self.error = 'Invalid email address'
 
-            if 'youtube' in settings and validator.validYoutube(settings['youtube']):
+            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
                 trigger.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
