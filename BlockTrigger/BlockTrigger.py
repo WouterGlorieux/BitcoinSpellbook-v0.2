@@ -18,67 +18,63 @@ from google.appengine.api import mail
 urlfetch.set_default_fetch_deadline(60)
 
 
-REQUIRED_CONFIRMATIONS = 3 #must be at least 3
-
-
+REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 
 
 def triggerToDict(trigger):
-    triggerDict = {}
-    triggerDict['name'] = trigger.key.id()
-    triggerDict['triggerType'] = trigger.triggerType
-    triggerDict['address'] = trigger.address
-    triggerDict['amount'] = trigger.amount
-    triggerDict['confirmations'] = trigger.confirmations
-    triggerDict['triggered'] = trigger.triggered
-    triggerDict['description'] = trigger.description
-    triggerDict['creator'] = trigger.creator
-    triggerDict['creatorEmail'] = trigger.creatorEmail
-    triggerDict['youtube'] = trigger.youtube
-    triggerDict['status'] = trigger.status
-    triggerDict['visibility'] = trigger.visibility
-    triggerDict['date'] = int(time.mktime(trigger.date.timetuple()))
+    trigger_dict = {'name': trigger.key.id(),
+                    'triggerType': trigger.triggerType,
+                    'address': trigger.address,
+                    'amount': trigger.amount,
+                    'confirmations': trigger.confirmations,
+                    'triggered': trigger.triggered,
+                    'description': trigger.description,
+                    'creator': trigger.creator,
+                    'creatorEmail': trigger.creatorEmail,
+                    'youtube': trigger.youtube,
+                    'status': trigger.status,
+                    'visibility': trigger.visibility,
+                    'date': int(time.mktime(trigger.date.timetuple()))}
 
     actions_query = datastore.Action.query(ancestor=trigger.key)
     actions = actions_query.fetch()
 
-    triggerDict['actions'] = []
+    trigger_dict['actions'] = []
     for action in actions:
-        triggerDict['actions'].append(actionToDict(action))
+        trigger_dict['actions'].append(actionToDict(action))
 
-
-
-    return triggerDict
+    return trigger_dict
 
 
 def actionToDict(action):
-    actionDict = {}
-    actionDict['triggerName'] = action.trigger
-    actionDict['actionName'] = action.key.id()
-    actionDict['actionType'] = action.actionType
-    actionDict['description'] = action.description
+    action_dict = {'triggerName': action.trigger,
+                   'actionName': action.key.id(),
+                   'actionType': action.actionType,
+                   'description': action.description}
 
-    if action.actionType == 'RevealText' and action.revealAllowed == True:
-        actionDict['revealText'] = action.revealText
-    elif action.actionType == 'RevealLink' and action.revealAllowed == True:
-        actionDict['revealLinkText'] = action.revealLinkText
-        actionDict['revealLinkURL'] = action.revealLinkURL
+    if action.actionType == 'RevealText' and action.revealAllowed is True:
+        action_dict['revealText'] = action.revealText
+    elif action.actionType == 'RevealLink' and action.revealAllowed is True:
+        action_dict['revealLinkText'] = action.revealLinkText
+        action_dict['revealLinkURL'] = action.revealLinkURL
     elif action.actionType == 'SendMail':
-        actionDict['mailTo'] = action.mailTo
-        actionDict['mailSubject'] = action.mailSubject
-        actionDict['mailBody'] = action.mailBody
-        actionDict['mailSent'] = action.mailSent
+        action_dict['mailTo'] = action.mailTo
+        action_dict['mailSubject'] = action.mailSubject
+        action_dict['mailBody'] = action.mailBody
+        action_dict['mailSent'] = action.mailSent
     elif action.actionType == 'Webhook':
-        actionDict['webhook'] = action.webhook
+        action_dict['webhook'] = action.webhook
 
-    return actionDict
+    return action_dict
 
 
 def getTriggers():
     response = {'success': 0}
     triggers = []
 
-    triggers_query = datastore.Trigger.query(datastore.Trigger.visibility == 'Public', datastore.Trigger.status == 'Active', ancestor=datastore.triggers_key()).order(-datastore.Trigger.date)
+    triggers_query = datastore.Trigger.query(datastore.Trigger.visibility == 'Public',
+                                             datastore.Trigger.status == 'Active',
+                                             ancestor=datastore.triggers_key()).order(-datastore.Trigger.date)
     data = triggers_query.fetch()
     for trigger in data:
         triggers.append(triggerToDict(trigger))
@@ -88,9 +84,9 @@ def getTriggers():
 
     return response
 
+
 class BlockTrigger():
     @ndb.transactional(xg=True)
-
     def __init__(self, name):
         self.error = ''
         if isinstance(name, (str, unicode)) and len(name) > 0:
@@ -111,10 +107,9 @@ class BlockTrigger():
 
         return response
 
-
-
-
-    def saveTrigger(self, settings={}):
+    def saveTrigger(self, settings=None):
+        if not settings:
+            settings = {}
         response = {'success': 0}
 
         if self.error == '':
@@ -175,8 +170,6 @@ class BlockTrigger():
             elif 'triggered' in settings:
                 self.error = 'invalid triggered'
 
-
-
             if self.error == '':
                 trigger.put()
                 response['trigger'] = triggerToDict(trigger)
@@ -201,13 +194,14 @@ class BlockTrigger():
 
         return response
 
-
-    def saveAction(self, actionName, settings={}):
+    def saveAction(self, action_name, settings=None):
+        if not settings:
+            settings = {}
         response = {'success': 0}
 
         if self.error == '':
             trigger = datastore.Trigger.get_by_id(self.name, parent=datastore.triggers_key())
-            action = datastore.Action.get_or_insert(actionName, parent=trigger.key)
+            action = datastore.Action.get_or_insert(action_name, parent=trigger.key)
 
             action.trigger = trigger.key.id()
 
@@ -215,7 +209,6 @@ class BlockTrigger():
                 action.actionType = settings['actionType']
             elif 'actionType' in settings:
                 self.error = 'actionType must be RevealText, RevealLink, SendMail or Webhook'
-
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
@@ -262,7 +255,6 @@ class BlockTrigger():
             elif 'webhook' in settings:
                 self.error = 'invalid webhook'
 
-
             if self.error == '':
                 action.put()
                 response['action'] = actionToDict(action)
@@ -273,12 +265,12 @@ class BlockTrigger():
 
         return response
 
-    def deleteAction(self, actionName):
+    def deleteAction(self, action_name):
         response = {'success': 0}
 
         if self.error == '':
             trigger = datastore.Trigger.get_by_id(self.name, parent=datastore.triggers_key())
-            action = datastore.Action.get_by_id(actionName,  parent=trigger.key)
+            action = datastore.Action.get_by_id(action_name,  parent=trigger.key)
 
             if action:
                 action.key.delete()
@@ -287,8 +279,6 @@ class BlockTrigger():
                 response['error'] = 'No action with that name found.'
 
         return response
-
-
 
 
 class CheckTriggers():
@@ -306,18 +296,14 @@ class CheckTriggers():
             for trigger in triggers:
                 self.run(trigger)
 
-
-
-
-
     def run(self, trigger):
-        if trigger.triggered == False:
+        if not trigger.triggered:
             if trigger.triggerType == 'BlockHeight':
-                latestBlock_data = BlockData.latestBlock()
-                if 'success' in latestBlock_data and latestBlock_data['success'] == 1:
-                    latestBlockHeight = latestBlock_data['latestBlock']['height']
-                    if trigger.blockHeight + trigger.confirmations <= latestBlockHeight:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current block_height:' + str(latestBlockHeight))
+                latest_block_data = BlockData.latestBlock()
+                if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                    latest_block_height = latest_block_data['latestBlock']['height']
+                    if trigger.blockHeight + trigger.confirmations <= latest_block_height:
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current block_height:' + str(latest_block_height))
                         trigger.triggered = True
                         trigger.put()
                         self.activate(trigger)
@@ -350,12 +336,12 @@ class CheckTriggers():
 
             for action in actions:
 
-                if action.actionType in ['RevealText', 'RevealLink'] and action.revealAllowed == False:
+                if action.actionType in ['RevealText', 'RevealLink'] and action.revealAllowed is False:
                     logging.info('executing action: ' + action.key.id())
                     action.revealAllowed = True
                     action.put()
 
-                elif action.actionType == 'SendMail' and action.mailSent == False:
+                elif action.actionType == 'SendMail' and action.mailSent is False:
                     if validator.validEmail(action.mailTo):
                         logging.info('executing action: ' + action.key.id())
                         try:
@@ -369,7 +355,7 @@ class CheckTriggers():
                     else:
                         logging.error("Invalid email address: " + action.mailTo)
 
-                elif action.actionType == 'Webhook' and action.webhookActivated == False:
+                elif action.actionType == 'Webhook' and action.webhookActivated is False:
 
                     if validator.validURL(action.webhook):
                         logging.info('executing action: ' + action.key.id())
