@@ -1265,7 +1265,6 @@ class Profile(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', mainPage),
     ('/admin/initialize', initialize),
-    ('/admin/initializeWallet', initializeWallet),
     ('/admin/updateRecommendedFee', updateRecommendedFee),
 
     ('/data/saveProvider', saveProvider),

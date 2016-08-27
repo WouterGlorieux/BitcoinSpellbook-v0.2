@@ -45,10 +45,6 @@ handlers:
   script: BitcoinSpellbook.app
   login: admin
 
-- url: /admin/initializeWallet
-  script: BitcoinSpellbook.app
-
-
 - url: /admin/updateRecommendedFee
   script: BitcoinSpellbook.app
   login: admin
