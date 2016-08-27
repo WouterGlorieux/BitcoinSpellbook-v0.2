@@ -68,7 +68,7 @@ class TX():
         tx_dict["primeInputAddress"] = self.primeInputAddress()
         tx_dict["inputs"] = self.inputs
         tx_dict["outputs"] = self.outputs
-        tx_dict["blockHeight"] = self.blockHeight
+        tx_dict["block_height"] = self.blockHeight
         tx_dict["confirmations"] = self.confirmations
         tx_dict["receiving"] = self.receivingTX(address)
         if tx_dict["receiving"] == True:

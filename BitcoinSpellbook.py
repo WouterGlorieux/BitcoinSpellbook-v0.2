@@ -282,12 +282,12 @@ class SIL(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockInputs.SIL(address, blockHeight)
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockInputs.SIL(address)
@@ -305,12 +305,12 @@ class LBL(webapp2.RequestHandler):
             address = self.request.get('address')
             xpub = self.request.get('xpub')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockLinker.BlockLinker(address, xpub, blockHeight).LBL()
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockLinker.BlockLinker(address, xpub).LBL()
@@ -328,12 +328,12 @@ class LRL(webapp2.RequestHandler):
             address = self.request.get('address')
             xpub = self.request.get('xpub')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockLinker.BlockLinker(address, xpub, blockHeight).LRL()
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockLinker.BlockLinker(address, xpub).LRL()
@@ -350,12 +350,12 @@ class LSL(webapp2.RequestHandler):
             address = self.request.get('address')
             xpub = self.request.get('xpub')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockLinker.BlockLinker(address, xpub, blockHeight).LSL()
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockLinker.BlockLinker(address, xpub).LSL()
@@ -372,12 +372,12 @@ class LAL(webapp2.RequestHandler):
             address = self.request.get('address')
             xpub = self.request.get('xpub')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockLinker.BlockLinker(address, xpub, blockHeight).LAL()
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockLinker.BlockLinker(address, xpub).LAL()
@@ -398,11 +398,11 @@ class proportionalRandom(webapp2.RequestHandler):
             xpub = ''
             source = 'SIL'
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             if self.request.get('rngBlockHeight'):
                 try:
@@ -514,11 +514,11 @@ class results(webapp2.RequestHandler):
                 response['error'] = 'voteCost must be a positive integer.'
 
         blockHeight = 0
-        if self.request.get('blockHeight'):
+        if self.request.get('block_height'):
             try:
-                blockHeight = int(self.request.get('blockHeight'))
+                blockHeight = int(self.request.get('block_height'))
             except ValueError:
-                response['error'] = 'blockHeight must be a positive integer.'
+                response['error'] = 'block_height must be a positive integer.'
 
         weights = 'Equal'
         if self.request.get('weights'):
@@ -1243,12 +1243,12 @@ class Profile(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-            if self.request.get('blockHeight'):
+            if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('blockHeight'))
+                    blockHeight = int(self.request.get('block_height'))
                     response = BlockProfile.Profile(address, blockHeight)
                 except ValueError:
-                    response['error'] = 'blockHeight must be a positive integer.'
+                    response['error'] = 'block_height must be a positive integer.'
 
             else:
                 response = BlockProfile.Profile(address)

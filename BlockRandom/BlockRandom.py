@@ -19,7 +19,7 @@ class Random():
         if isinstance(blockHeight, int) and blockHeight >= 0:
             self.blockHeight = blockHeight
         else:
-            self.error = 'blockHeight must be an integer greater than or equal to zero'
+            self.error = 'block_height must be an integer greater than or equal to zero'
 
         if xpub != '' and not validator.validXPUB(xpub):
             self.error = 'Invalid xpub: ' + xpub

@@ -151,7 +151,7 @@ class BlockVoter():
             response['results'] = results
             response['options'] = self.getOptions()
             response['voteCost'] = self.voteCost
-            response['blockHeight'] = blockHeight
+            response['block_height'] = blockHeight
             response['proposal'] = self.proposal
             response['address'] = self.address
             response['proposalHash'] = self.getProposalHash()
@@ -177,7 +177,7 @@ class BlockVoter():
         votes = {}
         if self.error == '':
             for i in range(0, len(TXS)):
-                if TXS[i]['blockHeight'] <= blockHeight and TXS[i]['receiving'] == True:
+                if TXS[i]['block_height'] <= blockHeight and TXS[i]['receiving'] == True:
                     voter = TXS[i]['primeInputAddress']
                     vote = str(TXS[i]['receivedValue'])[-significantDigits:]
                     value = TXS[i]['receivedValue'] - int(vote)

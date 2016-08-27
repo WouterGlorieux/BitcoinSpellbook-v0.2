@@ -77,7 +77,7 @@ class BlockVoterWrapper():
             parameters['weights'] = weights
 
         if blockHeight != 0:
-            parameters['blockHeight'] = str(blockHeight)
+            parameters['block_height'] = str(blockHeight)
 
         if registrationAddress != "":
             parameters['regAddress'] = str(registrationAddress)

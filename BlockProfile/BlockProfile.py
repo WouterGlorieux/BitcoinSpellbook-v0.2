@@ -38,11 +38,11 @@ def TXS2profile(txs, address, block=0):
     sortedTXS = sortTXS(txs)
     profile = {}
     for tx in sortedTXS:
-        if (block == 0 or tx['blockHeight'] <= block) and tx['blockHeight'] != None:
+        if (block == 0 or tx['block_height'] <= block) and tx['block_height'] != None:
             for output in tx['outputs']:
                 if 'OP_RETURN' in output:
                     primeInputAddress = tx['primeInputAddress']
-                    blockHeight = tx['blockHeight']
+                    blockHeight = tx['block_height']
                     profile[primeInputAddress] = {'lastUpdate': blockHeight}
                     message = output['OP_RETURN']
                     if validator.validOP_RETURN(message) and validator.validBlockProfileMessage(message):
@@ -76,10 +76,10 @@ def components(message):
 def sortTXS(txs):
     blockTXS = {}
     for tx in txs:
-        if tx['blockHeight'] in blockTXS:
-            blockTXS[tx['blockHeight']].append(tx)
+        if tx['block_height'] in blockTXS:
+            blockTXS[tx['block_height']].append(tx)
         else:
-            blockTXS[tx['blockHeight']] = [tx]
+            blockTXS[tx['block_height']] = [tx]
 
     sortedTXS = []
     for block in sorted(blockTXS):

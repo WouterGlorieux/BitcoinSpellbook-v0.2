@@ -317,12 +317,12 @@ class CheckTriggers():
                 if 'success' in latestBlock_data and latestBlock_data['success'] == 1:
                     latestBlockHeight = latestBlock_data['latestBlock']['height']
                     if trigger.blockHeight + trigger.confirmations <= latestBlockHeight:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current blockHeight:' + str(latestBlockHeight))
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current block_height:' + str(latestBlockHeight))
                         trigger.triggered = True
                         trigger.put()
                         self.activate(trigger)
                 else:
-                    logging.error('Unable to retrieve latest blockHeight')
+                    logging.error('Unable to retrieve latest block_height')
 
             elif trigger.triggerType in ['Balance', 'Received', 'Sent']:
                 balance_data = BlockData.balances(trigger.address)

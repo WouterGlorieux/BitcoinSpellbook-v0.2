@@ -166,7 +166,7 @@ def transactions(address, provider=''):
         response['error'] = 'Invalid address'
 
     if 'success' in response and response['success'] == 1:
-        response['TXS'] = sorted(response['TXS'], key=lambda k: (k['blockHeight'], k['txid']))
+        response['TXS'] = sorted(response['TXS'], key=lambda k: (k['block_height'], k['txid']))
 
     return response
 

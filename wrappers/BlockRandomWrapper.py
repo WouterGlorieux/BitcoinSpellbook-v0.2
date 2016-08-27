@@ -34,7 +34,7 @@ class BlockRandomWrapper():
         parameters = {}
         parameters['source'] = 'SIL'
         parameters['address'] = address
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
         parameters['rngBlockHeight'] = str(rngBlockHeight)
 
         queryString  = urllib.urlencode(parameters)
@@ -54,7 +54,7 @@ class BlockRandomWrapper():
         parameters['source'] = 'LBL'
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
         parameters['rngBlockHeight'] = str(rngBlockHeight)
 
         queryString  = urllib.urlencode(parameters)
@@ -74,7 +74,7 @@ class BlockRandomWrapper():
         parameters['source'] = 'LRL'
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
         parameters['rngBlockHeight'] = str(rngBlockHeight)
 
         queryString  = urllib.urlencode(parameters)
@@ -94,7 +94,7 @@ class BlockRandomWrapper():
         parameters['source'] = 'LRL'
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
         parameters['rngBlockHeight'] = str(rngBlockHeight)
 
         queryString  = urllib.urlencode(parameters)

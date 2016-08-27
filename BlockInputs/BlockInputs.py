@@ -39,7 +39,7 @@ def txs_2_SIL(txs, block=0):
     sorted_txs = sortTXS(txs)
     SIL = []
     for tx in sorted_txs:
-        if tx['receiving'] == True and (block == 0 or tx['blockHeight'] <= block) and tx['blockHeight'] is not None:
+        if tx['receiving'] == True and (block == 0 or tx['block_height'] <= block) and tx['block_height'] is not None:
             recurring = False
             for i in range(0, len(SIL)):
                 if SIL[i][0] == tx['primeInputAddress']:
@@ -47,7 +47,7 @@ def txs_2_SIL(txs, block=0):
                     recurring = True
 
             if not recurring:
-                SIL.append([tx['primeInputAddress'], tx['receivedValue'], 0, tx['blockHeight']])
+                SIL.append([tx['primeInputAddress'], tx['receivedValue'], 0, tx['block_height']])
 
     total = float(totalReceived(SIL))
 
@@ -68,10 +68,10 @@ def totalReceived(SIL):
 def sortTXS(txs):
     block_txs = {}
     for tx in txs:
-        if tx['blockHeight'] in block_txs:
-            block_txs[tx['blockHeight']].append(tx)
+        if tx['block_height'] in block_txs:
+            block_txs[tx['block_height']].append(tx)
         else:
-            block_txs[tx['blockHeight']] = [tx]
+            block_txs[tx['block_height']] = [tx]
 
     sorted_txs = []
     for block in sorted(block_txs):

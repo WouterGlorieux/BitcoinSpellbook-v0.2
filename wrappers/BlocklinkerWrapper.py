@@ -18,7 +18,7 @@ class BlockLinkerWrapper():
         parameters = {}
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
 
         queryString  = urllib.urlencode(parameters)
         url = self.url + "/linker/LBL?" + queryString
@@ -36,7 +36,7 @@ class BlockLinkerWrapper():
         parameters = {}
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
 
         queryString  = urllib.urlencode(parameters)
         url = self.url + "/linker/LRL?" + queryString
@@ -54,7 +54,7 @@ class BlockLinkerWrapper():
         parameters = {}
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
 
         queryString  = urllib.urlencode(parameters)
         url = self.url + "/linker/LSL?" + queryString
@@ -72,7 +72,7 @@ class BlockLinkerWrapper():
         parameters = {}
         parameters['address'] = address
         parameters['xpub'] = xpub
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
 
         queryString  = urllib.urlencode(parameters)
         url = self.url + "/linker/LAL?" + queryString

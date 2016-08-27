@@ -17,7 +17,7 @@ class BlockProfileWrapper():
         response = {'success': 0}
         parameters = {}
         parameters['address'] = address
-        parameters['blockHeight'] = str(blockHeight)
+        parameters['block_height'] = str(blockHeight)
 
         queryString  = urllib.urlencode(parameters)
         url = self.url + "/profile/profile?" + queryString
