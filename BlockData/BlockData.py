@@ -15,76 +15,67 @@ import blockexplorers.Insight as Insight
 from validators import validators as validator
 
 
-
-
-
 def getProviderAPI(name):
     provider = datastore.Providers.get_by_id(name)
 
     if provider and provider.providerType == 'Blocktrail.com':
-        providerAPI = Blocktrail_com.API(provider.blocktrail_key)
+        provider_api = Blocktrail_com.API(provider.blocktrail_key)
     elif provider and provider.providerType == 'Blockchain.info':
-        providerAPI = Blockchain_info.API()
-    elif provider and  provider.providerType == 'Insight':
-        providerAPI = Insight.API(provider.insight_url)
+        provider_api = Blockchain_info.API()
+    elif provider and provider.providerType == 'Insight':
+        provider_api = Insight.API(provider.insight_url)
     else:
-        providerAPI = None
+        provider_api = None
 
-    return providerAPI
+    return provider_api
+
 
 def getProviderNames():
     providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
-    providerNames = []
+    provider_names = []
     for provider in providers:
-        providerNames.append(provider.key.string_id())
+        provider_names.append(provider.key.string_id())
 
-    return providerNames
+    return provider_names
 
 
 def getProvidersList():
     providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
-    providersList = []
+    providers_list = []
     for provider in providers:
-        tmpProvider = {}
-        tmpProvider['name'] = provider.key.string_id()
-        tmpProvider['priority'] = provider.priority
-        tmpProvider['providerType'] = provider.providerType
+        tmp_provider = {'name': provider.key.string_id(),
+                        'priority': provider.priority,
+                        'providerType': provider.providerType}
+
         if provider.providerType == 'Blocktrail.com':
-            tmpProvider['Blocktrail_key'] = provider.blocktrail_key
+            tmp_provider['Blocktrail_key'] = provider.blocktrail_key
         elif provider.providerType == 'Insight':
-            tmpProvider['Insight_url'] = provider.insight_url
+            tmp_provider['Insight_url'] = provider.insight_url
 
-        providersList.append(tmpProvider)
+        providers_list.append(tmp_provider)
 
-    return providersList
+    return providers_list
 
-def saveProvider(name, priority, providerType, param=''):
+
+def saveProvider(name, priority, provider_type, param=''):
 
     provider = datastore.Providers.get_or_insert(name)
     provider.priority = priority
-    provider.providerType = providerType
+    provider.providerType = provider_type
 
-    providerDict = {}
-    providerDict['name'] = name
-    providerDict['priority'] = priority
-    providerDict['providerType'] = providerType
-
-    if providerType == 'Blocktrail.com':
+    if provider_type == 'Blocktrail.com':
         provider.blocktrail_key = param
-        providerDict['blocktrail_key'] = param
-    elif providerType == 'Insight':
+    elif provider_type == 'Insight':
         provider.insight_url = param
-        providerDict['insight_url'] = param
 
     try:
         provider.put()
         return True
-
-    except:
+    except Exception:
         return False
 
 
@@ -97,7 +88,7 @@ def deleteProvider(name):
         return False
 
 
-def query(queryType, param='', provider=''):
+def query(query_type, param='', provider=''):
     response = {'success': 0}
     providers = getProviderNames()
 
@@ -108,57 +99,54 @@ def query(queryType, param='', provider=''):
         return response
 
     for i in range(0, len(providers)):
-        providerAPI = getProviderAPI(providers[i])
-        if providerAPI:
+        provider_api = getProviderAPI(providers[i])
+        if provider_api:
             data = {}
-            if queryType == 'block':
-                data = providerAPI.getBlock(param)
-            elif queryType == 'latestBlock':
-                data = providerAPI.getLatestBlock()
-            elif queryType == 'primeInputAddress':
-                data = providerAPI.getPrimeInputAddress(param)
-            elif queryType == 'balances':
-                data = providerAPI.getBalances(param)
-            elif queryType == 'transactions':
-                data = providerAPI.getTXS(param)
-            elif queryType == 'utxos':
-                data = providerAPI.getUTXOs(param)
+            if query_type == 'block':
+                data = provider_api.getBlock(param)
+            elif query_type == 'latestBlock':
+                data = provider_api.getLatestBlock()
+            elif query_type == 'primeInputAddress':
+                data = provider_api.getPrimeInputAddress(param)
+            elif query_type == 'balances':
+                data = provider_api.getBalances(param)
+            elif query_type == 'transactions':
+                data = provider_api.getTXS(param)
+            elif query_type == 'utxos':
+                data = provider_api.getUTXOs(param)
 
             if 'success' in data and data['success'] == 1:
                 response = data
                 response['provider'] = providers[i]
                 break
             else:
-                message = str(providers[i]) + 'failed to provide data for query: ' + str(queryType)
+                message = '{0} failed to provide data for query: {1}'.format(str(providers[i]), str(query_type))
                 if param != '':
                     message += ' param: ' + str(param)
                 logging.warning(message)
-
 
     if response['success'] == 0 and provider == '':
         response['error'] = 'All data providers failed.'
     elif response['success'] == 0 and provider != '':
         response['error'] = provider + ' failed to provide data.'
 
-
-
     return response
 
 
-def block(blockHeight, provider=''):
+def block(block_height, provider=''):
     response = {'success': 0}
-    if isinstance(blockHeight, int) and blockHeight >= 0:
-        response = query('block', blockHeight, provider)
+    if validator.validBlockHeight(block_height):
+        response = query('block', block_height, provider)
     else:
-        response['error'] = 'blockHeight must be a positive integer.'
+        response['error'] = 'block_height must be a positive integer.'
 
     return response
-
 
 
 def latestBlock(provider=''):
     response = query('latestBlock', '', provider)
     return response
+
 
 def primeInputAddress(txid, provider=''):
     response = {'success': 0}
@@ -182,6 +170,7 @@ def transactions(address, provider=''):
 
     return response
 
+
 def balances(addresses, provider=''):
     response = {'success': 0}
     if validator.validAddresses(addresses):
@@ -190,6 +179,7 @@ def balances(addresses, provider=''):
         response['error'] = 'Invalid addresses'
 
     return response
+
 
 def utxos(addresses, provider=''):
     response = {'success': 0}
@@ -204,14 +194,9 @@ def utxos(addresses, provider=''):
     return response
 
 
-
-def TXS2JSON(self, TXS, address):
-    jsonObj = []
-    for i in range(0, len(TXS)):
-        tx = TXS[i]
-        jsonObj.append(tx.toDict(address))
-    return jsonObj
-
-
-
-
+def txs_2_json(txs, address):
+    json_obj = []
+    for i in range(0, len(txs)):
+        tx = txs[i]
+        json_obj.append(tx.toDict(address))
+    return json_obj
