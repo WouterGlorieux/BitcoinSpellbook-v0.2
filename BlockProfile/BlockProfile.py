@@ -10,16 +10,16 @@ def Profile(address, block=0):
 
     if validator.validAddress(address):
         if block == 0:
-            latestBlock = BlockData.latestBlock()
+            latest_block = BlockData.latestBlock()
 
-            if 'success' in latestBlock and latestBlock['success'] == 1:
-                block = latestBlock['latestBlock']['height']
+            if 'success' in latest_block and latest_block['success'] == 1:
+                block = latest_block['latestBlock']['height']
             else:
                 response['error'] = 'Unable to retrieve latest block'
 
-        txsData = BlockData.transactions(address)
-        if 'success' in txsData and txsData['success'] == 1:
-            txs = txsData['TXS']
+        txs_data = BlockData.transactions(address)
+        if 'success' in txs_data and txs_data['success'] == 1:
+            txs = txs_data['TXS']
             profile = TXS2profile(txs, address, block)
         else:
             response['error'] = 'Unable to retrieve transactions'
@@ -34,16 +34,16 @@ def Profile(address, block=0):
     return response
 
 
-def TXS2profile(txs, address, block=0):
-    sortedTXS = sortTXS(txs)
+def TXS2profile(txs, address, block_height=0):
+    sorted_txs = sortTXS(txs)
     profile = {}
-    for tx in sortedTXS:
-        if (block == 0 or tx['block_height'] <= block) and tx['block_height'] != None:
+    for tx in sorted_txs:
+        if (block_height == 0 or tx['block_height'] <= block_height) and tx['block_height'] is not None:
             for output in tx['outputs']:
                 if 'OP_RETURN' in output:
-                    primeInputAddress = tx['primeInputAddress']
-                    blockHeight = tx['block_height']
-                    profile[primeInputAddress] = {'lastUpdate': blockHeight}
+                    prime_input_address = tx['primeInputAddress']
+                    block_height = tx['block_height']
+                    profile[prime_input_address] = {'lastUpdate': block_height}
                     message = output['OP_RETURN']
                     if validator.validOP_RETURN(message) and validator.validBlockProfileMessage(message):
                         for message_part in message.split("|"):
@@ -55,16 +55,14 @@ def TXS2profile(txs, address, block=0):
                             to_address = tx['outputs'][int(to_index)]['address']
 
                             if to_address == address:
-                                if from_address in profile[primeInputAddress]:
-                                    if variable_name in profile[primeInputAddress][from_address]:
+                                if from_address in profile[prime_input_address]:
+                                    if variable_name in profile[prime_input_address][from_address]:
                                         #variable already exists, overwrite or adjust value
-                                        profile[primeInputAddress][from_address][variable_name] = variable_value
+                                        profile[prime_input_address][from_address][variable_name] = variable_value
                                     else:
-                                        profile[primeInputAddress][from_address][variable_name] = variable_value
+                                        profile[prime_input_address][from_address][variable_name] = variable_value
                                 else:
-                                    profile[primeInputAddress][from_address] = {variable_name: variable_value}
-
-
+                                    profile[prime_input_address][from_address] = {variable_name: variable_value}
     return profile
 
 
@@ -74,19 +72,16 @@ def components(message):
 
 
 def sortTXS(txs):
-    blockTXS = {}
+    block_txs = {}
     for tx in txs:
-        if tx['block_height'] in blockTXS:
-            blockTXS[tx['block_height']].append(tx)
+        if tx['block_height'] in block_txs:
+            block_txs[tx['block_height']].append(tx)
         else:
-            blockTXS[tx['block_height']] = [tx]
+            block_txs[tx['block_height']] = [tx]
 
-    sortedTXS = []
-    for block in sorted(blockTXS):
-        for tx in sorted(blockTXS[block], key= lambda x: x['txid']):
-            sortedTXS.append(tx)
+    sorted_txs = []
+    for block in sorted(block_txs):
+        for tx in sorted(block_txs[block], key=lambda x: x['txid']):
+            sorted_txs.append(tx)
 
-    return sortedTXS
-
-
-
+    return sorted_txs
