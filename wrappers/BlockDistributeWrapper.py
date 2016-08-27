@@ -14,13 +14,12 @@ class BlockDistributeWrapper():
     def __init__(self, url):
         self.url = url
 
-
     def getDistributers(self):
         response = {'success': 0}
         parameters = {}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/getDistributers?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/getDistributers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -32,11 +31,10 @@ class BlockDistributeWrapper():
 
     def getDistributer(self, name):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/getDistributer?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/getDistributer?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -45,16 +43,14 @@ class BlockDistributeWrapper():
             response['error'] = 'Unable to retrieve distributer'
 
         return response
-
 
     def checkAddress(self, name, address):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
-        parameters['address'] = address
+        parameters = {'name': name,
+                      'address': address}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/checkAddress?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/checkAddress?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -64,21 +60,21 @@ class BlockDistributeWrapper():
 
         return response
 
-
-    def saveDistributer(self, name, settings={}, APIkey='', APIsecret=''):
+    def saveDistributer(self, name, settings=None, api_key='', api_secret=''):
+        if not settings:
+            settings = {}
         response = {'success': 0}
-        parameters ={}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/saveDistributer?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/saveDistributer?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -91,21 +87,19 @@ class BlockDistributeWrapper():
 
         return response
 
-
-    def deleteDistributer(self, name, APIkey='', APIsecret=''):
+    def deleteDistributer(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/deleteDistributer?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/deleteDistributer?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -118,21 +112,19 @@ class BlockDistributeWrapper():
 
         return response
 
-
-    def updateDistribution(self, name, APIkey='', APIsecret=''):
+    def updateDistribution(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/updateDistribution?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/updateDistribution?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -145,16 +137,12 @@ class BlockDistributeWrapper():
 
         return response
 
-
-
-
     def doDistributing(self, name=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/distributer/doDistributing?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/distributer/doDistributing?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
