@@ -276,42 +276,6 @@ class updateRecommendedFee(webapp2.RequestHandler):
             parameters.put()
 
 
-class initializeWallet(webapp2.RequestHandler):
-    def get(self):
-        if self.request.get('module') in ['BlockWriter', 'BlockForwarder', 'BlockDistributer']:
-            module = self.request.get('module')
-            parameters = datastore.Parameters.get_by_id('DefaultConfig')
-            if parameters:
-                xpubKey = ''
-                if module == 'BlockWriter' and parameters.BlockWriter_walletseed not in ['', None]:
-                    xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
-                elif module == 'BlockForwarder' and parameters.BlockForward_walletseed not in ['', None]:
-                    xpubKey = BIP44.getXPUBKeys(parameters.BlockForward_walletseed, "", 1)[0]
-                elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
-                    xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
-
-                if self.request.get('n'):
-                    try:
-                        n = int(self.request.get('n'))
-                    except:
-                        n = 10
-
-                    for i in range(0, n):
-                        wallet_address = datastore.WalletAddress.get_or_insert("%s_%i" % (module, i), parent=datastore.address_key())
-                        wallet_address.module = module
-                        wallet_address.address = BIP44.getAddressFromXPUB(xpubKey, i)
-                        wallet_address.i = i
-                        wallet_address.k = 0
-                        if i == 0:
-                            wallet_address.status = 'Unavailable'
-                        else:
-                            wallet_address.status = 'Available'
-                        wallet_address.put()
-
-
-
-
-
 class SIL(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}

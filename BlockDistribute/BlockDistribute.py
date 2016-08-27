@@ -253,21 +253,15 @@ class Distributer():
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
 
-
             if distributer.addressType == 'PrivKey' and distributer.privateKey != '':
                 distributer.address = bitcoin.privtoaddr(distributer.privateKey)
             elif distributer.addressType == 'BIP44':
-                parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.BlockDistribute_walletseed != "":
-                    if distributer.walletIndex == 0:
-                        distributer.walletIndex = getNextIndex()
+                if distributer.walletIndex == 0:
+                    distributer.walletIndex = getNextIndex()
+                distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.walletIndex)
 
-                    xpub = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed)[0]
-                    distributer.address = BIP44.getAddressFromXPUB(xpub, distributer.walletIndex)
-                else:
-                    self.error = 'Unable to retrieve wallet seed'
-            else:
-                self.error = 'No private key supplied'
+            if not validator.validAddress(distributer.address):
+                self.error = 'Unable to get address for distributer'
 
 
             if self.error == '':
@@ -401,22 +395,15 @@ class DoDistributing():
                 optimalOutputs = self.optimalOutputs(totalInputValue, distribution, distributer)
                 logging.info("optimal outputs: " + str(optimalOutputs))
 
-
                 privKeys = {}
                 if distributer.addressType == 'PrivKey':
-                    address = bitcoin.privtoaddr(distributer.privateKey)
-                    privKeys = {address: distributer.privateKey}
+                    privKeys = {distributer.address: distributer.privateKey}
 
                 elif distributer.addressType == 'BIP44':
-                    parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                    if parameters and parameters.BlockDistribute_walletseed != '' and parameters.BlockDistribute_walletseed != None:
-                        xprivKeys = BIP44.getXPRIVKeys(parameters.BlockDistribute_walletseed, "", 1)
-                        privKeys = BIP44.getPrivKey(xprivKeys[0], distributer.walletIndex)
-
+                    privKeys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.walletIndex)
 
                 if distributer.distributionSource == 'SIL' and distributer.address == distributer.registrationAddress:
                     self.error = 'Dark magic detected! Ponzi schemes are illegal!!'
-
 
                 if len(optimalOutputs) > 0 and self.error == '':
                     totalOutputValue = 0

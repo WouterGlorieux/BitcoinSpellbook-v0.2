@@ -108,6 +108,13 @@ def getXPRIVKeys(mnemonic, passphrase="", i=1):
 
     return xprivs
 
+def get_xpriv_key(mnemonic, passphrase="", account=0):
+    seed = hexlify(bitcoin.mnemonic_to_seed(mnemonic, passphrase=passphrase))
+    master_key = bitcoin.bip32_master_key(unhexlify(seed))
+    xpriv_key = bitcoin.bip32_ckd(bitcoin.bip32_ckd(bitcoin.bip32_ckd(master_key, 44+HARDENED), HARDENED), HARDENED+account)
+
+    return xpriv_key
+
 def getPrivKey(xpriv, i, k=0):
     privkeys = {}
     priv0 = bitcoin.bip32_ckd(xpriv, k)
@@ -134,6 +141,11 @@ def getXPUBKeys(mnemonic, passphrase="", i=1):
         xpubs.append(xpub)
 
     return xpubs
+
+def get_xpub_key(mnemonic, passphrase="", account=0):
+    xpriv_key = get_xpriv_key(mnemonic=mnemonic, passphrase=passphrase, account=account)
+    xpub_key = bitcoin.bip32_privtopub(xpriv_key)
+    return xpub_key
 
 def showDetails(mnemonic, passphrase="", i=1):
 

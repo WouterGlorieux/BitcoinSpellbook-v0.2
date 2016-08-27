@@ -274,20 +274,16 @@ class Writer():
 
             if writer.addressType == 'PrivKey' and writer.privateKey != '':
                 writer.address = bitcoin.privtoaddr(writer.privateKey)
-                writer.extraValueAddress = writer.address
-            elif writer.addressType == 'BIP44':
-                parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.BlockWriter_walletseed != "":
-                    if writer.walletIndex == 0:
-                        writer.walletIndex = getAvailableAddressIndex()
 
-                    xpub = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed)[0]
-                    writer.address = BIP44.getAddressFromXPUB(xpub, writer.walletIndex)
-                    writer.extraValueAddress = writer.address
-                else:
-                    self.error = 'Unable to retrieve wallet seed'
+            elif writer.addressType == 'BIP44':
+                if writer.walletIndex == 0:
+                    writer.walletIndex = getAvailableAddressIndex()
+                writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.walletIndex)
+
+            if not validator.validAddress(writer.address):
+                self.error = 'Unable to get address for writer'
             else:
-                self.error = 'No private key supplied'
+                writer.extraValueAddress = writer.address
 
             if not datastore.consistencyCheck('BlockWriter'):
                 self.error = 'Unable to assign address.'
@@ -386,10 +382,7 @@ class DoWriting():
             if writer.addressType == 'PrivKey':
                 privKeys = {writer.address: writer.privateKey}
             elif writer.addressType == 'BIP44':
-                parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.BlockWriter_walletseed not in ['', None]:
-                    xprivKeys = BIP44.getXPRIVKeys(parameters.BlockWriter_walletseed, "", 1)
-                    privKeys = BIP44.getPrivKey(xprivKeys[0], writer.walletIndex)
+                privKeys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.walletIndex)
 
             logging.info("Sending " + str(totalInputValue) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transactionFee) + ' with OP_RETURN message: ' + writer.message)
             tx = TxFactory.makeCustomTransaction(privKeys, UTXOs, outputs, transactionFee, writer.message)

@@ -166,7 +166,7 @@ class BlockForward():
             elif 'minimumAmount' in settings:
                 self.error = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
 
-            if 'youtube' in settings and validator.validYoutube(settings['youtube']):
+            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
                 forwarder.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
@@ -215,17 +215,12 @@ class BlockForward():
             if forwarder.addressType == 'PrivKey' and forwarder.privateKey != '':
                 forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
             elif forwarder.addressType == 'BIP44':
-                parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                if parameters and parameters.BlockForward_walletseed != "":
-                    if forwarder.walletIndex == 0:
-                        forwarder.walletIndex = getNextIndex()
+                if forwarder.walletIndex == 0:
+                    forwarder.walletIndex = getNextIndex()
+                forwarder.address = datastore.get_service_address(datastore.Services.BlockForward, forwarder.walletIndex)
 
-                    xpub = BIP44.getXPUBKeys(parameters.BlockForward_walletseed)[0]
-                    forwarder.address = BIP44.getAddressFromXPUB(xpub, forwarder.walletIndex)
-                else:
-                    self.error = 'Unable to retrieve wallet seed'
-            else:
-                self.error = 'No private key supplied'
+            if not validator.validAddress(forwarder.address):
+                self.error = 'Unable to get address for forwarder'
 
 
             if self.error == '':
@@ -311,13 +306,7 @@ class DoForwarding():
                     if forwarder.addressType == 'PrivKey':
                         privKeys = {forwarder.address: forwarder.privateKey}
                     elif forwarder.addressType == 'BIP44':
-                        parameters = datastore.Parameters.get_or_insert('DefaultConfig')
-                        if parameters and parameters.BlockForward_walletseed != '' and parameters.BlockForward_walletseed != None:
-                            xprivKeys = BIP44.getXPRIVKeys(parameters.BlockForward_walletseed, "", 1)
-                            privKeys = BIP44.getPrivKey(xprivKeys[0], forwarder.walletIndex)
-
-
-
+                        privKeys = datastore.get_service_private_key(datastore.Services.BlockForward, forwarder.walletIndex)
 
                     if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount+TRANSACTION_FEE:
                         logging.warning(str(amounts[0]) + " is below minimum of " + str(forwarder.minimumAmount) + " + transaction fee of " + str(TRANSACTION_FEE) + "! returning btc to sender")
