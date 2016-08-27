@@ -5,36 +5,37 @@ import bitcoin
 
 from bitcoin.transaction import *
 
-def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
+
+def makeCustomTransaction(private_keys, inputs, outputs, fee=0, op_return_data=''):
     #input format= txid:i
     tx = None
-    totalInputValue = 0
+    total_input_value = 0
     UTXOs = []
     for tx_input in inputs:
         if 'spend' not in tx_input:
-            totalInputValue += tx_input['value']
+            total_input_value += tx_input['value']
             UTXOs.append(tx_input)
 
-    totalOutputValue = 0
+    total_output_value = 0
     for tx_output in outputs:
-        totalOutputValue += tx_output['value']
+        total_output_value += tx_output['value']
 
-    diff = totalInputValue - totalOutputValue
+    diff = total_input_value - total_output_value
     if fee != diff:
         logging.error("Fee incorrect! aborting transaction! " + str(fee) + " != " + str(diff))
     elif fee < 0:
         logging.error('Fee cannot be lower than zero! aborting transaction! fee: ' + str(fee))
     else:
-        allKeysPresent = True
-        allInputsConfirmed = True
+        all_keys_present = True
+        all_inputs_confirmed = True
         for tx_input in UTXOs:
-            if tx_input['address'] not in privkeys:
-                allKeysPresent = False
+            if tx_input['address'] not in private_keys:
+                all_keys_present = False
 
-            if tx_input['block_height'] == None:
-                allInputsConfirmed = False
+            if tx_input['block_height'] is None:
+                all_inputs_confirmed = False
 
-        if allKeysPresent == True and allInputsConfirmed == True:
+        if all_keys_present is True and all_inputs_confirmed is True:
             tx = bitcoin.mktx(UTXOs, outputs)
 
             if op_return_data != '' and len(op_return_data) <= 80:
@@ -44,14 +45,15 @@ def makeCustomTransaction(privkeys, inputs, outputs, fee=0, op_return_data=''):
                 return None
 
             for i in range(0, len(UTXOs)):
-                tx = bitcoin.sign(tx, i, str(privkeys[UTXOs[i]['address']]))
+                tx = bitcoin.sign(tx, i, str(private_keys[UTXOs[i]['address']]))
 
-        elif allKeysPresent == False:
+        elif not all_keys_present:
             logging.error("At least 1 private key is missing.")
-        elif allInputsConfirmed == False:
+        elif not all_inputs_confirmed:
             logging.error("At least 1 input is unconfirmed.")
 
     return tx
+
 
 def sendTransaction(tx):
     success = False
@@ -63,41 +65,38 @@ def sendTransaction(tx):
     except Exception as e:
         logging.error("TX broadcast failed: %s" % str(e))
 
-
     if 'status' in response and response['status'] == 'success':
         success = True
 
     return success
 
 
-
-def decodeOP_RETURN(hexdata):
-    data = ''
-    checkLenght = 0
-    if hexdata[:2] == '6a':
-        if hexdata[2:4] == '4c':
-            data = hexdata[6:]
-            checkLenght = hexdata[4:6]
-        elif hexdata[2:4] == '4d':
-            data = hexdata[8:]
-            checkLenght = hexdata[4:8]
-        elif hexdata[2:4] == '4e':
-            data = hexdata[10:]
-            checkLenght = hexdata[4:10]
+def decodeOP_RETURN(hex_data):
+    if hex_data[:2] == '6a':
+        if hex_data[2:4] == '4c':
+            data = hex_data[6:]
+            check_length = hex_data[4:6]
+        elif hex_data[2:4] == '4d':
+            data = hex_data[8:]
+            check_length = hex_data[4:8]
+        elif hex_data[2:4] == '4e':
+            data = hex_data[10:]
+            check_length = hex_data[4:10]
         else:
-            data = hexdata[4:]
-            checkLenght = hexdata[2:4]
+            data = hex_data[4:]
+            check_length = hex_data[2:4]
 
-        unhexData = binascii.unhexlify(data)
+        unhex_data = binascii.unhexlify(data)
 
-        if len(unhexData) != int(checkLenght, 16):
-            logging.error('OP_RETURN data is not the correct lenght! ' + str(len(unhexData)) + ' -> should be ' + str(int(checkLenght, 16)) )
-            unhexData = None
+        if len(unhex_data) != int(check_length, 16):
+            logging.error('OP_RETURN data is not the correct length! ' + str(len(unhex_data)) + ' -> should be ' + str(int(check_length, 16)))
+            unhex_data = None
 
-    return unhexData
+    return unhex_data
 
 #extra functions for op_return from a fork of pybitcointools
 #https://github.com/wizardofozzie/pybitcointools
+
 
 def num_to_op_push(x):
     x = int(x)
@@ -117,31 +116,31 @@ def num_to_op_push(x):
         raise ValueError("0xffffffff > value >= 0")
     return pc + num
 
+
 def wrap_script(hexdata):
     if re.match('^[0-9a-fA-F]*$', hexdata):
         return binascii.hexlify(wrap_script(binascii.unhexlify(hexdata)))
     return num_to_op_push(len(hexdata)) + hexdata
 
-def addOP_RETURN(msg, txhex=None):
-    """Makes OP_RETURN script from msg, embeds in Tx hex"""
-    hexdata = binascii.hexlify(b'\x6a' + wrap_script(msg))
 
-    if txhex is None:
-        return hexdata
+def addOP_RETURN(msg, tx_hex=None):
+    """Makes OP_RETURN script from msg, embeds in Tx hex"""
+    hex_data = binascii.hexlify(b'\x6a' + wrap_script(msg))
+
+    if tx_hex is None:
+        return hex_data
     else:
-        if not re.match("^[0-9a-fA-F]*$", txhex):
-            return binascii.unhexlify(addOP_RETURN(msg, binascii.hexlify(txhex)))
-        elif isinstance(txhex, dict):
-            txo = txhex
+        if not re.match("^[0-9a-fA-F]*$", tx_hex):
+            return binascii.unhexlify(addOP_RETURN(msg, binascii.hexlify(tx_hex)))
+        elif isinstance(tx_hex, dict):
+            txo = tx_hex
             outs = txo.get('outs')
         else:
-            outs = deserialize(txhex).get('outs')
+            outs = deserialize(tx_hex).get('outs')
 
-        txo = deserialize(txhex)
+        txo = deserialize(tx_hex)
         assert (len(outs) > 0) and sum(multiaccess(outs, 'value')) > 0 \
-                and not any([o for o in outs if o.get("script")[:2] == '6a']), "Tx limited to *1* OP_RETURN, and only whilst the other outputs send funds"
-        txo['outs'].append({
-                    'script': hexdata,
-                    'value': 0
-                    })
+                and not any([o for o in outs if o.get("script")[:2] == '6a']), \
+                "Tx limited to *1* OP_RETURN, and only whilst the other outputs send funds"
+        txo['outs'].append({'script': hex_data, 'value': 0})
         return serialize(txo)
