@@ -16,14 +16,16 @@ import logging
 
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
+
 urlfetch.set_default_fetch_deadline(60)
 
+REQUIRED_CONFIRMATIONS = 3  # must be at least 3
+TRANSACTION_FEE = 10000  # in Satoshis
 
-REQUIRED_CONFIRMATIONS = 3 #must be at least 3
-TRANSACTION_FEE = 10000 #in Satoshis
 
 def getNextIndex():
-    forwarders_query = datastore.Forwarder.query(ancestor=datastore.forwarders_key()).order(-datastore.Forwarder.walletIndex)
+    forwarders_query = datastore.Forwarder.query(ancestor=datastore.forwarders_key()).order(
+        -datastore.Forwarder.walletIndex)
     forwarders = forwarders_query.fetch()
 
     if len(forwarders) > 0:
@@ -33,31 +35,33 @@ def getNextIndex():
 
     return i
 
-def forwarderToDict(forwarder):
-    forwarderDict = {}
-    forwarderDict['name'] = forwarder.key.id()
-    forwarderDict['address'] = forwarder.address
-    forwarderDict['description'] = forwarder.description
-    forwarderDict['creator'] = forwarder.creator
-    forwarderDict['creatorEmail'] = forwarder.creatorEmail
-    forwarderDict['youtube'] = forwarder.youtube
-    forwarderDict['status'] = forwarder.status
-    forwarderDict['confirmAmount'] = forwarder.confirmAmount
-    forwarderDict['feeAddress'] = forwarder.feeAddress
-    forwarderDict['feePercent'] = forwarder.feePercent
-    forwarderDict['minimumAmount'] = forwarder.minimumAmount
-    forwarderDict['xpub'] = forwarder.xpub
-    forwarderDict['visibility'] = forwarder.visibility
-    forwarderDict['date'] = int(time.mktime(forwarder.date.timetuple()))
 
-    return forwarderDict
+def forwarderToDict(forwarder):
+    forwarder_dict = {'name': forwarder.key.id(),
+                      'address': forwarder.address,
+                      'description': forwarder.description,
+                      'creator': forwarder.creator,
+                      'creatorEmail': forwarder.creatorEmail,
+                      'youtube': forwarder.youtube,
+                      'status': forwarder.status,
+                      'confirmAmount': forwarder.confirmAmount,
+                      'feeAddress': forwarder.feeAddress,
+                      'feePercent': forwarder.feePercent,
+                      'minimumAmount': forwarder.minimumAmount,
+                      'xpub': forwarder.xpub,
+                      'visibility': forwarder.visibility,
+                      'date': int(time.mktime(forwarder.date.timetuple()))}
+
+    return forwarder_dict
 
 
 def getForwarders():
     response = {'success': 0}
     forwarders = []
 
-    forwarders_query = datastore.Forwarder.query(datastore.Forwarder.visibility == 'Public', datastore.Forwarder.status == 'Active', ancestor=datastore.forwarders_key()).order(-datastore.Forwarder.date)
+    forwarders_query = datastore.Forwarder.query(datastore.Forwarder.visibility == 'Public',
+                                                 datastore.Forwarder.status == 'Active',
+                                                 ancestor=datastore.forwarders_key()).order(-datastore.Forwarder.date)
     data = forwarders_query.fetch()
     for forwarder in data:
         forwarders.append(forwarderToDict(forwarder))
@@ -67,9 +71,9 @@ def getForwarders():
 
     return response
 
+
 class BlockForward():
     @ndb.transactional(xg=True)
-
     def __init__(self, name):
         self.error = ''
         if isinstance(name, (str, unicode)) and len(name) > 0:
@@ -90,16 +94,15 @@ class BlockForward():
 
         return response
 
-
     def checkAddress(self, address):
         response = {'success': 0}
         if self.error == '':
             forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
 
             if forwarder:
-                forwardingRelation = {'relation': 'unrelated address'}
+                forwarding_relation = {'relation': 'unrelated address'}
                 if forwarder.address == address:
-                    forwardingRelation['relation'] = 'forwarding address'
+                    forwarding_relation['relation'] = 'forwarding address'
                 else:
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
                     LAL_data = linker.LAL()
@@ -112,20 +115,20 @@ class BlockForward():
 
                     for i in range(0, len(LAL)):
                         if LAL[i][0] == address:
-                            forwardingRelation['relation'] = 'sending address'
-                            forwardingRelation['sentTo'] = LAL[i][1]
-                            forwardingRelation['balance'] = LBL[i][1]
-                            forwardingRelation['share'] = LBL[i][2]
+                            forwarding_relation['relation'] = 'sending address'
+                            forwarding_relation['sentTo'] = LAL[i][1]
+                            forwarding_relation['balance'] = LBL[i][1]
+                            forwarding_relation['share'] = LBL[i][2]
                             break
 
                         elif LAL[i][1] == address:
-                            forwardingRelation['relation'] = 'receiving address'
-                            forwardingRelation['sentFrom'] = LAL[i][0]
-                            forwardingRelation['balance'] = LBL[i][1]
-                            forwardingRelation['share'] = LBL[i][2]
+                            forwarding_relation['relation'] = 'receiving address'
+                            forwarding_relation['sentFrom'] = LAL[i][0]
+                            forwarding_relation['balance'] = LBL[i][1]
+                            forwarding_relation['share'] = LBL[i][2]
                             break
 
-                response[address] = forwardingRelation
+                response[address] = forwarding_relation
                 response['success'] = 1
 
             else:
@@ -133,9 +136,9 @@ class BlockForward():
 
         return response
 
-
-
-    def saveForwarder(self, settings={}):
+    def saveForwarder(self, settings=None):
+        if not settings:
+            settings = {}
         response = {'success': 0}
 
         if self.error == '':
@@ -211,17 +214,16 @@ class BlockForward():
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
 
-
             if forwarder.addressType == 'PrivKey' and forwarder.privateKey != '':
                 forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
             elif forwarder.addressType == 'BIP44':
                 if forwarder.walletIndex == 0:
                     forwarder.walletIndex = getNextIndex()
-                forwarder.address = datastore.get_service_address(datastore.Services.BlockForward, forwarder.walletIndex)
+                forwarder.address = datastore.get_service_address(datastore.Services.BlockForward,
+                                                                  forwarder.walletIndex)
 
             if not validator.validAddress(forwarder.address):
                 self.error = 'Unable to get address for forwarder'
-
 
             if self.error == '':
                 forwarder.put()
@@ -248,10 +250,9 @@ class BlockForward():
         return response
 
 
-
-
 class DoForwarding():
     def __init__(self, name=''):
+        self.error = ''
 
         if name != '':
             forwarder = datastore.Forwarder.get_by_id(name, parent=datastore.forwarders_key())
@@ -265,26 +266,21 @@ class DoForwarding():
             for forwarder in forwarders:
                 self.run(forwarder)
 
-
-
-
-
     def run(self, forwarder):
         success = False
         utxos_data = BlockData.utxos(forwarder.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
-            UTXOs = utxos_data['UTXOs']
+            utxos = utxos_data['UTXOs']
         else:
             self.error = 'Unable to retrieve UTXOs'
 
-
-        for UTXO in UTXOs:
+        for utxo in utxos:
             to_addresses = []
             amounts = []
 
-            primeInputAddress_data = BlockData.primeInputAddress(UTXO['output'].split(":")[0])
-            if 'success' in primeInputAddress_data and primeInputAddress_data['success'] == 1:
-                primeInputAddress = primeInputAddress_data['PrimeInputAddress']
+            prime_input_address_data = BlockData.primeInputAddress(utxo['output'].split(":")[0])
+            if 'success' in prime_input_address_data and prime_input_address_data['success'] == 1:
+                primeInputAddress = prime_input_address_data['PrimeInputAddress']
                 if primeInputAddress != forwarder.address:
 
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
@@ -297,41 +293,43 @@ class DoForwarding():
                     for i in range(0, len(LAL)):
                         if LAL[i][0] == primeInputAddress:
                             to_addresses.append(LAL[i][1])
-                            amounts.append(UTXO['value'])
+                            amounts.append(utxo['value'])
 
-                    logging.info(forwarder.key.id() + ' : Starting forward from address '+ primeInputAddress + ', value: ' + str(amounts[0]) + ' Satoshis')
+                    logging.info(forwarder.key.id() + ' : Starting forward from address ' + primeInputAddress
+                                 + ', value: ' + str(amounts[0]) + ' Satoshis')
 
-
-                    privKeys = {}
+                    private_keys = {}
                     if forwarder.addressType == 'PrivKey':
-                        privKeys = {forwarder.address: forwarder.privateKey}
+                        private_keys = {forwarder.address: forwarder.privateKey}
                     elif forwarder.addressType == 'BIP44':
-                        privKeys = datastore.get_service_private_key(datastore.Services.BlockForward, forwarder.walletIndex)
+                        private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
+                                                                         forwarder.walletIndex)
 
-                    if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount+TRANSACTION_FEE:
-                        logging.warning(str(amounts[0]) + " is below minimum of " + str(forwarder.minimumAmount) + " + transaction fee of " + str(TRANSACTION_FEE) + "! returning btc to sender")
+                    if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount + TRANSACTION_FEE:
+                        logging.warning(
+                            "{0} is below minimum of {1} + transaction fee of {2}! returning btc to sender".format(
+                                str(amounts[0]), str(forwarder.minimumAmount), str(TRANSACTION_FEE)))
                         to_addresses = [primeInputAddress]
 
                         #if there is enough btc, subtract network fee, otherwise log a warning
                         if amounts[0] > TRANSACTION_FEE:
                             #subtract network fee in satoshis from first amount
-                            amounts[0] = amounts[0] - TRANSACTION_FEE
+                            amounts[0] -= TRANSACTION_FEE
 
-                            outputs = []
-                            outputs.append({'address': to_addresses[0], 'value': amounts[0]})
-                            logging.info("Returning " + str(amounts[0]) + " to " + to_addresses[0] + " transaction fee: " + str(TRANSACTION_FEE))
-                            tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
-                            if tx != None:
-                               success = TxFactory.sendTransaction(tx)
-
+                            outputs = [{'address': to_addresses[0], 'value': amounts[0]}]
+                            logging.info(
+                                "Returning " + str(amounts[0]) + " to " + to_addresses[0] + " transaction fee: " + str(
+                                    TRANSACTION_FEE))
+                            tx = TxFactory.makeCustomTransaction(private_keys, [utxo], outputs, TRANSACTION_FEE)
+                            if tx is not None:
+                                success = TxFactory.sendTransaction(tx)
                         else:
-                            logging.error("Insufficient amount to send, please remove UTXO manually as soon as possible.")
-
-
+                            logging.error(
+                                "Insufficient amount to send, please remove UTXO manually as soon as possible.")
 
                     elif len(to_addresses) > 0:
                         if forwarder.feePercent > 0.0 and forwarder.feeAddress != '':
-                            fee = int(amounts[0] * forwarder.feePercent/100)
+                            fee = int(amounts[0] * forwarder.feePercent / 100)
                             amounts = [amounts[0] - fee, fee]
                             to_addresses.append(forwarder.feeAddress)
                             logging.info("Forwarding Fee: " + str(amounts[1]) + " -> " + str(to_addresses[1]))
@@ -342,9 +340,8 @@ class DoForwarding():
                             to_addresses.append(primeInputAddress)
                             logging.info("Origin: " + str(forwarder.confirmAmount) + " -> " + primeInputAddress)
 
-
                         #subtract transaction fee in satoshis from first amount
-                        amounts[0] = amounts[0] - TRANSACTION_FEE
+                        amounts[0] -= TRANSACTION_FEE
 
                         logging.info("Destination: " + str(amounts[0]) + " -> " + to_addresses[0])
                         logging.info("Transaction fee: " + str(TRANSACTION_FEE))
@@ -354,19 +351,19 @@ class DoForwarding():
                             for i in range(0, len(amounts)):
                                 outputs.append({'address': to_addresses[i], 'value': amounts[i]})
 
-                            tx = TxFactory.makeCustomTransaction(privKeys, [UTXO], outputs, TRANSACTION_FEE)
-                            if tx != None:
-                               success = TxFactory.sendTransaction(tx)
+                            tx = TxFactory.makeCustomTransaction(private_keys, [utxo], outputs, TRANSACTION_FEE)
+                            if tx is not None:
+                                success = TxFactory.sendTransaction(tx)
                         else:
                             logging.error("Not enough balance left to send Transaction")
 
-
-                        if success == True:
+                        if success:
                             logging.info("Success")
                         else:
                             logging.error("Failed to send transaction")
 
                 else:
-                    logging.warning('Found UTXO originating from the forwarder address itself, please remove UTXO manually as soon as possible')
+                    logging.warning(
+                        'Found UTXO originating from the forwarder address itself, please remove UTXO manually as soon as possible')
 
         return success
