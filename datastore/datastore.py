@@ -7,18 +7,22 @@ import logging
 MAX_TRANSACTION_FEE = 10000 #in Satoshis
 
 
+class Services:
+    BlockForward = 1
+    BlockDistribute = 2
+    BlockWriter = 3
+    BlockTrigger = 4
+
+
 class APIKeys(ndb.Model):
     api_key = ndb.StringProperty(indexed=True, default='')
     api_secret = ndb.StringProperty(indexed=True, default='')
 
 
 class Parameters(ndb.Model):
-    BlockForward_walletseed = ndb.StringProperty(indexed=False, default="")
-    BlockDistribute_walletseed = ndb.StringProperty(indexed=False, default="")
-    BlockWriter_walletseed = ndb.StringProperty(indexed=False, default="")
+    master_seed = ndb.StringProperty(indexed=False, default="")
     mailFrom = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
     optimalFeePerKB = ndb.IntegerProperty(indexed=False, default=0)
-
 
 
 class Providers(ndb.Model):
@@ -47,9 +51,6 @@ class Forwarder(ndb.Model):
     feeAddress = ndb.StringProperty(default='')
     confirmAmount = ndb.IntegerProperty(indexed=False, default=0)
     maxTransactionFee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
-
-
-
 
 
 def forwarders_key():
@@ -102,10 +103,10 @@ class Trigger(ndb.Model):
     creatorEmail = ndb.StringProperty(default='')
 
 
-
 def triggers_key():
     #Constructs a Datastore key for a Trigger entity
     return ndb.Key('BlockTrigger', 'BlockTrigger')
+
 
 class Action(ndb.Model):
     trigger = ndb.StringProperty(default='')
@@ -126,6 +127,7 @@ class Action(ndb.Model):
 def trigger_key(trigger):
     #Constructs a Datastore key for a Action entity
     return ndb.Key('Action', str(trigger.key.id()))
+
 
 class Writer(ndb.Model):
     message = ndb.StringProperty(default='')
@@ -159,6 +161,7 @@ def writers_key():
     #Constructs a Datastore key for a Writer entity
     return ndb.Key('BlockWriter', 'BlockWriter')
 
+
 class WalletAddress(ndb.Model):
     module = ndb.StringProperty(indexed=True, choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'], default=None)
     address = ndb.StringProperty(indexed=True)
@@ -175,29 +178,6 @@ def address_key():
     #Constructs a Datastore key for a WalletAddress entity
     return ndb.Key('WalletAddress', 'WalletAddress')
 
-def initializeWalletAddress(module, i):
-    if module in ['BlockWriter', 'BlockForwarder', 'BlockDistributer']:
-        parameters = Parameters.get_by_id('DefaultConfig')
-        if parameters:
-            xpubKey = ''
-            if module == 'BlockWriter' and parameters.BlockWriter_walletseed not in ['', None]:
-                xpubKey = BIP44.getXPUBKeys(parameters.BlockWriter_walletseed, "", 1)[0]
-            elif module == 'BlockForwarder' and parameters.BlockForward_walletseed not in ['', None]:
-                xpubKey = BIP44.getXPUBKeys(parameters.BlockForward_walletseed, "", 1)[0]
-            elif module == 'BlockDistributer' and parameters.BlockDistribute_walletseed not in ['', None]:
-                xpubKey = BIP44.getXPUBKeys(parameters.BlockDistribute_walletseed, "", 1)[0]
-
-            if xpubKey != '':
-                wallet_address = WalletAddress.get_or_insert("%s_%i" % (module, i), parent=address_key())
-                wallet_address.module = module
-                wallet_address.address = BIP44.getAddressFromXPUB(xpubKey, i)
-                wallet_address.i = i
-                wallet_address.k = 0
-                if i == 0:
-                    wallet_address.status = 'Unavailable'
-                wallet_address.put()
-
-                return wallet_address.address
 
 def consistencyCheck(module):
     success = True
@@ -217,5 +197,24 @@ def consistencyCheck(module):
 
                 tmpIndex = writers[i].walletIndex
 
-
     return success
+
+
+def get_service_address(service, index):
+    parameters = Parameters.get_by_id('DefaultConfig')
+    address = None
+    if parameters.master_seed:
+        xpub_key = BIP44.get_xpub_key(parameters.master_seed, '', service)
+        address = BIP44.getAddressFromXPUB(xpub_key, index)
+
+    return address
+
+
+def get_service_private_key(service, index):
+    parameters = Parameters.get_by_id('DefaultConfig')
+    private_key = None
+    if parameters.master_seed:
+        xpriv_key = BIP44.get_xpriv_key(parameters.master_seed, '', service)
+        private_key = BIP44.getPrivKey(xpriv_key, index)
+
+    return private_key
