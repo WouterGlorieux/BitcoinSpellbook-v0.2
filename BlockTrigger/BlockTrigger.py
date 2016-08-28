@@ -57,7 +57,7 @@ def actionToDict(action):
     elif action.action_type == 'reveal_link' and action.revealAllowed is True:
         action_dict['reveal_link_text'] = action.reveal_link_text
         action_dict['reveal_link_url'] = action.reveal_link_url
-    elif action.action_type == 'SendMail':
+    elif action.action_type == 'send_mail':
         action_dict['mailTo'] = action.mailTo
         action_dict['mailSubject'] = action.mailSubject
         action_dict['mailBody'] = action.mailBody
@@ -205,10 +205,10 @@ class BlockTrigger():
 
             action.trigger = trigger.key.id()
 
-            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'reveal_link', 'SendMail', 'Webhook']:
+            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'reveal_link', 'send_mail', 'Webhook']:
                 action.action_type = settings['action_type']
             elif 'action_type' in settings:
-                self.error = 'action_type must be reveal_text, reveal_link, SendMail or Webhook'
+                self.error = 'action_type must be reveal_text, reveal_link, send_mail or Webhook'
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
@@ -341,7 +341,7 @@ class CheckTriggers():
                     action.revealAllowed = True
                     action.put()
 
-                elif action.action_type == 'SendMail' and action.mailSent is False:
+                elif action.action_type == 'send_mail' and action.mailSent is False:
                     if validator.validEmail(action.mailTo):
                         logging.info('executing action: ' + action.key.id())
                         try:
