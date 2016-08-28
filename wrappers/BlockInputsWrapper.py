@@ -7,20 +7,17 @@ import json
 import urllib
 
 
-
 class BlockInputsWrapper():
     def __init__(self, url):
         self.url = url
 
-
-    def SIL(self, address, blockHeight=0):
+    def SIL(self, address, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/SIL/SIL?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/SIL/SIL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
