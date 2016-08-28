@@ -170,7 +170,7 @@ class WalletAddress(ndb.Model):
     balance = ndb.IntegerProperty(default=0)
     received = ndb.IntegerProperty(default=0)
     sent = ndb.IntegerProperty(default=0)
-    cooldownEnd = ndb.DateTimeProperty(auto_now_add=True)
+    cooldown_end = ndb.DateTimeProperty(auto_now_add=True)
 
 
 def address_key():

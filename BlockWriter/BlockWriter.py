@@ -384,7 +384,7 @@ class DoWriting():
                 wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index, parent=datastore.address_key())
                 if wallet_address:
                     wallet_address.status = 'Cooldown'
-                    wallet_address.cooldownEnd = datetime.datetime.now() + datetime.timedelta(days=7)
+                    wallet_address.cooldown_end = datetime.datetime.now() + datetime.timedelta(days=7)
                     wallet_address.put()
             else:
                 logging.error("Failed to send transaction")
