@@ -62,7 +62,7 @@ def actionToDict(action):
         action_dict['mailSubject'] = action.mailSubject
         action_dict['mailBody'] = action.mailBody
         action_dict['mailSent'] = action.mailSent
-    elif action.action_type == 'Webhook':
+    elif action.action_type == 'webhook':
         action_dict['webhook'] = action.webhook
 
     return action_dict
@@ -205,10 +205,10 @@ class BlockTrigger():
 
             action.trigger = trigger.key.id()
 
-            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'reveal_link', 'send_mail', 'Webhook']:
+            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'reveal_link', 'send_mail', 'webhook']:
                 action.action_type = settings['action_type']
             elif 'action_type' in settings:
-                self.error = 'action_type must be reveal_text, reveal_link, send_mail or Webhook'
+                self.error = 'action_type must be reveal_text, reveal_link, send_mail or webhook'
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
@@ -355,7 +355,7 @@ class CheckTriggers():
                     else:
                         logging.error("Invalid email address: " + action.mailTo)
 
-                elif action.action_type == 'Webhook' and action.webhookActivated is False:
+                elif action.action_type == 'webhook' and action.webhookActivated is False:
 
                     if validator.validURL(action.webhook):
                         logging.info('executing action: ' + action.key.id())
