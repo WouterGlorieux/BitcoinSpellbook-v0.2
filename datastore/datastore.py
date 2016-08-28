@@ -69,7 +69,7 @@ class Distributer(ndb.Model):
     distribution = ndb.JsonProperty(default=[])
     registration_address = ndb.StringProperty(default='')
     registration_xpub = ndb.StringProperty(default='')
-    registrationBlockHeight = ndb.IntegerProperty(default=0)
+    registration_block_height = ndb.IntegerProperty(default=0)
     threshold = ndb.IntegerProperty(default=0)
     minimum_amount = ndb.IntegerProperty(default=0)
     date = ndb.DateTimeProperty(auto_now_add=True)

@@ -41,7 +41,7 @@ def distributerToDict(distributer):
                         'address': distributer.address,
                         'distribution_source': distributer.distribution_source,
                         'registration_address': distributer.registration_address,
-                        'registration_block_height': distributer.registrationBlockHeight,
+                        'registration_block_height': distributer.registration_block_height,
                         'registration_xpub': distributer.registration_xpub,
                         'distribution': distributer.distribution,
                         'minimum_amount': distributer.minimum_amount,
@@ -154,7 +154,7 @@ class Distributer():
                 self.error = 'Invalid registration_xpub'
 
             if 'registration_block_height' in settings and (validator.validBlockHeight(settings['registration_block_height'])):
-                distributer.registrationBlockHeight = settings['registration_block_height']
+                distributer.registration_block_height = settings['registration_block_height']
             elif 'registration_block_height' in settings:
                 self.error = 'Invalid registration_block_height: ' + str(settings['registration_block_height'])
 
@@ -277,7 +277,7 @@ class Distributer():
             if distributer:
                 distribution = distributer.distribution
                 if distributer.distribution_source == 'SIL':
-                    SIL_data = BlockInputs.SIL(distributer.registration_address, distributer.registrationBlockHeight)
+                    SIL_data = BlockInputs.SIL(distributer.registration_address, distributer.registration_block_height)
                     if 'success' in SIL_data and SIL_data['success'] == 1:
                         distribution = SIL_data['SIL']
                     else:
@@ -286,7 +286,7 @@ class Distributer():
                 elif distributer.distribution_source in ['LBL', 'LRL', 'LSL']:
                     linker = BlockLinker.BlockLinker(distributer.registration_address,
                                                      distributer.registration_xpub,
-                                                     distributer.registrationBlockHeight)
+                                                     distributer.registration_block_height)
                     linker_data = {}
                     if distributer.distribution_source == 'LBL':
                         linker_data = linker.LBL()
