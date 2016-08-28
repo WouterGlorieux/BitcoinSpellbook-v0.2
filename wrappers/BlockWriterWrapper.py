@@ -14,13 +14,12 @@ class BlockWriterWrapper():
     def __init__(self, url):
         self.url = url
 
-
     def getWriters(self):
         response = {'success': 0}
         parameters = {}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/writer/getWriters?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/writer/getWriters?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -32,11 +31,10 @@ class BlockWriterWrapper():
 
     def getWriter(self, name=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/writer/getWriter?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/writer/getWriter?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -46,21 +44,21 @@ class BlockWriterWrapper():
 
         return response
 
-
-    def saveWriter(self, name, settings={}, APIkey='', APIsecret=''):
+    def saveWriter(self, name, settings=None, api_key='', api_secret=''):
+        if not settings:
+            settings = {}
         response = {'success': 0}
-        parameters ={}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/writer/saveWriter?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/writer/saveWriter?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -73,21 +71,19 @@ class BlockWriterWrapper():
 
         return response
 
-
-    def deleteWriter(self, name, APIkey='', APIsecret=''):
+    def deleteWriter(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/writer/deleteWriter?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/writer/deleteWriter?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -100,16 +96,12 @@ class BlockWriterWrapper():
 
         return response
 
-
-
-
     def doWriting(self, name=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/writer/doWriting?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/writer/doWriting?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
