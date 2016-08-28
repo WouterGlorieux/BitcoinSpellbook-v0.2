@@ -628,11 +628,11 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('fee_address', None) is not None:
                     settings['fee_address'] = self.request.get('fee_address')
 
-                if self.request.get('confirmAmount'):
+                if self.request.get('confirm_amount'):
                     try:
-                        settings['confirmAmount'] = int(self.request.get('confirmAmount'))
+                        settings['confirm_amount'] = int(self.request.get('confirm_amount'))
                     except ValueError:
-                        response['error'] = 'confirmAmount must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'confirm_amount must be a positive integer or equal to 0 (in Satoshis)'
 
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')

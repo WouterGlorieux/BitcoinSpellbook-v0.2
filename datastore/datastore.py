@@ -49,7 +49,7 @@ class Forwarder(ndb.Model):
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
     fee_percentage = ndb.FloatProperty(default=0.0)
     fee_address = ndb.StringProperty(default='')
-    confirmAmount = ndb.IntegerProperty(indexed=False, default=0)
+    confirm_amount = ndb.IntegerProperty(indexed=False, default=0)
     maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
 
 

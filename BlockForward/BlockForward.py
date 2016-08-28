@@ -44,7 +44,7 @@ def forwarderToDict(forwarder):
                       'creator_email': forwarder.creator_email,
                       'youtube': forwarder.youtube,
                       'status': forwarder.status,
-                      'confirmAmount': forwarder.confirmAmount,
+                      'confirm_amount': forwarder.confirm_amount,
                       'fee_address': forwarder.fee_address,
                       'fee_percentage': forwarder.fee_percentage,
                       'minimum_amount': forwarder.minimum_amount,
@@ -194,10 +194,10 @@ class BlockForward():
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
-            if 'confirmAmount' in settings and validator.validAmount(settings['confirmAmount']):
-                forwarder.confirmAmount = settings['confirmAmount']
-            elif 'confirmAmount' in settings:
-                self.error = 'confirmAmount must be greater than or equal to 0 (in Satoshis)'
+            if 'confirm_amount' in settings and validator.validAmount(settings['confirm_amount']):
+                forwarder.confirm_amount = settings['confirm_amount']
+            elif 'confirm_amount' in settings:
+                self.error = 'confirm_amount must be greater than or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
                 forwarder.address_type = settings['address_type']
@@ -334,11 +334,11 @@ class DoForwarding():
                             to_addresses.append(forwarder.fee_address)
                             logging.info("Forwarding Fee: " + str(amounts[1]) + " -> " + str(to_addresses[1]))
 
-                        if forwarder.confirmAmount > 0:
-                            amounts[0] -= forwarder.confirmAmount
-                            amounts.append(forwarder.confirmAmount)
+                        if forwarder.confirm_amount > 0:
+                            amounts[0] -= forwarder.confirm_amount
+                            amounts.append(forwarder.confirm_amount)
                             to_addresses.append(primeInputAddress)
-                            logging.info("Origin: " + str(forwarder.confirmAmount) + " -> " + primeInputAddress)
+                            logging.info("Origin: " + str(forwarder.confirm_amount) + " -> " + primeInputAddress)
 
                         #subtract transaction fee in satoshis from first amount
                         amounts[0] -= TRANSACTION_FEE
