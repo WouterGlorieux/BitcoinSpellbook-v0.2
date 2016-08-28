@@ -164,7 +164,7 @@ def validYoutubeID(youtube):
     return valid
 
 
-def validPrivateKey(private_key):
+def validprivate_key(private_key):
     valid = False
 
     if isinstance(private_key, (str, unicode)) and len(private_key) > 0:

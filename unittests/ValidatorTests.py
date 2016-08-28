@@ -130,7 +130,7 @@ class ValidatorTests(unittest.TestCase):
     def test_valid_private_key(self):
         print 'testing valid_private_key...',
         for vector in TestVectors.private_key_test_vectors:
-            self.assertEqual(validators.validPrivateKey(vector[0]), vector[1],
+            self.assertEqual(validators.validprivate_key(vector[0]), vector[1],
                              "%s should return %s: %s" % (vector[0], vector[1], vector[2]))
         print 'OK'
 

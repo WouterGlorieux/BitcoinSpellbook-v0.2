@@ -643,8 +643,8 @@ class saveForwarder(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('privateKey', None) is not None:
-                    settings['privateKey'] = self.request.get('privateKey')
+                if self.request.get('private_key', None) is not None:
+                    settings['private_key'] = self.request.get('private_key')
 
                 response = BlockForward.BlockForward(name).saveForwarder(settings)
 
@@ -805,8 +805,8 @@ class saveDistributer(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('privateKey', None) is not None:
-                    settings['privateKey'] = self.request.get('privateKey')
+                if self.request.get('private_key', None) is not None:
+                    settings['private_key'] = self.request.get('private_key')
 
                 response = BlockDistribute.Distributer(name).saveDistributer(settings)
 
@@ -1138,8 +1138,8 @@ class saveWriter(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('privateKey', None) is not None:
-                    settings['privateKey'] = self.request.get('privateKey')
+                if self.request.get('private_key', None) is not None:
+                    settings['private_key'] = self.request.get('private_key')
 
                 response = BlockWriter.Writer(name).saveWriter(settings)
 

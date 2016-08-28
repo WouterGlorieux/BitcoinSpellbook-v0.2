@@ -256,13 +256,13 @@ class Writer():
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
-                writer.privateKey = settings['privateKey']
-            elif 'privateKey' in settings:
-                self.error = 'Invalid privateKey'
+            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+                writer.private_key = settings['private_key']
+            elif 'private_key' in settings:
+                self.error = 'Invalid private_key'
 
-            if writer.address_type == 'PrivKey' and writer.privateKey != '':
-                writer.address = bitcoin.privtoaddr(writer.privateKey)
+            if writer.address_type == 'PrivKey' and writer.private_key != '':
+                writer.address = bitcoin.privtoaddr(writer.private_key)
 
             elif writer.address_type == 'BIP44':
                 if writer.wallet_index == 0:
@@ -368,7 +368,7 @@ class DoWriting():
 
             private_keys = {}
             if writer.address_type == 'PrivKey':
-                private_keys = {writer.address: writer.privateKey}
+                private_keys = {writer.address: writer.private_key}
             elif writer.address_type == 'BIP44':
                 private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.wallet_index)
 

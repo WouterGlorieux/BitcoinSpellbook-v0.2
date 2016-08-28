@@ -230,13 +230,13 @@ class Distributer():
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
-                distributer.privateKey = settings['privateKey']
-            elif 'privateKey' in settings:
-                self.error = 'Invalid privateKey'
+            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+                distributer.private_key = settings['private_key']
+            elif 'private_key' in settings:
+                self.error = 'Invalid private_key'
 
-            if distributer.address_type == 'PrivKey' and distributer.privateKey != '':
-                distributer.address = bitcoin.privtoaddr(distributer.privateKey)
+            if distributer.address_type == 'PrivKey' and distributer.private_key != '':
+                distributer.address = bitcoin.privtoaddr(distributer.private_key)
             elif distributer.address_type == 'BIP44':
                 if distributer.wallet_index == 0:
                     distributer.wallet_index = getNextIndex()
@@ -367,7 +367,7 @@ class DoDistributing():
 
                 private_keys = {}
                 if distributer.address_type == 'PrivKey':
-                    private_keys = {distributer.address: distributer.privateKey}
+                    private_keys = {distributer.address: distributer.private_key}
 
                 elif distributer.address_type == 'BIP44':
                     private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.wallet_index)

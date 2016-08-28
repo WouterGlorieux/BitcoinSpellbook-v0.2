@@ -209,13 +209,13 @@ class BlockForward():
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
-                forwarder.privateKey = settings['privateKey']
-            elif 'privateKey' in settings:
-                self.error = 'Invalid privateKey'
+            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+                forwarder.private_key = settings['private_key']
+            elif 'private_key' in settings:
+                self.error = 'Invalid private_key'
 
-            if forwarder.address_type == 'PrivKey' and forwarder.privateKey != '':
-                forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
+            if forwarder.address_type == 'PrivKey' and forwarder.private_key != '':
+                forwarder.address = bitcoin.privtoaddr(forwarder.private_key)
             elif forwarder.address_type == 'BIP44':
                 if forwarder.wallet_index == 0:
                     forwarder.wallet_index = getNextIndex()
@@ -300,7 +300,7 @@ class DoForwarding():
 
                     private_keys = {}
                     if forwarder.address_type == 'PrivKey':
-                        private_keys = {forwarder.address: forwarder.privateKey}
+                        private_keys = {forwarder.address: forwarder.private_key}
                     elif forwarder.address_type == 'BIP44':
                         private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
                                                                          forwarder.wallet_index)

@@ -36,7 +36,7 @@ class Providers(ndb.Model):
 class Forwarder(ndb.Model):
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
-    privateKey = ndb.StringProperty(indexed=False, default='')
+    private_key = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
     creatorEmail = ndb.StringProperty(default='')
     address = ndb.StringProperty(indexed=True, default='')
@@ -61,7 +61,7 @@ def forwarders_key():
 class Distributer(ndb.Model):
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
-    privateKey = ndb.StringProperty(indexed=False, default='')
+    private_key = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
     creatorEmail = ndb.StringProperty(default='')
     address = ndb.StringProperty(indexed=True)
@@ -142,7 +142,7 @@ class Writer(ndb.Model):
     address = ndb.StringProperty(indexed=True, default='')
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
-    privateKey = ndb.StringProperty(indexed=False, default='')
+    private_key = ndb.StringProperty(indexed=False, default='')
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled', 'Complete'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
 
