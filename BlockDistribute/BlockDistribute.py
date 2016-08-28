@@ -50,7 +50,7 @@ def distributerToDict(distributer):
                         'visibility': distributer.visibility,
                         'description': distributer.description,
                         'creator': distributer.creator,
-                        'creatorEmail': distributer.creatorEmail,
+                        'creator_email': distributer.creator_email,
                         'youtube': distributer.youtube,
                         'feeAddress': distributer.feeAddress,
                         'feePercent': distributer.feePercent,
@@ -195,9 +195,9 @@ class Distributer():
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creatorEmail' in settings and validator.validEmail(settings['creatorEmail']):
-                distributer.creatorEmail = settings['creatorEmail']
-            elif 'creatorEmail' in settings:
+            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+                distributer.creator_email = settings['creator_email']
+            elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):

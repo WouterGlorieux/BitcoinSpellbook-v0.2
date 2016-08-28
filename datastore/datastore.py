@@ -38,7 +38,7 @@ class Forwarder(ndb.Model):
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     private_key = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
-    creatorEmail = ndb.StringProperty(default='')
+    creator_email = ndb.StringProperty(default='')
     address = ndb.StringProperty(indexed=True, default='')
     xpub = ndb.StringProperty(indexed=True, default='')
     minimumAmount = ndb.IntegerProperty(default=0)
@@ -63,7 +63,7 @@ class Distributer(ndb.Model):
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     private_key = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
-    creatorEmail = ndb.StringProperty(default='')
+    creator_email = ndb.StringProperty(default='')
     address = ndb.StringProperty(indexed=True)
     distributionSource = ndb.StringProperty(choices=['Custom', 'SIL', 'LBL', 'LRL', 'LSL'], default='Custom')
     distribution = ndb.JsonProperty(default=[])
@@ -100,7 +100,7 @@ class Trigger(ndb.Model):
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
     creator = ndb.StringProperty(default='')
-    creatorEmail = ndb.StringProperty(default='')
+    creator_email = ndb.StringProperty(default='')
 
 
 def triggers_key():
@@ -147,7 +147,7 @@ class Writer(ndb.Model):
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
 
     creator = ndb.StringProperty(default='')
-    creatorEmail = ndb.StringProperty(default='')
+    creator_email = ndb.StringProperty(default='')
     date = ndb.DateTimeProperty(auto_now_add=True)
     description = ndb.TextProperty(default='')
     youtube = ndb.StringProperty(default='')

@@ -30,7 +30,7 @@ def triggerToDict(trigger):
                     'triggered': trigger.triggered,
                     'description': trigger.description,
                     'creator': trigger.creator,
-                    'creatorEmail': trigger.creatorEmail,
+                    'creator_email': trigger.creator_email,
                     'youtube': trigger.youtube,
                     'status': trigger.status,
                     'visibility': trigger.visibility,
@@ -145,9 +145,9 @@ class BlockTrigger():
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creatorEmail' in settings and validator.validEmail(settings['creatorEmail']):
-                trigger.creatorEmail = settings['creatorEmail']
-            elif 'creatorEmail' in settings:
+            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+                trigger.creator_email = settings['creator_email']
+            elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):

@@ -601,8 +601,8 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('creator', None) is not None:
                     settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creatorEmail', None) is not None:
-                    settings['creatorEmail'] = self.request.get('creatorEmail')
+                if self.request.get('creator_email', None) is not None:
+                    settings['creator_email'] = self.request.get('creator_email')
 
                 if self.request.get('minimumAmount'):
                     try:
@@ -775,8 +775,8 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('creator', None) is not None:
                     settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creatorEmail', None) is not None:
-                    settings['creatorEmail'] = self.request.get('creatorEmail')
+                if self.request.get('creator_email', None) is not None:
+                    settings['creator_email'] = self.request.get('creator_email')
 
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
@@ -928,8 +928,8 @@ class saveTrigger(webapp2.RequestHandler):
                 if self.request.get('creator', None) is not None:
                     settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creatorEmail', None) is not None:
-                    settings['creatorEmail'] = self.request.get('creatorEmail')
+                if self.request.get('creator_email', None) is not None:
+                    settings['creator_email'] = self.request.get('creator_email')
 
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
@@ -1108,8 +1108,8 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('creator', None) is not None:
                     settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creatorEmail', None) is not None:
-                    settings['creatorEmail'] = self.request.get('creatorEmail')
+                if self.request.get('creator_email', None) is not None:
+                    settings['creator_email'] = self.request.get('creator_email')
 
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')

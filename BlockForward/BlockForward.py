@@ -41,7 +41,7 @@ def forwarderToDict(forwarder):
                       'address': forwarder.address,
                       'description': forwarder.description,
                       'creator': forwarder.creator,
-                      'creatorEmail': forwarder.creatorEmail,
+                      'creator_email': forwarder.creator_email,
                       'youtube': forwarder.youtube,
                       'status': forwarder.status,
                       'confirmAmount': forwarder.confirmAmount,
@@ -159,9 +159,9 @@ class BlockForward():
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creatorEmail' in settings and validator.validEmail(settings['creatorEmail']):
-                forwarder.creatorEmail = settings['creatorEmail']
-            elif 'creatorEmail' in settings:
+            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+                forwarder.creator_email = settings['creator_email']
+            elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'minimumAmount' in settings and validator.validAmount(settings['minimumAmount']):
