@@ -49,11 +49,11 @@ def getAvailableAddressIndex():
 def checkActiveAddresses():
     writers_query = datastore.Writer.query(datastore.Writer.address_type == 'BIP44',
                                            datastore.Writer.status == 'Active',
-                                           ancestor=datastore.writers_key()).order(datastore.Writer.walletIndex)
+                                           ancestor=datastore.writers_key()).order(datastore.Writer.wallet_index)
     writers = writers_query.fetch()
 
     for writer in writers:
-        wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.walletIndex, parent=datastore.address_key())
+        wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index, parent=datastore.address_key())
         if wallet_address and wallet_address.status != 'InUse':
             logging.warning("Found active writer with address not InUse status! %i %s" % (wallet_address.i, wallet_address.address))
             wallet_address.status = 'InUse'
@@ -251,10 +251,10 @@ class Writer():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
-                writer.walletIndex = settings['walletIndex']
-            elif 'walletIndex' in settings:
-                self.error = 'walletIndex must be greater than or equal to 0'
+            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+                writer.wallet_index = settings['wallet_index']
+            elif 'wallet_index' in settings:
+                self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
                 writer.privateKey = settings['privateKey']
@@ -265,9 +265,9 @@ class Writer():
                 writer.address = bitcoin.privtoaddr(writer.privateKey)
 
             elif writer.address_type == 'BIP44':
-                if writer.walletIndex == 0:
-                    writer.walletIndex = getAvailableAddressIndex()
-                writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.walletIndex)
+                if writer.wallet_index == 0:
+                    writer.wallet_index = getAvailableAddressIndex()
+                writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.wallet_index)
 
             if not validator.validAddress(writer.address):
                 self.error = 'Unable to get address for writer'
@@ -370,7 +370,7 @@ class DoWriting():
             if writer.address_type == 'PrivKey':
                 private_keys = {writer.address: writer.privateKey}
             elif writer.address_type == 'BIP44':
-                private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.walletIndex)
+                private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.wallet_index)
 
             logging.info("Sending " + str(total_input_value) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transaction_fee) + ' with OP_RETURN message: ' + writer.message)
             tx = TxFactory.makeCustomTransaction(private_keys, utxos, outputs, transaction_fee, writer.message)
@@ -381,7 +381,7 @@ class DoWriting():
                 logging.info("Success")
                 writer.status = 'Complete'
                 writer.put()
-                wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.walletIndex, parent=datastore.address_key())
+                wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index, parent=datastore.address_key())
                 if wallet_address:
                     wallet_address.status = 'Cooldown'
                     wallet_address.cooldownEnd = datetime.datetime.now() + datetime.timedelta(days=7)

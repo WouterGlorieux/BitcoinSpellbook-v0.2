@@ -637,11 +637,11 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('walletIndex'):
+                if self.request.get('wallet_index'):
                     try:
-                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                        settings['wallet_index'] = int(self.request.get('wallet_index'))
                     except ValueError:
-                        response['error'] = 'walletIndex must be a positive integer'
+                        response['error'] = 'wallet_index must be a positive integer'
 
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')
@@ -799,11 +799,11 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('walletIndex'):
+                if self.request.get('wallet_index'):
                     try:
-                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                        settings['wallet_index'] = int(self.request.get('wallet_index'))
                     except ValueError:
-                        response['error'] = 'walletIndex must be a positive integer'
+                        response['error'] = 'wallet_index must be a positive integer'
 
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')
@@ -1132,11 +1132,11 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('walletIndex'):
+                if self.request.get('wallet_index'):
                     try:
-                        settings['walletIndex'] = int(self.request.get('walletIndex'))
+                        settings['wallet_index'] = int(self.request.get('wallet_index'))
                     except ValueError:
-                        response['error'] = 'walletIndex must be a positive integer'
+                        response['error'] = 'wallet_index must be a positive integer'
 
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')

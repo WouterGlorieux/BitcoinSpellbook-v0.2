@@ -25,11 +25,11 @@ TRANSACTION_FEE = 10000  # in Satoshis
 
 
 def getNextIndex():
-    distributers_query = datastore.Distributer.query(ancestor=datastore.distributers_key()).order(-datastore.Distributer.walletIndex)
+    distributers_query = datastore.Distributer.query(ancestor=datastore.distributers_key()).order(-datastore.Distributer.wallet_index)
     distributers = distributers_query.fetch()
 
     if len(distributers) > 0:
-        i = distributers[0].walletIndex + 1
+        i = distributers[0].wallet_index + 1
     else:
         i = 1
 
@@ -225,10 +225,10 @@ class Distributer():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
-                distributer.walletIndex = settings['walletIndex']
-            elif 'walletIndex' in settings:
-                self.error = 'walletIndex must be greater than or equal to 0'
+            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+                distributer.wallet_index = settings['wallet_index']
+            elif 'wallet_index' in settings:
+                self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
                 distributer.privateKey = settings['privateKey']
@@ -238,9 +238,9 @@ class Distributer():
             if distributer.address_type == 'PrivKey' and distributer.privateKey != '':
                 distributer.address = bitcoin.privtoaddr(distributer.privateKey)
             elif distributer.address_type == 'BIP44':
-                if distributer.walletIndex == 0:
-                    distributer.walletIndex = getNextIndex()
-                distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.walletIndex)
+                if distributer.wallet_index == 0:
+                    distributer.wallet_index = getNextIndex()
+                distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.wallet_index)
 
             if not validator.validAddress(distributer.address):
                 self.error = 'Unable to get address for distributer'
@@ -370,7 +370,7 @@ class DoDistributing():
                     private_keys = {distributer.address: distributer.privateKey}
 
                 elif distributer.address_type == 'BIP44':
-                    private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.walletIndex)
+                    private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.wallet_index)
 
                 if distributer.distributionSource == 'SIL' and distributer.address == distributer.registrationAddress:
                     self.error = 'Dark magic detected! Ponzi schemes are illegal!!'

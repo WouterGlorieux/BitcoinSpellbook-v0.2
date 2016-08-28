@@ -35,7 +35,7 @@ class Providers(ndb.Model):
 
 class Forwarder(ndb.Model):
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
-    walletIndex = ndb.IntegerProperty(indexed=True, default=0)
+    wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     privateKey = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
     creatorEmail = ndb.StringProperty(default='')
@@ -60,7 +60,7 @@ def forwarders_key():
 
 class Distributer(ndb.Model):
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
-    walletIndex = ndb.IntegerProperty(indexed=True, default=0)
+    wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     privateKey = ndb.StringProperty(indexed=False, default='')
     creator = ndb.StringProperty(default='')
     creatorEmail = ndb.StringProperty(default='')
@@ -141,7 +141,7 @@ class Writer(ndb.Model):
 
     address = ndb.StringProperty(indexed=True, default='')
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
-    walletIndex = ndb.IntegerProperty(indexed=True, default=0)
+    wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     privateKey = ndb.StringProperty(indexed=False, default='')
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled', 'Complete'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
@@ -182,20 +182,20 @@ def address_key():
 def consistencyCheck(module):
     success = True
     if module == 'BlockWriter':
-        writers_query = Writer.query(Writer.status == 'Active', Writer.walletIndex != 0, ancestor=writers_key()).order(Writer.walletIndex)
+        writers_query = Writer.query(Writer.status == 'Active', Writer.wallet_index != 0, ancestor=writers_key()).order(Writer.wallet_index)
         writers = writers_query.fetch()
 
         if len(writers) > 0:
             tmpIndex = 0
             for i in range(0, len(writers)):
-                if writers[i].walletIndex == tmpIndex:
-                    message = 'Consistency check failed: multiple active writers with same walletIndex! walletIndex = %i' % tmpIndex
+                if writers[i].wallet_index == tmpIndex:
+                    message = 'Consistency check failed: multiple active writers with same wallet_index! wallet_index = %i' % tmpIndex
                     logging.error(message)
                     parameters = Parameters.get_by_id('DefaultConfig')
                     mail.send_mail(parameters.mail_from, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
                     success = False
 
-                tmpIndex = writers[i].walletIndex
+                tmpIndex = writers[i].wallet_index
 
     return success
 

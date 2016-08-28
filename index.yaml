@@ -21,7 +21,7 @@ indexes:
 - kind: Distributer
   ancestor: yes
   properties:
-  - name: walletIndex
+  - name: wallet_index
     direction: desc
 
 - kind: Forwarder
@@ -42,7 +42,7 @@ indexes:
 - kind: Forwarder
   ancestor: yes
   properties:
-  - name: walletIndex
+  - name: wallet_index
     direction: desc
 
 - kind: Trigger
@@ -78,13 +78,13 @@ indexes:
   properties:
   - name: address_type
   - name: status
-  - name: walletIndex
+  - name: wallet_index
 
 - kind: Writer
   ancestor: yes
   properties:
   - name: address_type
-  - name: walletIndex
+  - name: wallet_index
 
 - kind: Writer
   ancestor: yes
@@ -110,4 +110,4 @@ indexes:
   ancestor: yes
   properties:
   - name: status
-  - name: walletIndex
+  - name: wallet_index

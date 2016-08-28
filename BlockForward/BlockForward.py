@@ -25,11 +25,11 @@ TRANSACTION_FEE = 10000  # in Satoshis
 
 def getNextIndex():
     forwarders_query = datastore.Forwarder.query(ancestor=datastore.forwarders_key()).order(
-        -datastore.Forwarder.walletIndex)
+        -datastore.Forwarder.wallet_index)
     forwarders = forwarders_query.fetch()
 
     if len(forwarders) > 0:
-        i = forwarders[0].walletIndex + 1
+        i = forwarders[0].wallet_index + 1
     else:
         i = 1
 
@@ -204,10 +204,10 @@ class BlockForward():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
-                forwarder.walletIndex = settings['walletIndex']
-            elif 'walletIndex' in settings:
-                self.error = 'walletIndex must be greater than or equal to 0'
+            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+                forwarder.wallet_index = settings['wallet_index']
+            elif 'wallet_index' in settings:
+                self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'privateKey' in settings and validator.validPrivateKey(settings['privateKey']):
                 forwarder.privateKey = settings['privateKey']
@@ -217,10 +217,10 @@ class BlockForward():
             if forwarder.address_type == 'PrivKey' and forwarder.privateKey != '':
                 forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
             elif forwarder.address_type == 'BIP44':
-                if forwarder.walletIndex == 0:
-                    forwarder.walletIndex = getNextIndex()
+                if forwarder.wallet_index == 0:
+                    forwarder.wallet_index = getNextIndex()
                 forwarder.address = datastore.get_service_address(datastore.Services.BlockForward,
-                                                                  forwarder.walletIndex)
+                                                                  forwarder.wallet_index)
 
             if not validator.validAddress(forwarder.address):
                 self.error = 'Unable to get address for forwarder'
@@ -303,7 +303,7 @@ class DoForwarding():
                         private_keys = {forwarder.address: forwarder.privateKey}
                     elif forwarder.address_type == 'BIP44':
                         private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
-                                                                         forwarder.walletIndex)
+                                                                         forwarder.wallet_index)
 
                     if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount + TRANSACTION_FEE:
                         logging.warning(
