@@ -14,13 +14,12 @@ class BlockTriggerWrapper():
     def __init__(self, url):
         self.url = url
 
-
     def getTriggers(self):
         response = {'success': 0}
         parameters = {}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/getTriggers?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/getTriggers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -32,11 +31,10 @@ class BlockTriggerWrapper():
 
     def getTrigger(self, name):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/getTrigger?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/getTrigger?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -46,21 +44,21 @@ class BlockTriggerWrapper():
 
         return response
 
-
-    def saveTrigger(self, name, settings={}, APIkey='', APIsecret=''):
+    def saveTrigger(self, name, settings=None, api_key='', api_secret=''):
+        if not settings:
+            settings = {}
         response = {'success': 0}
-        parameters ={}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/saveTrigger?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/saveTrigger?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -73,21 +71,19 @@ class BlockTriggerWrapper():
 
         return response
 
-
-    def deleteTrigger(self, name, APIkey='', APIsecret=''):
+    def deleteTrigger(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/deleteTrigger?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/deleteTrigger?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -100,22 +96,22 @@ class BlockTriggerWrapper():
 
         return response
 
-
-    def saveAction(self, triggerName, actionName, settings={}, APIkey='', APIsecret=''):
+    def saveAction(self, trigger_name, action_name, settings=None, api_key='', api_secret=''):
+        if not settings:
+            settings = {}
         response = {'success': 0}
-        parameters ={}
-        parameters['triggerName'] = triggerName
-        parameters['actionName'] = actionName
+        parameters = {'trigger_name': trigger_name,
+                      'action_name': action_name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/saveAction?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/saveAction?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -128,22 +124,20 @@ class BlockTriggerWrapper():
 
         return response
 
-
-    def deleteAction(self, triggerName, actionName, APIkey='', APIsecret=''):
+    def deleteAction(self, trigger_name, action_name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['triggerName'] = triggerName
-        parameters['actionName'] = actionName
+        parameters = {'trigger_name': trigger_name,
+                      'action_name': action_name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/deleteAction?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/deleteAction?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -156,22 +150,12 @@ class BlockTriggerWrapper():
 
         return response
 
-
-
-
-
-
-
-
-
-
     def checkTriggers(self, name=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/trigger/checkTriggers?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/trigger/checkTriggers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
