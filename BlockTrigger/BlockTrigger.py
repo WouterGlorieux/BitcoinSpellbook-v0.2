@@ -52,9 +52,9 @@ def actionToDict(action):
                    'action_type': action.action_type,
                    'description': action.description}
 
-    if action.action_type == 'reveal_text' and action.revealAllowed is True:
+    if action.action_type == 'reveal_text' and action.reveal_allowed is True:
         action_dict['reveal_text'] = action.reveal_text
-    elif action.action_type == 'reveal_link' and action.revealAllowed is True:
+    elif action.action_type == 'reveal_link' and action.reveal_allowed is True:
         action_dict['reveal_link_text'] = action.reveal_link_text
         action_dict['reveal_link_url'] = action.reveal_link_url
     elif action.action_type == 'send_mail':
@@ -336,9 +336,9 @@ class CheckTriggers():
 
             for action in actions:
 
-                if action.action_type in ['reveal_text', 'reveal_link'] and action.revealAllowed is False:
+                if action.action_type in ['reveal_text', 'reveal_link'] and action.reveal_allowed is False:
                     logging.info('executing action: ' + action.key.id())
-                    action.revealAllowed = True
+                    action.reveal_allowed = True
                     action.put()
 
                 elif action.action_type == 'send_mail' and action.mailSent is False:
