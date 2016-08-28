@@ -68,7 +68,7 @@ def writerToDict(writer):
                    'amount': writer.amount,
                    'recommended_fee': writer.recommended_fee,
                    'maximum_transaction_fee': writer.maximum_transaction_fee,
-                   'transactionFee': writer.transactionFee,
+                   'transaction_fee': writer.transaction_fee,
                    'totalAmount': writer.totalAmount,
                    'status': writer.status,
                    'visibility': writer.visibility}
@@ -192,11 +192,11 @@ class Writer():
                 writer.recommended_fee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
                 if writer.recommended_fee > writer.maximum_transaction_fee:
-                    writer.transactionFee = writer.maximum_transaction_fee
+                    writer.transaction_fee = writer.maximum_transaction_fee
                 else:
-                    writer.transactionFee = writer.recommended_fee
+                    writer.transaction_fee = writer.recommended_fee
 
-                writer.totalAmount = writer.amount + writer.transactionFee
+                writer.totalAmount = writer.amount + writer.transaction_fee
 
             elif 'outputs' in settings:
                 self.error = 'Invalid outputs: ' + settings['outputs'] + ' (must be a list of address-value tuples)'
