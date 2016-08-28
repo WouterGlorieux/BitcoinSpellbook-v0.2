@@ -604,11 +604,11 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('creator_email', None) is not None:
                     settings['creator_email'] = self.request.get('creator_email')
 
-                if self.request.get('minimumAmount'):
+                if self.request.get('minimum_amount'):
                     try:
-                        settings['minimumAmount'] = int(self.request.get('minimumAmount'))
+                        settings['minimum_amount'] = int(self.request.get('minimum_amount'))
                     except ValueError:
-                        response['error'] = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
@@ -751,11 +751,11 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('distribution', None) is not None:
                     settings['distribution'] = self.request.get('distribution')
 
-                if self.request.get('minimumAmount'):
+                if self.request.get('minimum_amount'):
                     try:
-                        settings['minimumAmount'] = int(self.request.get('minimumAmount'))
+                        settings['minimum_amount'] = int(self.request.get('minimum_amount'))
                     except ValueError:
-                        response['error'] = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
                 if self.request.get('threshold'):
                     try:

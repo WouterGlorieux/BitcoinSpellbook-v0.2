@@ -44,7 +44,7 @@ def distributerToDict(distributer):
                         'registration_block_height': distributer.registrationBlockHeight,
                         'registration_xpub': distributer.registrationXPUB,
                         'distribution': distributer.distribution,
-                        'minimumAmount': distributer.minimumAmount,
+                        'minimum_amount': distributer.minimum_amount,
                         'threshold': distributer.threshold,
                         'status': distributer.status,
                         'visibility': distributer.visibility,
@@ -165,13 +165,13 @@ class Distributer():
             elif 'distribution' in settings:
                 self.error = 'Invalid distribution: ' + settings['distribution']
 
-            if 'minimumAmount' in settings and validator.validAmount(settings['minimumAmount']):
-                distributer.minimumAmount = settings['minimumAmount']
-            elif 'minimumAmount' in settings:
-                self.error = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+            if 'minimum_amount' in settings and validator.validAmount(settings['minimum_amount']):
+                distributer.minimum_amount = settings['minimum_amount']
+            elif 'minimum_amount' in settings:
+                self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'threshold' in settings and validator.validAmount(settings['threshold']):
-                distributer.minimumAmount = settings['threshold']
+                distributer.minimum_amount = settings['threshold']
             elif 'threshold' in settings:
                 self.error = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
 
@@ -349,7 +349,7 @@ class DoDistributing():
         if total_input_value >= distributer.threshold:
             logging.info(
                 'Starting distribution of {0} Satoshis, minimum output value: {1}'.format(str(total_input_value),
-                                                                                          str(distributer.minimumAmount)))
+                                                                                          str(distributer.minimum_amount)))
 
             if distributer.distributionSource in ['SIL', 'LBL', 'LRL', 'LSL']:
                 distribution_data = Distributer(distributer.key.id()).updateDistribution()
@@ -413,8 +413,8 @@ class DoDistributing():
             value_to_distribute -= distributing_fee
             optimal.append({'address': distributer.feeAddress, 'value': distributing_fee})
 
-        if value_to_distribute < distributer.minimumAmount:
-            self.error = 'minimumAmount is lower than the amount available to distribute.'
+        if value_to_distribute < distributer.minimum_amount:
+            self.error = 'minimum_amount is lower than the amount available to distribute.'
 
         sorted_distribution = sorted(distribution, key=lambda x: x[1], reverse=True)
 
@@ -425,7 +425,7 @@ class DoDistributing():
 
             share = sorted_distribution[i][1]/float(tmp_total)
 
-            if share*value_to_distribute < distributer.minimumAmount:
+            if share*value_to_distribute < distributer.minimum_amount:
                 del sorted_distribution[i]
             else:
                 optimal.append({'address': sorted_distribution[i][0], 'value': int(share*value_to_distribute)})

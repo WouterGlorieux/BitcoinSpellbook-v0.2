@@ -47,7 +47,7 @@ def forwarderToDict(forwarder):
                       'confirmAmount': forwarder.confirmAmount,
                       'feeAddress': forwarder.feeAddress,
                       'feePercent': forwarder.feePercent,
-                      'minimumAmount': forwarder.minimumAmount,
+                      'minimum_amount': forwarder.minimum_amount,
                       'xpub': forwarder.xpub,
                       'visibility': forwarder.visibility,
                       'date': int(time.mktime(forwarder.date.timetuple()))}
@@ -164,10 +164,10 @@ class BlockForward():
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
-            if 'minimumAmount' in settings and validator.validAmount(settings['minimumAmount']):
-                forwarder.minimumAmount = settings['minimumAmount']
-            elif 'minimumAmount' in settings:
-                self.error = 'minimumAmount must be a positive integer or equal to 0 (in Satoshis)'
+            if 'minimum_amount' in settings and validator.validAmount(settings['minimum_amount']):
+                forwarder.minimum_amount = settings['minimum_amount']
+            elif 'minimum_amount' in settings:
+                self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
                 forwarder.youtube = settings['youtube']
@@ -305,10 +305,10 @@ class DoForwarding():
                         private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
                                                                          forwarder.wallet_index)
 
-                    if len(amounts) > 0 and forwarder.minimumAmount > 0 and amounts[0] < forwarder.minimumAmount + TRANSACTION_FEE:
+                    if len(amounts) > 0 and forwarder.minimum_amount > 0 and amounts[0] < forwarder.minimum_amount + TRANSACTION_FEE:
                         logging.warning(
                             "{0} is below minimum of {1} + transaction fee of {2}! returning btc to sender".format(
-                                str(amounts[0]), str(forwarder.minimumAmount), str(TRANSACTION_FEE)))
+                                str(amounts[0]), str(forwarder.minimum_amount), str(TRANSACTION_FEE)))
                         to_addresses = [primeInputAddress]
 
                         #if there is enough btc, subtract network fee, otherwise log a warning
