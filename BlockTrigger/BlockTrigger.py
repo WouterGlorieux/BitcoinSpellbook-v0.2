@@ -355,7 +355,7 @@ class CheckTriggers():
                     else:
                         logging.error("Invalid email address: " + action.mail_to)
 
-                elif action.action_type == 'webhook' and action.webhookActivated is False:
+                elif action.action_type == 'webhook' and action.webhook_activated is False:
 
                     if validator.validURL(action.webhook):
                         logging.info('executing action: ' + action.key.id())
@@ -365,7 +365,7 @@ class CheckTriggers():
                             ret = urllib2.urlopen(urllib2.Request(url))
                             response = json.loads(ret.read())
                             logging.info('webhook executed, response: ' + str(response))
-                            action.webhookActivated = True
+                            action.webhook_activated = True
                             action.put()
                         except:
                             logging.error = "Unable to execute webhook"

@@ -121,7 +121,7 @@ class Action(ndb.Model):
     mail_body = ndb.TextProperty(default='')
     mail_sent = ndb.BooleanProperty(default=False)
     webhook = ndb.StringProperty(default='')
-    webhookActivated = ndb.BooleanProperty(default=False)
+    webhook_activated = ndb.BooleanProperty(default=False)
 
 
 def trigger_key(trigger):
