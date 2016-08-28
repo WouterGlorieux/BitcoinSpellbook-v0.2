@@ -23,10 +23,10 @@ class API:
         txs = []
         LIMIT = 10 #number of tx given by insight is 10
 
-        latestBlockHeight = -1
+        latest_block_height = -1
         try:
             latestBlock = self.getLatestBlock()
-            latestBlockHeight = latestBlock['latestBlock']['height']
+            latest_block_height = latestBlock['latestBlock']['height']
         except:
             logging.error('Insight: Unable to retrieve latest block')
             self.error = 'Unable to retrieve latest block'
@@ -61,7 +61,7 @@ class API:
             tx.txid = transaction['txid']
             tx.confirmations = transaction['confirmations']
             if transaction['confirmations'] >= 1:
-                tx.block_height = latestBlockHeight - tx.confirmations + 1
+                tx.block_height = latest_block_height - tx.confirmations + 1
             else:
                 tx.block_height = None
 
@@ -273,10 +273,10 @@ class API:
         response = {'success': 0}
         addresses = addresses.replace('|', ',')
 
-        latestBlockHeight = 0
+        latest_block_height = 0
         try:
             latestBlock = self.getLatestBlock()
-            latestBlockHeight = latestBlock['latestBlock']['height']
+            latest_block_height = latestBlock['latestBlock']['height']
         except:
             logging.error('Insight: Unable to retrieve latest block')
             self.error = 'Unable to retrieve latest block'
@@ -306,7 +306,7 @@ class API:
 
             if 'txid' in tx and tx['txid'] == data[i]['txid']:
                 utxo['confirmations'] = int(tx['confirmations'])
-                utxo['block_height'] = latestBlockHeight - utxo['confirmations'] +1
+                utxo['block_height'] = latest_block_height - utxo['confirmations'] +1
 
             utxo['output'] = data[i]['txid'] + ":" + str(data[i]['vout'])
             utxo['value'] = int(data[i]['satoshis'])

@@ -18,9 +18,9 @@ class API:
         response = {'success': 0}
         LIMIT = 50 #max number of tx given by blockchain.info is 50
 
-        latestBlockHeight = -1
+        latest_block_height = -1
         try:
-            latestBlockHeight = self.getLatestBlock()['latestBlock']['height']
+            latest_block_height = self.getLatestBlock()['latestBlock']['height']
         except:
             logging.warning('Blockchain.info: unable to retrieve latest block')
             response = {'success': 0, 'error': 'unable to retrieve latest block'}
@@ -56,7 +56,7 @@ class API:
 
             if 'block_height' in transaction:
                 tx.block_height = transaction['block_height']
-                tx.confirmations = (latestBlockHeight - tx.block_height) +1
+                tx.confirmations = (latest_block_height - tx.block_height) +1
             else:
                 tx.block_height = None
                 tx.confirmations = 0
