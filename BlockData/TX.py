@@ -5,11 +5,11 @@ class TX():
         self.txid = ''
         self.inputs = []
         self.outputs = []
-        self.blockHeight = 0
+        self.block_height = 0
         self.confirmations = 0
 
     def printTX(self):
-        print '\nblock ', str(self.blockHeight) , "(" + str(self.confirmations) + " confirmations)", self.txid
+        print '\nblock ', str(self.block_height) , "(" + str(self.confirmations) + " confirmations)", self.txid
         print 'IN:', self.inputs
         print 'OUT:', self.outputs
         print 'primeInput:', self.primeInputAddress()
@@ -68,7 +68,7 @@ class TX():
         tx_dict["primeInputAddress"] = self.primeInputAddress()
         tx_dict["inputs"] = self.inputs
         tx_dict["outputs"] = self.outputs
-        tx_dict["block_height"] = self.blockHeight
+        tx_dict["block_height"] = self.block_height
         tx_dict["confirmations"] = self.confirmations
         tx_dict["receiving"] = self.receivingTX(address)
         if tx_dict["receiving"] == True:
@@ -82,10 +82,10 @@ class TX():
 def sortTXS(self, txs):
     blockTXS = {}
     for tx in txs:
-        if tx.blockheight in blockTXS:
-            blockTXS[tx.blockheight].append(tx)
+        if tx.block_height in blockTXS:
+            blockTXS[tx.block_height].append(tx)
         else:
-            blockTXS[tx.blockheight] = [tx]
+            blockTXS[tx.block_height] = [tx]
 
     sortedTXS = []
     for block in sorted(blockTXS):

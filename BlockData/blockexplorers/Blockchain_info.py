@@ -55,10 +55,10 @@ class API:
             tx.txid = transaction['hash']
 
             if 'block_height' in transaction:
-                tx.blockHeight = transaction['block_height']
-                tx.confirmations = (latestBlockHeight - tx.blockHeight) +1
+                tx.block_height = transaction['block_height']
+                tx.confirmations = (latestBlockHeight - tx.block_height) +1
             else:
-                tx.blockHeight = None
+                tx.block_height = None
                 tx.confirmations = 0
 
             for input in transaction['inputs']:

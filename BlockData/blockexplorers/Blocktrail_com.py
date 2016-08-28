@@ -45,7 +45,7 @@ class API:
             for i in range(0, len(data)):
                 tx = TX.TX()
                 tx.txid = data[i]['hash']
-                tx.blockHeight = data[i]['block_height']
+                tx.block_height = data[i]['block_height']
                 tx.confirmations = data[i]['confirmations']
 
                 for tx_input in data[i]['inputs']:

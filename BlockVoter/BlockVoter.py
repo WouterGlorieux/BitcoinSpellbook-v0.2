@@ -58,7 +58,7 @@ class BlockVoter():
                     elif weights in ['LBL', 'LRL', 'LSL']:
                         self.error = 'Invalid registration XPUB'
                 else:
-                    self.error = 'Registration BlockHeight must be a integer greater than or equal to zero.'
+                    self.error = 'Registration block_height must be a integer greater than or equal to zero.'
 
             elif weights in ['SIL', 'LBL', 'LRL', 'LSL']:
                 self.error = 'Invalid registration address'

@@ -61,9 +61,9 @@ class API:
             tx.txid = transaction['txid']
             tx.confirmations = transaction['confirmations']
             if transaction['confirmations'] >= 1:
-                tx.blockHeight = latestBlockHeight - tx.confirmations + 1
+                tx.block_height = latestBlockHeight - tx.confirmations + 1
             else:
-                tx.blockHeight = None
+                tx.block_height = None
 
             for input in transaction['vin']:
                 tx_in = {}

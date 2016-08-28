@@ -115,7 +115,7 @@ class BlockTrigger():
         if self.error == '':
             trigger = datastore.Trigger.get_or_insert(self.name, parent=datastore.triggers_key())
 
-            if 'trigger_type' in settings and settings['trigger_type'] in ['Balance', 'Received', 'Sent', 'BlockHeight']:
+            if 'trigger_type' in settings and settings['trigger_type'] in ['Balance', 'Received', 'Sent', 'block_height']:
                 trigger.trigger_type = settings['trigger_type']
             elif 'trigger_type' in settings:
                 self.error = 'trigger_type must be Balance, Received or Sent'
@@ -298,11 +298,11 @@ class CheckTriggers():
 
     def run(self, trigger):
         if not trigger.triggered:
-            if trigger.trigger_type == 'BlockHeight':
+            if trigger.trigger_type == 'block_height':
                 latest_block_data = BlockData.latestBlock()
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
                     latest_block_height = latest_block_data['latestBlock']['height']
-                    if trigger.blockHeight + trigger.confirmations <= latest_block_height:
+                    if trigger.block_height + trigger.confirmations <= latest_block_height:
                         logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: ' +  ' current block_height:' + str(latest_block_height))
                         trigger.triggered = True
                         trigger.put()
