@@ -68,7 +68,7 @@ class Distributer(ndb.Model):
     distribution_source = ndb.StringProperty(choices=['Custom', 'SIL', 'LBL', 'LRL', 'LSL'], default='Custom')
     distribution = ndb.JsonProperty(default=[])
     registration_address = ndb.StringProperty(default='')
-    registrationXPUB = ndb.StringProperty(default='')
+    registration_xpub = ndb.StringProperty(default='')
     registrationBlockHeight = ndb.IntegerProperty(default=0)
     threshold = ndb.IntegerProperty(default=0)
     minimum_amount = ndb.IntegerProperty(default=0)

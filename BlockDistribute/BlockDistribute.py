@@ -42,7 +42,7 @@ def distributerToDict(distributer):
                         'distribution_source': distributer.distribution_source,
                         'registration_address': distributer.registration_address,
                         'registration_block_height': distributer.registrationBlockHeight,
-                        'registration_xpub': distributer.registrationXPUB,
+                        'registration_xpub': distributer.registration_xpub,
                         'distribution': distributer.distribution,
                         'minimum_amount': distributer.minimum_amount,
                         'threshold': distributer.threshold,
@@ -149,7 +149,7 @@ class Distributer():
                 self.error = 'Invalid registration_address'
 
             if 'registration_xpub' in settings and (validator.validXPUB(settings['registration_xpub']) or settings['registration_xpub'] == ''):
-                distributer.registrationXPUB = settings['registration_xpub']
+                distributer.registration_xpub = settings['registration_xpub']
             elif 'registration_xpub' in settings:
                 self.error = 'Invalid registration_xpub'
 
@@ -285,7 +285,7 @@ class Distributer():
 
                 elif distributer.distribution_source in ['LBL', 'LRL', 'LSL']:
                     linker = BlockLinker.BlockLinker(distributer.registration_address,
-                                                     distributer.registrationXPUB,
+                                                     distributer.registration_xpub,
                                                      distributer.registrationBlockHeight)
                     linker_data = {}
                     if distributer.distribution_source == 'LBL':
