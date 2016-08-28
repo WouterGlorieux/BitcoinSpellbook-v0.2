@@ -47,7 +47,7 @@ def getAvailableAddressIndex():
 
 
 def checkActiveAddresses():
-    writers_query = datastore.Writer.query(datastore.Writer.addressType == 'BIP44',
+    writers_query = datastore.Writer.query(datastore.Writer.address_type == 'BIP44',
                                            datastore.Writer.status == 'Active',
                                            ancestor=datastore.writers_key()).order(datastore.Writer.walletIndex)
     writers = writers_query.fetch()
@@ -246,10 +246,10 @@ class Writer():
             elif 'maxTransactionFee' in settings:
                 self.error = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
 
-            if 'addressType' in settings and settings['addressType'] in ['PrivKey', 'BIP44']:
-                writer.addressType = settings['addressType']
-            elif 'addressType' in settings:
-                self.error = 'AddressType must be BIP44 or PrivKey'
+            if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
+                writer.address_type = settings['address_type']
+            elif 'address_type' in settings:
+                self.error = 'address_type must be BIP44 or PrivKey'
 
             if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
                 writer.walletIndex = settings['walletIndex']
@@ -261,10 +261,10 @@ class Writer():
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
 
-            if writer.addressType == 'PrivKey' and writer.privateKey != '':
+            if writer.address_type == 'PrivKey' and writer.privateKey != '':
                 writer.address = bitcoin.privtoaddr(writer.privateKey)
 
-            elif writer.addressType == 'BIP44':
+            elif writer.address_type == 'BIP44':
                 if writer.walletIndex == 0:
                     writer.walletIndex = getAvailableAddressIndex()
                 writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.walletIndex)
@@ -367,9 +367,9 @@ class DoWriting():
             logging.info('transaction fee: ' + str(transaction_fee))
 
             private_keys = {}
-            if writer.addressType == 'PrivKey':
+            if writer.address_type == 'PrivKey':
                 private_keys = {writer.address: writer.privateKey}
-            elif writer.addressType == 'BIP44':
+            elif writer.address_type == 'BIP44':
                 private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.walletIndex)
 
             logging.info("Sending " + str(total_input_value) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transaction_fee) + ' with OP_RETURN message: ' + writer.message)

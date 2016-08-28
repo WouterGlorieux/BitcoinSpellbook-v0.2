@@ -70,20 +70,20 @@ indexes:
 - kind: Writer
   ancestor: yes
   properties:
-  - name: addressType
+  - name: address_type
   - name: date
 
 - kind: Writer
   ancestor: yes
   properties:
-  - name: addressType
+  - name: address_type
   - name: status
   - name: walletIndex
 
 - kind: Writer
   ancestor: yes
   properties:
-  - name: addressType
+  - name: address_type
   - name: walletIndex
 
 - kind: Writer

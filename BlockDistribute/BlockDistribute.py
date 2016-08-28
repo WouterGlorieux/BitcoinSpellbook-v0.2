@@ -220,10 +220,10 @@ class Distributer():
             elif 'maxTransactionFee' in settings:
                 self.error = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
 
-            if 'addressType' in settings and settings['addressType'] in ['PrivKey', 'BIP44']:
-                distributer.addressType = settings['addressType']
-            elif 'addressType' in settings:
-                self.error = 'AddressType must be BIP44 or PrivKey'
+            if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
+                distributer.address_type = settings['address_type']
+            elif 'address_type' in settings:
+                self.error = 'address_type must be BIP44 or PrivKey'
 
             if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
                 distributer.walletIndex = settings['walletIndex']
@@ -235,9 +235,9 @@ class Distributer():
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
 
-            if distributer.addressType == 'PrivKey' and distributer.privateKey != '':
+            if distributer.address_type == 'PrivKey' and distributer.privateKey != '':
                 distributer.address = bitcoin.privtoaddr(distributer.privateKey)
-            elif distributer.addressType == 'BIP44':
+            elif distributer.address_type == 'BIP44':
                 if distributer.walletIndex == 0:
                     distributer.walletIndex = getNextIndex()
                 distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.walletIndex)
@@ -366,10 +366,10 @@ class DoDistributing():
                 logging.info("optimal outputs: " + str(optimal_outputs))
 
                 private_keys = {}
-                if distributer.addressType == 'PrivKey':
+                if distributer.address_type == 'PrivKey':
                     private_keys = {distributer.address: distributer.privateKey}
 
-                elif distributer.addressType == 'BIP44':
+                elif distributer.address_type == 'BIP44':
                     private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.walletIndex)
 
                 if distributer.distributionSource == 'SIL' and distributer.address == distributer.registrationAddress:

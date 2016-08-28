@@ -634,8 +634,8 @@ class saveForwarder(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'confirmAmount must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('addressType'):
-                    settings['addressType'] = self.request.get('addressType')
+                if self.request.get('address_type'):
+                    settings['address_type'] = self.request.get('address_type')
 
                 if self.request.get('walletIndex'):
                     try:
@@ -796,8 +796,8 @@ class saveDistributer(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('addressType'):
-                    settings['addressType'] = self.request.get('addressType')
+                if self.request.get('address_type'):
+                    settings['address_type'] = self.request.get('address_type')
 
                 if self.request.get('walletIndex'):
                     try:
@@ -1129,8 +1129,8 @@ class saveWriter(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('addressType'):
-                    settings['addressType'] = self.request.get('addressType')
+                if self.request.get('address_type'):
+                    settings['address_type'] = self.request.get('address_type')
 
                 if self.request.get('walletIndex'):
                     try:

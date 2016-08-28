@@ -199,10 +199,10 @@ class BlockForward():
             elif 'confirmAmount' in settings:
                 self.error = 'confirmAmount must be greater than or equal to 0 (in Satoshis)'
 
-            if 'addressType' in settings and settings['addressType'] in ['PrivKey', 'BIP44']:
-                forwarder.addressType = settings['addressType']
-            elif 'addressType' in settings:
-                self.error = 'AddressType must be BIP44 or PrivKey'
+            if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
+                forwarder.address_type = settings['address_type']
+            elif 'address_type' in settings:
+                self.error = 'address_type must be BIP44 or PrivKey'
 
             if 'walletIndex' in settings and validator.validAmount(settings['walletIndex']):
                 forwarder.walletIndex = settings['walletIndex']
@@ -214,9 +214,9 @@ class BlockForward():
             elif 'privateKey' in settings:
                 self.error = 'Invalid privateKey'
 
-            if forwarder.addressType == 'PrivKey' and forwarder.privateKey != '':
+            if forwarder.address_type == 'PrivKey' and forwarder.privateKey != '':
                 forwarder.address = bitcoin.privtoaddr(forwarder.privateKey)
-            elif forwarder.addressType == 'BIP44':
+            elif forwarder.address_type == 'BIP44':
                 if forwarder.walletIndex == 0:
                     forwarder.walletIndex = getNextIndex()
                 forwarder.address = datastore.get_service_address(datastore.Services.BlockForward,
@@ -299,9 +299,9 @@ class DoForwarding():
                                  + ', value: ' + str(amounts[0]) + ' Satoshis')
 
                     private_keys = {}
-                    if forwarder.addressType == 'PrivKey':
+                    if forwarder.address_type == 'PrivKey':
                         private_keys = {forwarder.address: forwarder.privateKey}
-                    elif forwarder.addressType == 'BIP44':
+                    elif forwarder.address_type == 'BIP44':
                         private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
                                                                          forwarder.walletIndex)
 
