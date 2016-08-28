@@ -7,21 +7,18 @@ import json
 import urllib
 
 
-
 class BlockLinkerWrapper():
     def __init__(self, url):
         self.url = url
 
-
-    def LBL(self, address, xpub, blockHeight=0):
+    def LBL(self, address, xpub, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['xpub'] = xpub
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'xpub': xpub,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/linker/LBL?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/linker/LBL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -31,15 +28,14 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LRL(self, address, xpub, blockHeight=0):
+    def LRL(self, address, xpub, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['xpub'] = xpub
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'xpub': xpub,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/linker/LRL?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/linker/LRL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -49,15 +45,14 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LSL(self, address, xpub, blockHeight=0):
+    def LSL(self, address, xpub, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['xpub'] = xpub
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'xpub': xpub,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/linker/LSL?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/linker/LSL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -67,15 +62,14 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LAL(self, address, xpub, blockHeight=0):
+    def LAL(self, address, xpub, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['xpub'] = xpub
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'xpub': xpub,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/linker/LAL?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/linker/LAL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
