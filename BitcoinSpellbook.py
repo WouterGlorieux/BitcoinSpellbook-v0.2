@@ -899,8 +899,8 @@ class saveTrigger(webapp2.RequestHandler):
 
                 settings = {}
 
-                if self.request.get('triggerType'):
-                    settings['triggerType'] = self.request.get('triggerType')
+                if self.request.get('trigger_type'):
+                    settings['trigger_type'] = self.request.get('trigger_type')
 
                 if self.request.get('address', None) is not None:
                     settings['address'] = self.request.get('address')

@@ -23,7 +23,7 @@ REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 
 def triggerToDict(trigger):
     trigger_dict = {'name': trigger.key.id(),
-                    'triggerType': trigger.triggerType,
+                    'trigger_type': trigger.trigger_type,
                     'address': trigger.address,
                     'amount': trigger.amount,
                     'confirmations': trigger.confirmations,
@@ -115,10 +115,10 @@ class BlockTrigger():
         if self.error == '':
             trigger = datastore.Trigger.get_or_insert(self.name, parent=datastore.triggers_key())
 
-            if 'triggerType' in settings and settings['triggerType'] in ['Balance', 'Received', 'Sent', 'BlockHeight']:
-                trigger.triggerType = settings['triggerType']
-            elif 'triggerType' in settings:
-                self.error = 'triggerType must be Balance, Received or Sent'
+            if 'trigger_type' in settings and settings['trigger_type'] in ['Balance', 'Received', 'Sent', 'BlockHeight']:
+                trigger.trigger_type = settings['trigger_type']
+            elif 'trigger_type' in settings:
+                self.error = 'trigger_type must be Balance, Received or Sent'
 
             if 'address' in settings and (validator.validAddress(settings['address']) or settings['address'] == ''):
                 trigger.address = settings['address']
@@ -298,33 +298,33 @@ class CheckTriggers():
 
     def run(self, trigger):
         if not trigger.triggered:
-            if trigger.triggerType == 'BlockHeight':
+            if trigger.trigger_type == 'BlockHeight':
                 latest_block_data = BlockData.latestBlock()
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
                     latest_block_height = latest_block_data['latestBlock']['height']
                     if trigger.blockHeight + trigger.confirmations <= latest_block_height:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current block_height:' + str(latest_block_height))
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: ' +  ' current block_height:' + str(latest_block_height))
                         trigger.triggered = True
                         trigger.put()
                         self.activate(trigger)
                 else:
                     logging.error('Unable to retrieve latest block_height')
 
-            elif trigger.triggerType in ['Balance', 'Received', 'Sent']:
+            elif trigger.trigger_type in ['Balance', 'Received', 'Sent']:
                 balance_data = BlockData.balances(trigger.address)
 
                 if 'success' in balance_data and balance_data['success'] == 1:
                     balances = balance_data['balances'][trigger.address]
                     value = 0
-                    if trigger.triggerType == 'Balance':
+                    if trigger.trigger_type == 'Balance':
                         value = balances['balance']
-                    elif trigger.triggerType == 'Received':
+                    elif trigger.trigger_type == 'Received':
                         value = balances['received']
-                    elif trigger.triggerType == 'Sent':
+                    elif trigger.trigger_type == 'Sent':
                         value = balances['sent']
 
                     if trigger.amount <= value:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.triggerType) + ' activated: ' +  ' current value:' + str(value))
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: ' +  ' current value:' + str(value))
                         trigger.triggered = True
                         trigger.put()
                 else:

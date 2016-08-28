@@ -88,7 +88,7 @@ def distributers_key():
 
 
 class Trigger(ndb.Model):
-    triggerType = ndb.StringProperty(choices=['Balance', 'Received', 'Sent', 'BlockHeight'], default='Received')
+    trigger_type = ndb.StringProperty(choices=['Balance', 'Received', 'Sent', 'BlockHeight'], default='Received')
     blockHeight = ndb.IntegerProperty(default=0)
     address = ndb.StringProperty(indexed=True, default='')
     amount = ndb.IntegerProperty(default=0)
