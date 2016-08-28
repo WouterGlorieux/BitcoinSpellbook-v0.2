@@ -468,8 +468,8 @@ class proposal(webapp2.RequestHandler):
             weights = self.request.get('weights')
 
         registration_address = ''
-        if self.request.get('regAddress'):
-            registration_address = self.request.get('regAddress')
+        if self.request.get('registration_address'):
+            registration_address = self.request.get('registration_address')
 
         registration_block_height = 0
         if self.request.get('registration_block_height'):
@@ -525,8 +525,8 @@ class results(webapp2.RequestHandler):
             weights = self.request.get('weights')
 
         registration_address = ''
-        if self.request.get('regAddress'):
-            registration_address = self.request.get('regAddress')
+        if self.request.get('registration_address'):
+            registration_address = self.request.get('registration_address')
 
         registration_block_height = 0
         if self.request.get('registration_block_height'):

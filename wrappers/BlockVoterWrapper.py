@@ -34,7 +34,7 @@ class BlockVoterWrapper():
             parameters['weights'] = weights
 
         if registration_address != "":
-            parameters['regAddress'] = str(registration_address)
+            parameters['registration_address'] = str(registration_address)
 
         if registration_block_height != 0:
             parameters['registration_block_height'] = str(registration_block_height)
@@ -81,7 +81,7 @@ class BlockVoterWrapper():
             parameters['block_height'] = str(block_height)
 
         if registration_address != "":
-            parameters['regAddress'] = str(registration_address)
+            parameters['registration_address'] = str(registration_address)
 
         if registration_block_height != 0:
             parameters['regBlock'] = str(registration_block_height)

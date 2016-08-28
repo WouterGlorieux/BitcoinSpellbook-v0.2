@@ -89,7 +89,7 @@ class BlockVoter():
             if self.weights != '':
                 proposal['weights'] = self.weights
             if self.registration_address != '':
-                proposal['regAddress'] = self.registration_address
+                proposal['registration_address'] = self.registration_address
             if self.registration_xpub != '':
                 proposal['regXPUB'] = self.registration_xpub
             if self.registration_block_height != 0:
@@ -161,7 +161,7 @@ class BlockVoter():
             if self.weights != '':
                 response['weights'] = self.weights
             if self.registration_address != '':
-                response['regAddress'] = self.registration_address
+                response['registration_address'] = self.registration_address
             if self.registration_block_height != '':
                 response['registration_block_height'] = self.registration_block_height
             if self.registration_xpub != '':
