@@ -984,8 +984,8 @@ class saveAction(webapp2.RequestHandler):
                 action_name = self.request.get('action_name')
 
                 settings = {}
-                if self.request.get('actionType'):
-                    settings['actionType'] = self.request.get('actionType')
+                if self.request.get('action_type'):
+                    settings['action_type'] = self.request.get('action_type')
 
                 if self.request.get('description', None) is not None:
                     settings['description'] = self.request.get('description')

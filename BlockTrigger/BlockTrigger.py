@@ -49,20 +49,20 @@ def triggerToDict(trigger):
 def actionToDict(action):
     action_dict = {'triggerName': action.trigger,
                    'actionName': action.key.id(),
-                   'actionType': action.actionType,
+                   'action_type': action.action_type,
                    'description': action.description}
 
-    if action.actionType == 'RevealText' and action.revealAllowed is True:
+    if action.action_type == 'RevealText' and action.revealAllowed is True:
         action_dict['revealText'] = action.revealText
-    elif action.actionType == 'RevealLink' and action.revealAllowed is True:
+    elif action.action_type == 'RevealLink' and action.revealAllowed is True:
         action_dict['revealLinkText'] = action.revealLinkText
         action_dict['revealLinkURL'] = action.revealLinkURL
-    elif action.actionType == 'SendMail':
+    elif action.action_type == 'SendMail':
         action_dict['mailTo'] = action.mailTo
         action_dict['mailSubject'] = action.mailSubject
         action_dict['mailBody'] = action.mailBody
         action_dict['mailSent'] = action.mailSent
-    elif action.actionType == 'Webhook':
+    elif action.action_type == 'Webhook':
         action_dict['webhook'] = action.webhook
 
     return action_dict
@@ -205,10 +205,10 @@ class BlockTrigger():
 
             action.trigger = trigger.key.id()
 
-            if 'actionType' in settings and settings['actionType'] in ['RevealText', 'RevealLink', 'SendMail', 'Webhook']:
-                action.actionType = settings['actionType']
-            elif 'actionType' in settings:
-                self.error = 'actionType must be RevealText, RevealLink, SendMail or Webhook'
+            if 'action_type' in settings and settings['action_type'] in ['RevealText', 'RevealLink', 'SendMail', 'Webhook']:
+                action.action_type = settings['action_type']
+            elif 'action_type' in settings:
+                self.error = 'action_type must be RevealText, RevealLink, SendMail or Webhook'
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
@@ -336,12 +336,12 @@ class CheckTriggers():
 
             for action in actions:
 
-                if action.actionType in ['RevealText', 'RevealLink'] and action.revealAllowed is False:
+                if action.action_type in ['RevealText', 'RevealLink'] and action.revealAllowed is False:
                     logging.info('executing action: ' + action.key.id())
                     action.revealAllowed = True
                     action.put()
 
-                elif action.actionType == 'SendMail' and action.mailSent is False:
+                elif action.action_type == 'SendMail' and action.mailSent is False:
                     if validator.validEmail(action.mailTo):
                         logging.info('executing action: ' + action.key.id())
                         try:
@@ -355,7 +355,7 @@ class CheckTriggers():
                     else:
                         logging.error("Invalid email address: " + action.mailTo)
 
-                elif action.actionType == 'Webhook' and action.webhookActivated is False:
+                elif action.action_type == 'Webhook' and action.webhookActivated is False:
 
                     if validator.validURL(action.webhook):
                         logging.info('executing action: ' + action.key.id())
