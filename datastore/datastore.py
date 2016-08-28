@@ -185,16 +185,16 @@ def consistencyCheck(module):
         writers = writers_query.fetch()
 
         if len(writers) > 0:
-            tmpIndex = 0
+            tmp_index = 0
             for i in range(0, len(writers)):
-                if writers[i].wallet_index == tmpIndex:
-                    message = 'Consistency check failed: multiple active writers with same wallet_index! wallet_index = %i' % tmpIndex
+                if writers[i].wallet_index == tmp_index:
+                    message = 'Consistency check failed: multiple active writers with same wallet_index! wallet_index = %i' % tmp_index
                     logging.error(message)
                     parameters = Parameters.get_by_id('DefaultConfig')
                     mail.send_mail(parameters.mail_from, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
                     success = False
 
-                tmpIndex = writers[i].wallet_index
+                tmp_index = writers[i].wallet_index
 
     return success
 
