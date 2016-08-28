@@ -479,8 +479,8 @@ class proposal(webapp2.RequestHandler):
                 response['error'] = 'registration_block_height must be a positive integer.'
 
         registration_xpub = ''
-        if self.request.get('regXPUB'):
-            registration_xpub = self.request.get('regXPUB')
+        if self.request.get('registration_xpub'):
+            registration_xpub = self.request.get('registration_xpub')
 
         blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
         blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)
@@ -536,8 +536,8 @@ class results(webapp2.RequestHandler):
                 response['error'] = 'registration_block_height must be a positive integer.'
 
         registration_xpub = ''
-        if self.request.get('regXPUB'):
-            registration_xpub = self.request.get('regXPUB')
+        if self.request.get('registration_xpub'):
+            registration_xpub = self.request.get('registration_xpub')
 
         blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
         blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)

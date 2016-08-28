@@ -40,7 +40,7 @@ class BlockVoterWrapper():
             parameters['registration_block_height'] = str(registration_block_height)
 
         if registration_xpub != "":
-            parameters['regXPUB'] = str(registration_xpub)
+            parameters['registration_xpub'] = str(registration_xpub)
 
         query_string = urllib.urlencode(parameters)
         url = self.url + "/voter/proposal?" + query_string
@@ -87,7 +87,7 @@ class BlockVoterWrapper():
             parameters['regBlock'] = str(registration_block_height)
 
         if registration_xpub != "":
-            parameters['regXPUB'] = str(registration_xpub)
+            parameters['registration_xpub'] = str(registration_xpub)
 
         query_string = urllib.urlencode(parameters)
         url = self.url + "/voter/results?" + query_string
