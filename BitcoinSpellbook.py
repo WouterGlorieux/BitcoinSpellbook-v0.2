@@ -1008,10 +1008,10 @@ class saveAction(webapp2.RequestHandler):
                 if self.request.get('mail_body', None) is not None:
                     settings['mail_body'] = self.request.get('mail_body')
 
-                if self.request.get('mailSent') == 'True':
-                    settings['mailSent'] = True
-                elif self.request.get('mailSent') == 'False':
-                    settings['mailSent'] = False
+                if self.request.get('mail_sent') == 'True':
+                    settings['mail_sent'] = True
+                elif self.request.get('mail_sent') == 'False':
+                    settings['mail_sent'] = False
 
                 if self.request.get('webhook', None) is not None:
                     settings['webhook'] = self.request.get('webhook')

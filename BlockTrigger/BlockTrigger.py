@@ -61,7 +61,7 @@ def actionToDict(action):
         action_dict['mail_to'] = action.mail_to
         action_dict['mail_subject'] = action.mail_subject
         action_dict['mail_body'] = action.mail_body
-        action_dict['mailSent'] = action.mailSent
+        action_dict['mail_sent'] = action.mail_sent
     elif action.action_type == 'webhook':
         action_dict['webhook'] = action.webhook
 
@@ -245,10 +245,10 @@ class BlockTrigger():
             elif 'mail_body' in settings:
                 self.error = 'invalid mail_body'
 
-            if 'mailSent' in settings and settings['mailSent'] in [True, False]:
-                action.mailSent = settings['mailSent']
-            elif 'mailSent' in settings:
-                self.error = 'invalid mailSent'
+            if 'mail_sent' in settings and settings['mail_sent'] in [True, False]:
+                action.mail_sent = settings['mail_sent']
+            elif 'mail_sent' in settings:
+                self.error = 'invalid mail_sent'
 
             if 'webhook' in settings and validator.validURL(settings['webhook']):
                 action.webhook = settings['webhook']
@@ -341,13 +341,13 @@ class CheckTriggers():
                     action.reveal_allowed = True
                     action.put()
 
-                elif action.action_type == 'send_mail' and action.mailSent is False:
+                elif action.action_type == 'send_mail' and action.mail_sent is False:
                     if validator.validEmail(action.mail_to):
                         logging.info('executing action: ' + action.key.id())
                         try:
                             parameters = datastore.Parameters.get_by_id('DefaultConfig')
                             mail.send_mail(parameters.mail_from, action.mail_to, action.mail_subject, action.mail_body)
-                            action.mailSent = True
+                            action.mail_sent = True
                             action.put()
                             logging.info('Mail sent successfully.')
                         except:
