@@ -54,9 +54,9 @@ def actionToDict(action):
 
     if action.action_type == 'reveal_text' and action.revealAllowed is True:
         action_dict['reveal_text'] = action.reveal_text
-    elif action.action_type == 'RevealLink' and action.revealAllowed is True:
+    elif action.action_type == 'reveal_link' and action.revealAllowed is True:
         action_dict['reveal_link_text'] = action.reveal_link_text
-        action_dict['revealLinkURL'] = action.revealLinkURL
+        action_dict['reveal_link_url'] = action.reveal_link_url
     elif action.action_type == 'SendMail':
         action_dict['mailTo'] = action.mailTo
         action_dict['mailSubject'] = action.mailSubject
@@ -205,10 +205,10 @@ class BlockTrigger():
 
             action.trigger = trigger.key.id()
 
-            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'RevealLink', 'SendMail', 'Webhook']:
+            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'reveal_link', 'SendMail', 'Webhook']:
                 action.action_type = settings['action_type']
             elif 'action_type' in settings:
-                self.error = 'action_type must be reveal_text, RevealLink, SendMail or Webhook'
+                self.error = 'action_type must be reveal_text, reveal_link, SendMail or Webhook'
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
@@ -225,10 +225,10 @@ class BlockTrigger():
             elif 'reveal_link_text' in settings:
                 self.error = 'invalid reveal_link_text'
 
-            if 'revealLinkURL' in settings and validator.validURL(settings['revealLinkURL']):
-                action.revealLinkURL = settings['revealLinkURL']
-            elif 'revealLinkURL' in settings:
-                self.error = 'invalid revealLinkURL'
+            if 'reveal_link_url' in settings and validator.validURL(settings['reveal_link_url']):
+                action.reveal_link_url = settings['reveal_link_url']
+            elif 'reveal_link_url' in settings:
+                self.error = 'invalid reveal_link_url'
 
             if 'mailTo' in settings and validator.validEmail(settings['mailTo']):
                 action.mailTo = settings['mailTo']
@@ -336,7 +336,7 @@ class CheckTriggers():
 
             for action in actions:
 
-                if action.action_type in ['reveal_text', 'RevealLink'] and action.revealAllowed is False:
+                if action.action_type in ['reveal_text', 'reveal_link'] and action.revealAllowed is False:
                     logging.info('executing action: ' + action.key.id())
                     action.revealAllowed = True
                     action.put()
