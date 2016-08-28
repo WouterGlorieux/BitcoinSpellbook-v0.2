@@ -88,8 +88,8 @@ def writerToDict(writer):
     if writer.feeAddress:
         writer_dict['feeAddress'] = writer.feeAddress
 
-    if writer.feePercent:
-        writer_dict['feePercent'] = writer.feePercent
+    if writer.fee_percentage:
+        writer_dict['fee_percentage'] = writer.fee_percentage
 
     writer_dict['date'] = int(time.mktime(writer.date.timetuple()))
 
@@ -231,10 +231,10 @@ class Writer():
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
-            if 'feePercent' in settings and validator.validPercentage(settings['feePercent']):
-                writer.feePercent = settings['feePercent']
-            elif 'feePercent' in settings:
-                self.error = 'FeePercent must be greater than or equal to 0'
+            if 'fee_percentage' in settings and validator.validPercentage(settings['fee_percentage']):
+                writer.fee_percentage = settings['fee_percentage']
+            elif 'fee_percentage' in settings:
+                self.error = 'fee_percentage must be greater than or equal to 0'
 
             if 'feeAddress' in settings and (validator.validAddress(settings['feeAddress']) or settings['feeAddress'] == ''):
                 writer.feeAddress = settings['feeAddress']

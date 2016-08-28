@@ -619,11 +619,11 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('status'):
                     settings['status'] = self.request.get('status')
 
-                if self.request.get('feePercent'):
+                if self.request.get('fee_percentage'):
                     try:
-                        settings['feePercent'] = float(self.request.get('feePercent'))
+                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
                     except ValueError:
-                        response['error'] = 'Incorrect feePercent'
+                        response['error'] = 'Incorrect fee_percentage'
 
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
@@ -781,11 +781,11 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('feePercent'):
+                if self.request.get('fee_percentage'):
                     try:
-                        settings['feePercent'] = float(self.request.get('feePercent'))
+                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
                     except ValueError:
-                        response['error'] = 'Incorrect feePercent'
+                        response['error'] = 'Incorrect fee_percentage'
 
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
@@ -1114,11 +1114,11 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('feePercent'):
+                if self.request.get('fee_percentage'):
                     try:
-                        settings['feePercent'] = float(self.request.get('feePercent'))
+                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
                     except ValueError:
-                        response['error'] = 'Incorrect feePercent'
+                        response['error'] = 'Incorrect fee_percentage'
 
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')

@@ -47,7 +47,7 @@ class Forwarder(ndb.Model):
     youtube = ndb.StringProperty(default='')
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
-    feePercent = ndb.FloatProperty(default=0.0)
+    fee_percentage = ndb.FloatProperty(default=0.0)
     feeAddress = ndb.StringProperty(default='')
     confirmAmount = ndb.IntegerProperty(indexed=False, default=0)
     maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
@@ -78,7 +78,7 @@ class Distributer(ndb.Model):
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
     maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
-    feePercent = ndb.FloatProperty(default=0.0)
+    fee_percentage = ndb.FloatProperty(default=0.0)
     feeAddress = ndb.StringProperty(default='')
 
 
@@ -153,7 +153,7 @@ class Writer(ndb.Model):
     youtube = ndb.StringProperty(default='')
 
 
-    feePercent = ndb.FloatProperty(default=0.0)
+    fee_percentage = ndb.FloatProperty(default=0.0)
     feeAddress = ndb.StringProperty(default='')
 
 

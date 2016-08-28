@@ -53,7 +53,7 @@ def distributerToDict(distributer):
                         'creator_email': distributer.creator_email,
                         'youtube': distributer.youtube,
                         'feeAddress': distributer.feeAddress,
-                        'feePercent': distributer.feePercent,
+                        'fee_percentage': distributer.fee_percentage,
                         'maximum_transaction_fee': distributer.maximum_transaction_fee,
                         'date': int(time.mktime(distributer.date.timetuple()))}
 
@@ -205,10 +205,10 @@ class Distributer():
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
-            if 'feePercent' in settings and validator.validPercentage(settings['feePercent']):
-                distributer.feePercent = settings['feePercent']
-            elif 'feePercent' in settings:
-                self.error = 'FeePercent must be greater than or equal to 0'
+            if 'fee_percentage' in settings and validator.validPercentage(settings['fee_percentage']):
+                distributer.fee_percentage = settings['fee_percentage']
+            elif 'fee_percentage' in settings:
+                self.error = 'fee_percentage must be greater than or equal to 0'
 
             if 'feeAddress' in settings and (validator.validAddress(settings['feeAddress']) or settings['feeAddress'] == ''):
                 distributer.feeAddress = settings['feeAddress']
@@ -405,8 +405,8 @@ class DoDistributing():
         optimal = []
         value_to_distribute = amount-distributer.maximum_transaction_fee
 
-        if distributer.feePercent != 0 and distributer.feeAddress != '':
-            distributing_fee = int(value_to_distribute * (distributer.feePercent / 100.0))
+        if distributer.fee_percentage != 0 and distributer.feeAddress != '':
+            distributing_fee = int(value_to_distribute * (distributer.fee_percentage / 100.0))
             if distributing_fee < 10000:
                 distributing_fee = 10000
 
