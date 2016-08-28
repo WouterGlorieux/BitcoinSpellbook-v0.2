@@ -67,7 +67,7 @@ def writerToDict(writer):
                    'message': writer.message,
                    'amount': writer.amount,
                    'recommendedFee': writer.recommendedFee,
-                   'maxTransactionFee': writer.maxTransactionFee,
+                   'maximum_transaction_fee': writer.maximum_transaction_fee,
                    'transactionFee': writer.transactionFee,
                    'totalAmount': writer.totalAmount,
                    'status': writer.status,
@@ -191,8 +191,8 @@ class Writer():
                 writer.amount = total_output_value
                 writer.recommendedFee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
-                if writer.recommendedFee > writer.maxTransactionFee:
-                    writer.transactionFee = writer.maxTransactionFee
+                if writer.recommendedFee > writer.maximum_transaction_fee:
+                    writer.transactionFee = writer.maximum_transaction_fee
                 else:
                     writer.transactionFee = writer.recommendedFee
 
@@ -241,10 +241,10 @@ class Writer():
             elif 'feeAddress' in settings:
                 self.error = 'Invalid feeAddress'
 
-            if 'maxTransactionFee' in settings and validator.validAmount(settings['maxTransactionFee']):
-                writer.maxTransactionFee = settings['maxTransactionFee']
-            elif 'maxTransactionFee' in settings:
-                self.error = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+            if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
+                writer.maximum_transaction_fee = settings['maximum_transaction_fee']
+            elif 'maximum_transaction_fee' in settings:
+                self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
                 writer.address_type = settings['address_type']

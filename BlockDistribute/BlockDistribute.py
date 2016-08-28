@@ -54,7 +54,7 @@ def distributerToDict(distributer):
                         'youtube': distributer.youtube,
                         'feeAddress': distributer.feeAddress,
                         'feePercent': distributer.feePercent,
-                        'maxTransactionFee': distributer.maxTransactionFee,
+                        'maximum_transaction_fee': distributer.maximum_transaction_fee,
                         'date': int(time.mktime(distributer.date.timetuple()))}
 
     return distributer_dict
@@ -215,10 +215,10 @@ class Distributer():
             elif 'feeAddress' in settings:
                 self.error = 'Invalid feeAddress'
 
-            if 'maxTransactionFee' in settings and validator.validAmount(settings['maxTransactionFee']):
-                distributer.maxTransactionFee = settings['maxTransactionFee']
-            elif 'maxTransactionFee' in settings:
-                self.error = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+            if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
+                distributer.maximum_transaction_fee = settings['maximum_transaction_fee']
+            elif 'maximum_transaction_fee' in settings:
+                self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
                 distributer.address_type = settings['address_type']
@@ -403,7 +403,7 @@ class DoDistributing():
 
     def optimalOutputs(self, amount, distribution, distributer):
         optimal = []
-        value_to_distribute = amount-distributer.maxTransactionFee
+        value_to_distribute = amount-distributer.maximum_transaction_fee
 
         if distributer.feePercent != 0 and distributer.feeAddress != '':
             distributing_fee = int(value_to_distribute * (distributer.feePercent / 100.0))

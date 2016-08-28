@@ -50,7 +50,7 @@ class Forwarder(ndb.Model):
     feePercent = ndb.FloatProperty(default=0.0)
     feeAddress = ndb.StringProperty(default='')
     confirmAmount = ndb.IntegerProperty(indexed=False, default=0)
-    maxTransactionFee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
+    maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
 
 
 def forwarders_key():
@@ -77,7 +77,7 @@ class Distributer(ndb.Model):
     youtube = ndb.StringProperty(default='')
     status = ndb.StringProperty(choices=['Pending', 'Active', 'Disabled'], default='Pending')
     visibility = ndb.StringProperty(choices=['Public', 'Private'], default='Private')
-    maxTransactionFee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
+    maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
     feePercent = ndb.FloatProperty(default=0.0)
     feeAddress = ndb.StringProperty(default='')
 
@@ -134,7 +134,7 @@ class Writer(ndb.Model):
     outputs = ndb.JsonProperty(default=[])
     amount = ndb.IntegerProperty(default=0)
     recommendedFee = ndb.IntegerProperty(default=0)
-    maxTransactionFee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
+    maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
     transactionFee = ndb.IntegerProperty(default=0)
     totalAmount = ndb.IntegerProperty(default=0)
     extraValueAddress = ndb.StringProperty(indexed=True, default='')

@@ -790,11 +790,11 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
 
-                if self.request.get('maxTransactionFee'):
+                if self.request.get('maximum_transaction_fee'):
                     try:
-                        settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
+                        settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
                     except ValueError:
-                        response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
@@ -1123,11 +1123,11 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
 
-                if self.request.get('maxTransactionFee'):
+                if self.request.get('maximum_transaction_fee'):
                     try:
-                        settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
+                        settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
                     except ValueError:
-                        response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
