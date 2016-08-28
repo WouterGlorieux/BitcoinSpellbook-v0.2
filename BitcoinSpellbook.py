@@ -1002,8 +1002,8 @@ class saveAction(webapp2.RequestHandler):
                 if self.request.get('mail_to', None) is not None:
                     settings['mail_to'] = self.request.get('mail_to')
 
-                if self.request.get('mailSubject', None) is not None:
-                    settings['mailSubject'] = self.request.get('mailSubject')
+                if self.request.get('mail_subject', None) is not None:
+                    settings['mail_subject'] = self.request.get('mail_subject')
 
                 if self.request.get('mailBody', None) is not None:
                     settings['mailBody'] = self.request.get('mailBody')

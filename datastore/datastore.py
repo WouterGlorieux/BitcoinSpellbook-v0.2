@@ -117,7 +117,7 @@ class Action(ndb.Model):
     reveal_link_url = ndb.StringProperty(default='')
     reveal_allowed = ndb.BooleanProperty(default=False)
     mail_to = ndb.StringProperty(default='')
-    mailSubject = ndb.StringProperty(default='')
+    mail_subject = ndb.StringProperty(default='')
     mailBody = ndb.TextProperty(default='')
     mailSent = ndb.BooleanProperty(default=False)
     webhook = ndb.StringProperty(default='')
