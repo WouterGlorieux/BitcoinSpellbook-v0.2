@@ -110,9 +110,9 @@ def triggers_key():
 
 class Action(ndb.Model):
     trigger = ndb.StringProperty(default='')
-    action_type = ndb.StringProperty(choices=['RevealText', 'RevealLink', 'SendMail', 'Webhook'])
+    action_type = ndb.StringProperty(choices=['reveal_text', 'RevealLink', 'SendMail', 'Webhook'])
     description = ndb.TextProperty(default='')
-    revealText = ndb.TextProperty(default='')
+    reveal_text = ndb.TextProperty(default='')
     revealLinkText = ndb.StringProperty(default='')
     revealLinkURL = ndb.StringProperty(default='')
     revealAllowed = ndb.BooleanProperty(default=False)

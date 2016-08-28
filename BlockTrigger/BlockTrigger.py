@@ -52,8 +52,8 @@ def actionToDict(action):
                    'action_type': action.action_type,
                    'description': action.description}
 
-    if action.action_type == 'RevealText' and action.revealAllowed is True:
-        action_dict['revealText'] = action.revealText
+    if action.action_type == 'reveal_text' and action.revealAllowed is True:
+        action_dict['reveal_text'] = action.reveal_text
     elif action.action_type == 'RevealLink' and action.revealAllowed is True:
         action_dict['revealLinkText'] = action.revealLinkText
         action_dict['revealLinkURL'] = action.revealLinkURL
@@ -205,20 +205,20 @@ class BlockTrigger():
 
             action.trigger = trigger.key.id()
 
-            if 'action_type' in settings and settings['action_type'] in ['RevealText', 'RevealLink', 'SendMail', 'Webhook']:
+            if 'action_type' in settings and settings['action_type'] in ['reveal_text', 'RevealLink', 'SendMail', 'Webhook']:
                 action.action_type = settings['action_type']
             elif 'action_type' in settings:
-                self.error = 'action_type must be RevealText, RevealLink, SendMail or Webhook'
+                self.error = 'action_type must be reveal_text, RevealLink, SendMail or Webhook'
 
             if 'description' in settings and validator.validDescription(settings['description']):
                 action.description = settings['description']
             elif 'description' in settings:
                 self.error = 'invalid description'
 
-            if 'revealText' in settings and validator.validText(settings['revealText']):
-                action.revealText = settings['revealText']
-            elif 'revealText' in settings:
-                self.error = 'invalid revealText'
+            if 'reveal_text' in settings and validator.validText(settings['reveal_text']):
+                action.reveal_text = settings['reveal_text']
+            elif 'reveal_text' in settings:
+                self.error = 'invalid reveal_text'
 
             if 'revealLinkText' in settings and validator.validText(settings['revealLinkText']):
                 action.revealLinkText = settings['revealLinkText']
@@ -336,7 +336,7 @@ class CheckTriggers():
 
             for action in actions:
 
-                if action.action_type in ['RevealText', 'RevealLink'] and action.revealAllowed is False:
+                if action.action_type in ['reveal_text', 'RevealLink'] and action.revealAllowed is False:
                     logging.info('executing action: ' + action.key.id())
                     action.revealAllowed = True
                     action.put()
