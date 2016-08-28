@@ -12,7 +12,6 @@ from BlockWriterWrapper import BlockWriterWrapper
 from BlockProfileWrapper import BlockProfileWrapper
 
 
-
 class SpellbookWrapper():
 
     def __init__(self, url='http://bitcoinspellbook.appspot.com'):
