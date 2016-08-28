@@ -136,7 +136,7 @@ class Writer(ndb.Model):
     recommended_fee = ndb.IntegerProperty(default=0)
     maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
     transaction_fee = ndb.IntegerProperty(default=0)
-    totalAmount = ndb.IntegerProperty(default=0)
+    total_amount = ndb.IntegerProperty(default=0)
     extraValueAddress = ndb.StringProperty(indexed=True, default='')
 
     address = ndb.StringProperty(indexed=True, default='')

@@ -69,7 +69,7 @@ def writerToDict(writer):
                    'recommended_fee': writer.recommended_fee,
                    'maximum_transaction_fee': writer.maximum_transaction_fee,
                    'transaction_fee': writer.transaction_fee,
-                   'totalAmount': writer.totalAmount,
+                   'total_amount': writer.total_amount,
                    'status': writer.status,
                    'visibility': writer.visibility}
 
@@ -196,7 +196,7 @@ class Writer():
                 else:
                     writer.transaction_fee = writer.recommended_fee
 
-                writer.totalAmount = writer.amount + writer.transaction_fee
+                writer.total_amount = writer.amount + writer.transaction_fee
 
             elif 'outputs' in settings:
                 self.error = 'Invalid outputs: ' + settings['outputs'] + ' (must be a list of address-value tuples)'
@@ -345,7 +345,7 @@ class DoWriting():
         for UTXO in utxos:
             total_input_value += UTXO['value']
 
-        if total_input_value >= writer.totalAmount:
+        if total_input_value >= writer.total_amount:
             logging.info('Detected ' + str(total_input_value) + ' Satoshis on address ' + writer.address)
             logging.info('Starting OP_RETURN transaction with message: ' + writer.message)
 
@@ -356,8 +356,8 @@ class DoWriting():
                 outputs.append({'address': output[0], 'value': output[1]})
 
             #check for extra value
-            if total_input_value > writer.totalAmount:
-                extra_value = total_input_value-writer.totalAmount
+            if total_input_value > writer.total_amount:
+                extra_value = total_input_value - writer.total_amount
                 total_output_value += extra_value
                 logging.info('Extra value detected: ' + str(extra_value) + ', sending it to ' + writer.extraValueAddress)
                 outputs.append({'address': writer.extraValueAddress, 'value': extra_value})
