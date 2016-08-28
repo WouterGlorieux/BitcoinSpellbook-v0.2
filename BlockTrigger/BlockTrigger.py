@@ -60,7 +60,7 @@ def actionToDict(action):
     elif action.action_type == 'send_mail':
         action_dict['mail_to'] = action.mail_to
         action_dict['mail_subject'] = action.mail_subject
-        action_dict['mailBody'] = action.mailBody
+        action_dict['mail_body'] = action.mail_body
         action_dict['mailSent'] = action.mailSent
     elif action.action_type == 'webhook':
         action_dict['webhook'] = action.webhook
@@ -240,10 +240,10 @@ class BlockTrigger():
             elif 'mail_subject' in settings:
                 self.error = 'invalid mail_subject'
 
-            if 'mailBody' in settings and validator.validText(settings['mailBody']):
-                action.mailBody = settings['mailBody']
-            elif 'mailBody' in settings:
-                self.error = 'invalid mailBody'
+            if 'mail_body' in settings and validator.validText(settings['mail_body']):
+                action.mail_body = settings['mail_body']
+            elif 'mail_body' in settings:
+                self.error = 'invalid mail_body'
 
             if 'mailSent' in settings and settings['mailSent'] in [True, False]:
                 action.mailSent = settings['mailSent']
@@ -346,7 +346,7 @@ class CheckTriggers():
                         logging.info('executing action: ' + action.key.id())
                         try:
                             parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                            mail.send_mail(parameters.mail_from, action.mail_to, action.mail_subject, action.mailBody)
+                            mail.send_mail(parameters.mail_from, action.mail_to, action.mail_subject, action.mail_body)
                             action.mailSent = True
                             action.put()
                             logging.info('Mail sent successfully.')
