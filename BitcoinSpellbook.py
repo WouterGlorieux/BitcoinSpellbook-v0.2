@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-
-
 import os
 import jinja2
 import webapp2
@@ -33,7 +31,6 @@ import BlockDistribute.BlockDistribute as BlockDistribute
 import BlockTrigger.BlockTrigger as BlockTrigger
 import BlockWriter.BlockWriter as BlockWriter
 import BlockProfile.BlockProfile as BlockProfile
-
 import datastore.datastore as datastore
 
 
@@ -42,15 +39,14 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'])
 
 
-
 def authenticate(headers, body):
     response = {'success': 0}
 
     if 'API_Key' in headers:
-        API_key = headers['API_Key']
+        api_key = headers['API_Key']
 
         authentication = None
-        APIKey = datastore.APIKeys.query(datastore.APIKeys.api_key == API_key).fetch(limit=1)
+        APIKey = datastore.APIKeys.query(datastore.APIKeys.api_key == api_key).fetch(limit=1)
         if len(APIKey) == 1:
             authentication = APIKey[0]
 
@@ -70,8 +66,6 @@ def authenticate(headers, body):
     else:
         response['error'] = 'No API_key supplied'
 
-
-
     return response
 
 
@@ -89,8 +83,8 @@ class block(webapp2.RequestHandler):
 
         if self.request.get('height'):
             try:
-                blockHeight = int(self.request.get('height'))
-                response = data.block(blockHeight, provider)
+                block_height = int(self.request.get('height'))
+                response = data.block(block_height, provider)
                 self.response.write(json.dumps(response, sort_keys=True))
 
             except ValueError:
@@ -110,6 +104,7 @@ class latestBlock(webapp2.RequestHandler):
         response = data.latestBlock(provider)
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class primeInputAddress(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
@@ -124,6 +119,7 @@ class primeInputAddress(webapp2.RequestHandler):
         else:
             response['error'] = 'You must specify a txid.'
             self.response.write(json.dumps(response, sort_keys=True))
+
 
 class transactions(webapp2.RequestHandler):
     def get(self):
@@ -173,19 +169,18 @@ class utxos(webapp2.RequestHandler):
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-
-
 class saveProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
-            if self.request.get('name') and self.request.get('priority') and self.request.get('providerType') in ['Blocktrail.com', 'Blockchain.info', 'Insight']:
+        if authentication_ok:
+            if self.request.get('name') and self.request.get('priority') \
+                    and self.request.get('provider_type') in ['Blocktrail.com', 'Blockchain.info', 'Insight']:
                 name = self.request.get('name')
                 try:
                     priority = int(self.request.get('priority'))
@@ -194,10 +189,10 @@ class saveProvider(webapp2.RequestHandler):
                     self.response.write(json.dumps(response))
                     return
 
-                providerType = self.request.get('providerType')
+                provider_type = self.request.get('provider_type')
                 param = self.request.get('param')
 
-                if data.saveProvider(name, priority, providerType, param) == True:
+                if data.saveProvider(name, priority, provider_type, param):
                     response['success'] = 1
 
             else:
@@ -206,20 +201,21 @@ class saveProvider(webapp2.RequestHandler):
             response['error'] = authentication['error']
 
         self.response.write(json.dumps(response, sort_keys=True))
+
 
 class deleteProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                if data.deleteProvider(name) == True:
+                if data.deleteProvider(name):
                     response['success'] = 1
 
             else:
@@ -228,6 +224,7 @@ class deleteProvider(webapp2.RequestHandler):
             response['error'] = authentication['error']
 
         self.response.write(json.dumps(response, sort_keys=True))
+
 
 class getProviders(webapp2.RequestHandler):
     def get(self):
@@ -240,20 +237,21 @@ class getProviders(webapp2.RequestHandler):
 
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class initialize(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
 
         datastore.Parameters.get_or_insert('DefaultConfig')
 
-        adminAPIKey = datastore.APIKeys.get_or_insert('Admin')
-        adminAPIKey.api_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-        adminAPIKey.api_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-        adminAPIKey.put()
+        admin_api_key = datastore.APIKeys.get_or_insert('Admin')
+        admin_api_key.api_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+        admin_api_key.api_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+        admin_api_key.put()
 
         response['name'] = 'Admin'
-        response['api_key'] = adminAPIKey.api_key
-        response['api_secret'] = adminAPIKey.api_secret
+        response['api_key'] = admin_api_key.api_key
+        response['api_secret'] = admin_api_key.api_secret
         response['success'] = 1
 
         self.response.write(json.dumps(response, sort_keys=True))
@@ -262,17 +260,17 @@ class initialize(webapp2.RequestHandler):
 class updateRecommendedFee(webapp2.RequestHandler):
     def get(self):
         parameters = datastore.Parameters.get_or_insert('DefaultConfig')
-        blocktrailKey = datastore.Providers.get_by_id('Blocktrail.com').blocktrail_key
-        data = {}
+        blocktrail_key = datastore.Providers.get_by_id('Blocktrail.com').blocktrail_key
+        fee_data = {}
 
-        url = 'https://api.blocktrail.com/v1/BTC/fee-per-kb?api_key=' + blocktrailKey
+        url = 'https://api.blocktrail.com/v1/BTC/fee-per-kb?api_key=' + blocktrail_key
         try:
-            data = json.loads(urllib2.urlopen(urllib2.Request(url)).read())
+            fee_data = json.loads(urllib2.urlopen(urllib2.Request(url)).read())
         except:
             logging.error('Failed to update optimal fee per KB from Blocktrail.com')
 
-        if 'optimal' in data:
-            parameters.optimalFeePerKB = data['optimal']
+        if 'optimal' in fee_data:
+            parameters.optimalFeePerKB = fee_data['optimal']
             parameters.put()
 
 
@@ -284,8 +282,8 @@ class SIL(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockInputs.SIL(address, blockHeight)
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockInputs.SIL(address, block_height)
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -307,8 +305,8 @@ class LBL(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LBL()
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).LBL()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -330,8 +328,8 @@ class LRL(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LRL()
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).LRL()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -343,6 +341,7 @@ class LRL(webapp2.RequestHandler):
 
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class LSL(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
@@ -352,8 +351,8 @@ class LSL(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LSL()
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).LSL()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -365,6 +364,7 @@ class LSL(webapp2.RequestHandler):
 
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class LAL(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
@@ -374,8 +374,8 @@ class LAL(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, blockHeight).LAL()
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).LAL()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -393,22 +393,22 @@ class proportionalRandom(webapp2.RequestHandler):
         response = {'success': 0}
         if self.request.get('address'):
             address = self.request.get('address')
-            blockHeight = 0
-            rngBlockHeight = 0
+            block_height = 0
+            rng_block_height = 0
             xpub = ''
             source = 'SIL'
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
+                    block_height = int(self.request.get('block_height'))
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
-            if self.request.get('rngBlockHeight'):
+            if self.request.get('rng_block_height'):
                 try:
-                    rngBlockHeight = int(self.request.get('rngBlockHeight'))
+                    rng_block_height = int(self.request.get('rng_block_height'))
                 except ValueError:
-                    response['error'] = 'rngBlockHeight must be a positive integer.'
+                    response['error'] = 'rng_block_height must be a positive integer.'
 
             if self.request.get('xpub'):
                 xpub = self.request.get('xpub')
@@ -416,25 +416,26 @@ class proportionalRandom(webapp2.RequestHandler):
             if self.request.get('source') and self.request.get('source') in ['SIL', 'LBL', 'LRL', 'LSL']:
                 source = self.request.get('source')
 
-            response = BlockRandom.Random(address, blockHeight, xpub).proportionalRandom(source, rngBlockHeight)
+            response = BlockRandom.Random(address, block_height, xpub).proportionalRandom(source, rng_block_height)
 
         else:
             response['error'] = 'You must provide an address.'
 
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class randomFromBlock(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
-        rngBlockHeight = 0
+        rng_block_height = 0
 
-        if self.request.get('rngBlockHeight'):
+        if self.request.get('rng_block_height'):
             try:
-                rngBlockHeight = int(self.request.get('rngBlockHeight'))
+                rng_block_height = int(self.request.get('rng_block_height'))
             except ValueError:
-                response['error'] = 'rngBlockHeight must be a positive integer.'
+                response['error'] = 'rng_block_height must be a positive integer.'
 
-        response = BlockRandom.Random().fromBlock(rngBlockHeight)
+        response = BlockRandom.Random().fromBlock(rng_block_height)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -455,40 +456,39 @@ class proposal(webapp2.RequestHandler):
         if self.request.get('options'):
             options = self.request.get('options').split("|")
 
-        voteCost = 0
-        if self.request.get('voteCost'):
+        vote_cost = 0
+        if self.request.get('vote_cost'):
             try:
-                voteCost = int(self.request.get('voteCost'))
+                vote_cost = int(self.request.get('vote_cost'))
             except ValueError:
-                response['error'] = 'voteCost must be a positive integer.'
+                response['error'] = 'vote_cost must be a positive integer.'
 
         weights = 'Equal'
         if self.request.get('weights'):
             weights = self.request.get('weights')
 
-        registrationAddress = ''
+        registration_address = ''
         if self.request.get('regAddress'):
-            registrationAddress = self.request.get('regAddress')
+            registration_address = self.request.get('regAddress')
 
-        registrationBlockHeight = 0
+        registration_block_height = 0
         if self.request.get('regBlockHeight'):
             try:
-                registrationBlockHeight = int(self.request.get('regBlockHeight'))
+                registration_block_height = int(self.request.get('regBlockHeight'))
             except ValueError:
                 response['error'] = 'regBlockHeight must be a positive integer.'
 
-        registrationXPUB = ''
+        registration_xpub = ''
         if self.request.get('regXPUB'):
-            registrationXPUB = self.request.get('regXPUB')
+            registration_xpub = self.request.get('regXPUB')
 
+        blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
+        blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)
 
-        blockVoter = BlockVoter.BlockVoter(address, proposal, options, voteCost)
-        blockVoter.setWeights(weights, registrationAddress, registrationBlockHeight, registrationXPUB)
-
-        response = blockVoter.getProposal()
-
+        response = blockvoter.getProposal()
 
         self.response.write(json.dumps(response, sort_keys=True))
+
 
 class results(webapp2.RequestHandler):
     def get(self):
@@ -506,17 +506,17 @@ class results(webapp2.RequestHandler):
         if self.request.get('options'):
             options = self.request.get('options').split("|")
 
-        voteCost = 0
-        if self.request.get('voteCost'):
+        vote_cost = 0
+        if self.request.get('vote_cost'):
             try:
-                voteCost = int(self.request.get('voteCost'))
+                vote_cost = int(self.request.get('vote_cost'))
             except ValueError:
-                response['error'] = 'voteCost must be a positive integer.'
+                response['error'] = 'vote_cost must be a positive integer.'
 
-        blockHeight = 0
+        block_height = 0
         if self.request.get('block_height'):
             try:
-                blockHeight = int(self.request.get('block_height'))
+                block_height = int(self.request.get('block_height'))
             except ValueError:
                 response['error'] = 'block_height must be a positive integer.'
 
@@ -524,55 +524,47 @@ class results(webapp2.RequestHandler):
         if self.request.get('weights'):
             weights = self.request.get('weights')
 
-        registrationAddress = ''
+        registration_address = ''
         if self.request.get('regAddress'):
-            registrationAddress = self.request.get('regAddress')
+            registration_address = self.request.get('regAddress')
 
-        registrationBlockHeight = 0
+        registration_block_height = 0
         if self.request.get('regBlockHeight'):
             try:
-                registrationBlockHeight = int(self.request.get('regBlockHeight'))
+                registration_block_height = int(self.request.get('regBlockHeight'))
             except ValueError:
                 response['error'] = 'regBlockHeight must be a positive integer.'
 
-        registrationXPUB = ''
+        registration_xpub = ''
         if self.request.get('regXPUB'):
-            registrationXPUB = self.request.get('regXPUB')
+            registration_xpub = self.request.get('regXPUB')
 
+        blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
+        blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)
 
-        blockVoter = BlockVoter.BlockVoter(address, proposal, options, voteCost)
-        blockVoter.setWeights(weights, registrationAddress, registrationBlockHeight, registrationXPUB)
-
-        response = blockVoter.getResults(blockHeight)
+        response = blockvoter.getResults(block_height)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class getForwarders(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
         response = BlockForward.getForwarders()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class getForwarder(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
 
         response = BlockForward.BlockForward(name).get()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class checkForwarderAddress(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
@@ -582,7 +574,6 @@ class checkForwarderAddress(webapp2.RequestHandler):
             address = self.request.get('address')
 
         response = BlockForward.BlockForward(name).checkAddress(address)
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -590,12 +581,12 @@ class saveForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -637,8 +628,6 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
 
-
-
                 if self.request.get('confirmAmount'):
                     try:
                         settings['confirmAmount'] = int(self.request.get('confirmAmount'))
@@ -671,12 +660,12 @@ class deleteForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockForward.BlockForward(name).deleteForwarder()
@@ -698,32 +687,24 @@ class doForwarding(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-
 class getDistributers(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
         response = BlockDistribute.getDistributers()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class getDistributer(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
 
         response = BlockDistribute.Distributer(name).get()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class checkDistributerAddress(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
@@ -741,12 +722,12 @@ class saveDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -767,10 +748,8 @@ class saveDistributer(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'registration_block_height must be a positive integer or equal to 0'
 
-
                 if self.request.get('distribution', None) is not None:
                     settings['distribution'] = self.request.get('distribution')
-
 
                 if self.request.get('minimumAmount'):
                     try:
@@ -784,13 +763,11 @@ class saveDistributer(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
 
-
                 if self.request.get('visibility'):
                     settings['visibility'] = self.request.get('visibility')
 
                 if self.request.get('status'):
                     settings['status'] = self.request.get('status')
-
 
                 if self.request.get('description', None) is not None:
                     settings['description'] = self.request.get('description')
@@ -801,11 +778,8 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('creatorEmail', None) is not None:
                     settings['creatorEmail'] = self.request.get('creatorEmail')
 
-
-
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
-
 
                 if self.request.get('feePercent'):
                     try:
@@ -816,13 +790,11 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
 
-
                 if self.request.get('maxTransactionFee'):
                     try:
                         settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
                     except ValueError:
                         response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
-
 
                 if self.request.get('addressType'):
                     settings['addressType'] = self.request.get('addressType')
@@ -835,7 +807,6 @@ class saveDistributer(webapp2.RequestHandler):
 
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')
-
 
                 response = BlockDistribute.Distributer(name).saveDistributer(settings)
 
@@ -851,12 +822,12 @@ class deleteDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockDistribute.Distributer(name).deleteDistributer()
@@ -870,12 +841,12 @@ class updateDistribution(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockDistribute.Distributer(name).updateDistribution()
@@ -883,8 +854,6 @@ class updateDistribution(webapp2.RequestHandler):
             response['error'] = authentication['error']
 
         self.response.write(json.dumps(response, sort_keys=True))
-
-
 
 
 class doDistributing(webapp2.RequestHandler):
@@ -899,27 +868,19 @@ class doDistributing(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-
-
-
 class getTriggers(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
         response = BlockTrigger.getTriggers()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class getTrigger(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
 
         response = BlockTrigger.BlockTrigger(name).get()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -927,12 +888,12 @@ class saveTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -940,7 +901,6 @@ class saveTrigger(webapp2.RequestHandler):
 
                 if self.request.get('triggerType'):
                     settings['triggerType'] = self.request.get('triggerType')
-
 
                 if self.request.get('address', None) is not None:
                     settings['address'] = self.request.get('address')
@@ -962,7 +922,6 @@ class saveTrigger(webapp2.RequestHandler):
                 elif self.request.get('triggered') == 'False':
                     settings['triggered'] = False
 
-
                 if self.request.get('description', None) is not None:
                     settings['description'] = self.request.get('description')
 
@@ -972,7 +931,6 @@ class saveTrigger(webapp2.RequestHandler):
                 if self.request.get('creatorEmail', None) is not None:
                     settings['creatorEmail'] = self.request.get('creatorEmail')
 
-
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
 
@@ -981,7 +939,6 @@ class saveTrigger(webapp2.RequestHandler):
 
                 if self.request.get('status'):
                     settings['status'] = self.request.get('status')
-
 
                 response = BlockTrigger.BlockTrigger(name).saveTrigger(settings)
 
@@ -997,12 +954,12 @@ class deleteTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockTrigger.BlockTrigger(name).deleteTrigger()
@@ -1016,15 +973,15 @@ class saveAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
-            if self.request.get('triggerName') and self.request.get('actionName'):
-                triggerName = self.request.get('triggerName')
-                actionName = self.request.get('actionName')
+        if authentication_ok:
+            if self.request.get('trigger_name') and self.request.get('action_name'):
+                trigger_name = self.request.get('trigger_name')
+                action_name = self.request.get('action_name')
 
                 settings = {}
                 if self.request.get('actionType'):
@@ -1059,8 +1016,7 @@ class saveAction(webapp2.RequestHandler):
                 if self.request.get('webhook', None) is not None:
                     settings['webhook'] = self.request.get('webhook')
 
-
-                response = BlockTrigger.BlockTrigger(triggerName).saveAction(actionName, settings)
+                response = BlockTrigger.BlockTrigger(trigger_name).saveAction(action_name, settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -1069,21 +1025,22 @@ class saveAction(webapp2.RequestHandler):
 
         self.response.write(json.dumps(response, sort_keys=True))
 
+
 class deleteAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
-            if self.request.get('triggerName') and self.request.get('actionName'):
-                triggerName = self.request.get('triggerName')
-                actionName = self.request.get('actionName')
+        if authentication_ok:
+            if self.request.get('trigger_name') and self.request.get('action_name'):
+                trigger_name = self.request.get('trigger_name')
+                action_name = self.request.get('action_name')
 
-                response = BlockTrigger.BlockTrigger(triggerName).deleteAction(actionName)
+                response = BlockTrigger.BlockTrigger(trigger_name).deleteAction(action_name)
         else:
             response['error'] = authentication['error']
 
@@ -1102,26 +1059,19 @@ class checkTriggers(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-
-
 class getWriters(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
         response = BlockWriter.getWriters()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
 class getWriter(webapp2.RequestHandler):
     def get(self):
-        response = {'success': 0}
-
         name = ''
         if self.request.get('name'):
             name = self.request.get('name')
 
         response = BlockWriter.Writer(name).get()
-
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -1129,12 +1079,12 @@ class saveWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -1146,13 +1096,11 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('message', None) is not None:
                     settings['message'] = self.request.get('message')
 
-
                 if self.request.get('visibility'):
                     settings['visibility'] = self.request.get('visibility')
 
                 if self.request.get('status'):
                     settings['status'] = self.request.get('status')
-
 
                 if self.request.get('description', None) is not None:
                     settings['description'] = self.request.get('description')
@@ -1166,7 +1114,6 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('youtube', None) is not None:
                     settings['youtube'] = self.request.get('youtube')
 
-
                 if self.request.get('feePercent'):
                     try:
                         settings['feePercent'] = float(self.request.get('feePercent'))
@@ -1176,13 +1123,11 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('feeAddress', None) is not None:
                     settings['feeAddress'] = self.request.get('feeAddress')
 
-
                 if self.request.get('maxTransactionFee'):
                     try:
                         settings['maxTransactionFee'] = int(self.request.get('maxTransactionFee'))
                     except ValueError:
                         response['error'] = 'maxTransactionFee must be a positive integer or equal to 0 (in Satoshis)'
-
 
                 if self.request.get('addressType'):
                     settings['addressType'] = self.request.get('addressType')
@@ -1195,7 +1140,6 @@ class saveWriter(webapp2.RequestHandler):
 
                 if self.request.get('privateKey', None) is not None:
                     settings['privateKey'] = self.request.get('privateKey')
-
 
                 response = BlockWriter.Writer(name).saveWriter(settings)
 
@@ -1211,12 +1155,12 @@ class deleteWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authenticationOK = False
+        authentication_ok = False
         authentication = authenticate(self.request.headers, self.request.body)
         if 'success' in authentication and authentication['success'] == 1:
-            authenticationOK = True
+            authentication_ok = True
 
-        if authenticationOK:
+        if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockWriter.Writer(name).deleteWriter()
@@ -1224,6 +1168,7 @@ class deleteWriter(webapp2.RequestHandler):
             response['error'] = authentication['error']
 
         self.response.write(json.dumps(response, sort_keys=True))
+
 
 class doWriting(webapp2.RequestHandler):
     def get(self):
@@ -1245,8 +1190,8 @@ class Profile(webapp2.RequestHandler):
 
             if self.request.get('block_height'):
                 try:
-                    blockHeight = int(self.request.get('block_height'))
-                    response = BlockProfile.Profile(address, blockHeight)
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockProfile.Profile(address, block_height)
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
@@ -1257,9 +1202,6 @@ class Profile(webapp2.RequestHandler):
             response['error'] = 'You must provide an address.'
 
         self.response.write(json.dumps(response, sort_keys=True))
-
-
-
 
 
 app = webapp2.WSGIApplication([
@@ -1322,4 +1264,3 @@ app = webapp2.WSGIApplication([
     ('/profile/profile', Profile),
 
 ], debug=True)
-
