@@ -18,11 +18,11 @@ from validators import validators as validator
 def getProviderAPI(name):
     provider = datastore.Providers.get_by_id(name)
 
-    if provider and provider.providerType == 'Blocktrail.com':
+    if provider and provider.provider_type == 'Blocktrail.com':
         provider_api = Blocktrail_com.API(provider.blocktrail_key)
-    elif provider and provider.providerType == 'Blockchain.info':
+    elif provider and provider.provider_type == 'Blockchain.info':
         provider_api = Blockchain_info.API()
-    elif provider and provider.providerType == 'Insight':
+    elif provider and provider.provider_type == 'Insight':
         provider_api = Insight.API(provider.insight_url)
     else:
         provider_api = None
@@ -49,11 +49,11 @@ def getProvidersList():
     for provider in providers:
         tmp_provider = {'name': provider.key.string_id(),
                         'priority': provider.priority,
-                        'providerType': provider.providerType}
+                        'provider_type': provider.provider_type}
 
-        if provider.providerType == 'Blocktrail.com':
+        if provider.provider_type == 'Blocktrail.com':
             tmp_provider['Blocktrail_key'] = provider.blocktrail_key
-        elif provider.providerType == 'Insight':
+        elif provider.provider_type == 'Insight':
             tmp_provider['Insight_url'] = provider.insight_url
 
         providers_list.append(tmp_provider)
@@ -65,7 +65,7 @@ def saveProvider(name, priority, provider_type, param=''):
 
     provider = datastore.Providers.get_or_insert(name)
     provider.priority = priority
-    provider.providerType = provider_type
+    provider.provider_type = provider_type
 
     if provider_type == 'Blocktrail.com':
         provider.blocktrail_key = param

@@ -28,7 +28,7 @@ class Parameters(ndb.Model):
 class Providers(ndb.Model):
     #Model for 3rd party data providers parameters
     priority = ndb.IntegerProperty(indexed=True, default=0)
-    providerType = ndb.StringProperty(indexed=True, choices=['Blocktrail.com', 'Blockchain.info', 'Insight'], default='Blocktrail.com')
+    provider_type = ndb.StringProperty(indexed=True, choices=['Blocktrail.com', 'Blockchain.info', 'Insight'], default='Blocktrail.com')
     blocktrail_key = ndb.StringProperty(indexed=False, default="")
     insight_url = ndb.StringProperty(indexed=False, default="")
 
