@@ -7,20 +7,17 @@ import json
 import urllib
 
 
-
 class BlockProfileWrapper():
     def __init__(self, url):
         self.url = url
 
-
-    def Profile(self, address, blockHeight=0):
+    def Profile(self, address, block_height=0):
         response = {'success': 0}
-        parameters = {}
-        parameters['address'] = address
-        parameters['block_height'] = str(blockHeight)
+        parameters = {'address': address,
+                      'block_height': str(block_height)}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/profile/profile?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/profile/profile?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
