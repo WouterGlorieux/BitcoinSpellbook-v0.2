@@ -4,7 +4,7 @@ from BIP44 import BIP44
 import logging
 
 
-MAX_TRANSACTION_FEE = 10000 #in Satoshis
+MAX_TRANSACTION_FEE = 10000  # in Satoshis
 
 
 class Services:
@@ -21,7 +21,7 @@ class APIKeys(ndb.Model):
 
 class Parameters(ndb.Model):
     master_seed = ndb.StringProperty(indexed=False, default="")
-    mailFrom = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
+    mail_from = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
     optimalFeePerKB = ndb.IntegerProperty(indexed=False, default=0)
 
 
@@ -192,7 +192,7 @@ def consistencyCheck(module):
                     message = 'Consistency check failed: multiple active writers with same walletIndex! walletIndex = %i' % tmpIndex
                     logging.error(message)
                     parameters = Parameters.get_by_id('DefaultConfig')
-                    mail.send_mail(parameters.mailFrom, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
+                    mail.send_mail(parameters.mail_from, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
                     success = False
 
                 tmpIndex = writers[i].walletIndex

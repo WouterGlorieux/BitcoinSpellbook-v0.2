@@ -346,7 +346,7 @@ class CheckTriggers():
                         logging.info('executing action: ' + action.key.id())
                         try:
                             parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                            mail.send_mail(parameters.mailFrom, action.mailTo, action.mailSubject, action.mailBody)
+                            mail.send_mail(parameters.mail_from, action.mailTo, action.mailSubject, action.mailBody)
                             action.mailSent = True
                             action.put()
                             logging.info('Mail sent successfully.')
