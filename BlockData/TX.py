@@ -9,7 +9,7 @@ class TX():
         self.confirmations = 0
 
     def printTX(self):
-        print '\nblock ', str(self.block_height) , "(" + str(self.confirmations) + " confirmations)", self.txid
+        print '\nblock ', str(self.block_height), "(" + str(self.confirmations) + " confirmations)", self.txid
         print 'IN:', self.inputs
         print 'OUT:', self.outputs
         print 'primeInput:', self.primeInputAddress()
@@ -20,7 +20,6 @@ class TX():
             addresses.append(tx_input['address'])
 
         return sorted(addresses)[0]
-
 
     def receivedValue(self, address):
         value = 0
@@ -37,7 +36,6 @@ class TX():
                 received = False
 
         return received
-
 
     def sentValue(self, address):
         value = 0
@@ -60,38 +58,17 @@ class TX():
 
         return sending
 
-
-
     def toDict(self, address):
-        tx_dict = {}
-        tx_dict["txid"] = self.txid
-        tx_dict["primeInputAddress"] = self.primeInputAddress()
-        tx_dict["inputs"] = self.inputs
-        tx_dict["outputs"] = self.outputs
-        tx_dict["block_height"] = self.block_height
-        tx_dict["confirmations"] = self.confirmations
-        tx_dict["receiving"] = self.receivingTX(address)
-        if tx_dict["receiving"] == True:
+        tx_dict = {"txid": self.txid,
+                   "primeInputAddress": self.primeInputAddress(),
+                   "inputs": self.inputs,
+                   "outputs": self.outputs,
+                   "block_height": self.block_height,
+                   "confirmations": self.confirmations,
+                   "receiving": self.receivingTX(address)}
+        if tx_dict["receiving"] is True:
             tx_dict["receivedValue"] = self.receivedValue(address)
         else:
             tx_dict["sentValue"] = self.sentValue(address)
 
         return tx_dict
-
-'''
-def sortTXS(self, txs):
-    blockTXS = {}
-    for tx in txs:
-        if tx.block_height in blockTXS:
-            blockTXS[tx.block_height].append(tx)
-        else:
-            blockTXS[tx.block_height] = [tx]
-
-    sortedTXS = []
-    for block in sorted(blockTXS):
-        for tx in sorted(blockTXS[block], key= lambda x: x.txid):
-            if self.receivingOnly == False or tx.receivingTX(self.address) == True:
-                sortedTXS.append(tx)
-
-    return sortedTXS
-'''
