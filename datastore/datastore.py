@@ -133,7 +133,7 @@ class Writer(ndb.Model):
     message = ndb.StringProperty(default='')
     outputs = ndb.JsonProperty(default=[])
     amount = ndb.IntegerProperty(default=0)
-    recommendedFee = ndb.IntegerProperty(default=0)
+    recommended_fee = ndb.IntegerProperty(default=0)
     maximum_transaction_fee = ndb.IntegerProperty(default=MAX_TRANSACTION_FEE)
     transactionFee = ndb.IntegerProperty(default=0)
     totalAmount = ndb.IntegerProperty(default=0)

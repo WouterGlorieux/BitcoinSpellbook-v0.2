@@ -66,7 +66,7 @@ def writerToDict(writer):
                    'outputs': writer.outputs,
                    'message': writer.message,
                    'amount': writer.amount,
-                   'recommendedFee': writer.recommendedFee,
+                   'recommended_fee': writer.recommended_fee,
                    'maximum_transaction_fee': writer.maximum_transaction_fee,
                    'transactionFee': writer.transactionFee,
                    'totalAmount': writer.totalAmount,
@@ -189,12 +189,12 @@ class Writer():
                     total_output_value += output[1]
 
                 writer.amount = total_output_value
-                writer.recommendedFee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
+                writer.recommended_fee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
-                if writer.recommendedFee > writer.maximum_transaction_fee:
+                if writer.recommended_fee > writer.maximum_transaction_fee:
                     writer.transactionFee = writer.maximum_transaction_fee
                 else:
-                    writer.transactionFee = writer.recommendedFee
+                    writer.transactionFee = writer.recommended_fee
 
                 writer.totalAmount = writer.amount + writer.transactionFee
 
