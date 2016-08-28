@@ -14,13 +14,12 @@ class BlockForwardWrapper():
     def __init__(self, url):
         self.url = url
 
-
     def getForwarders(self):
         response = {'success': 0}
         parameters = {}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/getForwarders?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/getForwarders?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -32,11 +31,10 @@ class BlockForwardWrapper():
 
     def getForwarder(self, name):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/getForwarder?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/getForwarder?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -45,16 +43,14 @@ class BlockForwardWrapper():
             response['error'] = 'Unable to retrieve forwarder'
 
         return response
-
 
     def checkAddress(self, name, address):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
-        parameters['address'] = address
+        parameters = {'name': name,
+                      'address': address}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/checkAddress?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/checkAddress?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -64,21 +60,21 @@ class BlockForwardWrapper():
 
         return response
 
-
-    def saveForwarder(self, name, settings={}, APIkey='', APIsecret=''):
+    def saveForwarder(self, name, settings=None, api_key='', api_secret=''):
+        if not settings:
+            settings = {}
         response = {'success': 0}
-        parameters ={}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/saveForwarder?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/saveForwarder?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -91,21 +87,19 @@ class BlockForwardWrapper():
 
         return response
 
-
-    def deleteForwarder(self, name, APIkey='', APIsecret=''):
+    def deleteForwarder(self, name, api_key='', api_secret=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/deleteForwarder?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/deleteForwarder?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
-        signature = hmac.new(base64.b64decode(APIsecret), message, hashlib.sha512)
+        signature = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
 
         headers = {
-            'API-Key': APIkey,
+            'API-Key': api_key,
             'API-Sign': base64.b64encode(signature.digest())
         }
 
@@ -120,11 +114,10 @@ class BlockForwardWrapper():
 
     def doForwarding(self, name=''):
         response = {'success': 0}
-        parameters = {}
-        parameters['name'] = name
+        parameters = {'name': name}
 
-        queryString  = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/doForwarding?" + queryString
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/forwarder/doForwarding?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
