@@ -22,7 +22,7 @@ class APIKeys(ndb.Model):
 class Parameters(ndb.Model):
     master_seed = ndb.StringProperty(indexed=False, default="")
     mail_from = ndb.StringProperty(indexed=False, default="Bitcoin Spellbook <wouter.glorieux@gmail.com>")
-    optimalFeePerKB = ndb.IntegerProperty(indexed=False, default=0)
+    optimal_fee_per_kb = ndb.IntegerProperty(indexed=False, default=0)
 
 
 class Providers(ndb.Model):

@@ -189,7 +189,7 @@ class Writer():
                     total_output_value += output[1]
 
                 writer.amount = total_output_value
-                writer.recommendedFee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimalFeePerKB)
+                writer.recommendedFee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
                 if writer.recommendedFee > writer.maxTransactionFee:
                     writer.transactionFee = writer.maxTransactionFee

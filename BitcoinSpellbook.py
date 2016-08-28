@@ -270,7 +270,7 @@ class updateRecommendedFee(webapp2.RequestHandler):
             logging.error('Failed to update optimal fee per KB from Blocktrail.com')
 
         if 'optimal' in fee_data:
-            parameters.optimalFeePerKB = fee_data['optimal']
+            parameters.optimal_fee_per_kb = fee_data['optimal']
             parameters.put()
 
 
