@@ -93,7 +93,7 @@ class BlockVoter():
             if self.registration_xpub != '':
                 proposal['regXPUB'] = self.registration_xpub
             if self.registration_block_height != 0:
-                proposal['regBlockHeight'] = self.registration_block_height
+                proposal['registration_block_height'] = self.registration_block_height
 
             proposal['proposalHash'] = self.getProposalHash()
 
@@ -163,7 +163,7 @@ class BlockVoter():
             if self.registration_address != '':
                 response['regAddress'] = self.registration_address
             if self.registration_block_height != '':
-                response['regBlockHeight'] = self.registration_block_height
+                response['registration_block_height'] = self.registration_block_height
             if self.registration_xpub != '':
                 response['regXPUB'] = self.registration_xpub
 

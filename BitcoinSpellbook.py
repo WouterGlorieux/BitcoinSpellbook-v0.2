@@ -472,11 +472,11 @@ class proposal(webapp2.RequestHandler):
             registration_address = self.request.get('regAddress')
 
         registration_block_height = 0
-        if self.request.get('regBlockHeight'):
+        if self.request.get('registration_block_height'):
             try:
-                registration_block_height = int(self.request.get('regBlockHeight'))
+                registration_block_height = int(self.request.get('registration_block_height'))
             except ValueError:
-                response['error'] = 'regBlockHeight must be a positive integer.'
+                response['error'] = 'registration_block_height must be a positive integer.'
 
         registration_xpub = ''
         if self.request.get('regXPUB'):
@@ -529,11 +529,11 @@ class results(webapp2.RequestHandler):
             registration_address = self.request.get('regAddress')
 
         registration_block_height = 0
-        if self.request.get('regBlockHeight'):
+        if self.request.get('registration_block_height'):
             try:
-                registration_block_height = int(self.request.get('regBlockHeight'))
+                registration_block_height = int(self.request.get('registration_block_height'))
             except ValueError:
-                response['error'] = 'regBlockHeight must be a positive integer.'
+                response['error'] = 'registration_block_height must be a positive integer.'
 
         registration_xpub = ''
         if self.request.get('regXPUB'):

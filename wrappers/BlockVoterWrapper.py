@@ -37,7 +37,7 @@ class BlockVoterWrapper():
             parameters['regAddress'] = str(registration_address)
 
         if registration_block_height != 0:
-            parameters['regBlockHeight'] = str(registration_block_height)
+            parameters['registration_block_height'] = str(registration_block_height)
 
         if registration_xpub != "":
             parameters['regXPUB'] = str(registration_xpub)
