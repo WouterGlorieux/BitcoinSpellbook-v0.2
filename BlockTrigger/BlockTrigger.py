@@ -55,7 +55,7 @@ def actionToDict(action):
     if action.action_type == 'reveal_text' and action.revealAllowed is True:
         action_dict['reveal_text'] = action.reveal_text
     elif action.action_type == 'RevealLink' and action.revealAllowed is True:
-        action_dict['revealLinkText'] = action.revealLinkText
+        action_dict['reveal_link_text'] = action.reveal_link_text
         action_dict['revealLinkURL'] = action.revealLinkURL
     elif action.action_type == 'SendMail':
         action_dict['mailTo'] = action.mailTo
@@ -220,10 +220,10 @@ class BlockTrigger():
             elif 'reveal_text' in settings:
                 self.error = 'invalid reveal_text'
 
-            if 'revealLinkText' in settings and validator.validText(settings['revealLinkText']):
-                action.revealLinkText = settings['revealLinkText']
-            elif 'revealLinkText' in settings:
-                self.error = 'invalid revealLinkText'
+            if 'reveal_link_text' in settings and validator.validText(settings['reveal_link_text']):
+                action.reveal_link_text = settings['reveal_link_text']
+            elif 'reveal_link_text' in settings:
+                self.error = 'invalid reveal_link_text'
 
             if 'revealLinkURL' in settings and validator.validURL(settings['revealLinkURL']):
                 action.revealLinkURL = settings['revealLinkURL']

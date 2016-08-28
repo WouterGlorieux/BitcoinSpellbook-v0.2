@@ -113,7 +113,7 @@ class Action(ndb.Model):
     action_type = ndb.StringProperty(choices=['reveal_text', 'RevealLink', 'SendMail', 'Webhook'])
     description = ndb.TextProperty(default='')
     reveal_text = ndb.TextProperty(default='')
-    revealLinkText = ndb.StringProperty(default='')
+    reveal_link_text = ndb.StringProperty(default='')
     revealLinkURL = ndb.StringProperty(default='')
     revealAllowed = ndb.BooleanProperty(default=False)
     mailTo = ndb.StringProperty(default='')
