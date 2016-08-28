@@ -733,8 +733,8 @@ class saveDistributer(webapp2.RequestHandler):
 
                 settings = {}
 
-                if self.request.get('distributionSource') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
-                    settings['distributionSource'] = self.request.get('distributionSource')
+                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
+                    settings['distribution_source'] = self.request.get('distribution_source')
 
                 if self.request.get('registration_address', None) is not None:
                     settings['registration_address'] = self.request.get('registration_address')
