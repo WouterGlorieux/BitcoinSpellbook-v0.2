@@ -272,7 +272,7 @@ class Writer():
             if not validator.validAddress(writer.address):
                 self.error = 'Unable to get address for writer'
             else:
-                writer.extraValueAddress = writer.address
+                writer.extra_value_address = writer.address
 
             if not datastore.consistencyCheck('BlockWriter'):
                 self.error = 'Unable to assign address.'
@@ -359,8 +359,8 @@ class DoWriting():
             if total_input_value > writer.total_amount:
                 extra_value = total_input_value - writer.total_amount
                 total_output_value += extra_value
-                logging.info('Extra value detected: ' + str(extra_value) + ', sending it to ' + writer.extraValueAddress)
-                outputs.append({'address': writer.extraValueAddress, 'value': extra_value})
+                logging.info('Extra value detected: ' + str(extra_value) + ', sending it to ' + writer.extra_value_address)
+                outputs.append({'address': writer.extra_value_address, 'value': extra_value})
 
             logging.info("outputs: " + str(outputs))
             transaction_fee = total_input_value - total_output_value
