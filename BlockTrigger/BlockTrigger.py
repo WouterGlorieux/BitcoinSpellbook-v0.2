@@ -58,7 +58,7 @@ def actionToDict(action):
         action_dict['reveal_link_text'] = action.reveal_link_text
         action_dict['reveal_link_url'] = action.reveal_link_url
     elif action.action_type == 'send_mail':
-        action_dict['mailTo'] = action.mailTo
+        action_dict['mail_to'] = action.mail_to
         action_dict['mailSubject'] = action.mailSubject
         action_dict['mailBody'] = action.mailBody
         action_dict['mailSent'] = action.mailSent
@@ -230,10 +230,10 @@ class BlockTrigger():
             elif 'reveal_link_url' in settings:
                 self.error = 'invalid reveal_link_url'
 
-            if 'mailTo' in settings and validator.validEmail(settings['mailTo']):
-                action.mailTo = settings['mailTo']
-            elif 'mailTo' in settings:
-                self.error = 'invalid mailTo address'
+            if 'mail_to' in settings and validator.validEmail(settings['mail_to']):
+                action.mail_to = settings['mail_to']
+            elif 'mail_to' in settings:
+                self.error = 'invalid mail_to address'
 
             if 'mailSubject' in settings and validator.validText(settings['mailSubject']):
                 action.mailSubject = settings['mailSubject']
@@ -342,18 +342,18 @@ class CheckTriggers():
                     action.put()
 
                 elif action.action_type == 'send_mail' and action.mailSent is False:
-                    if validator.validEmail(action.mailTo):
+                    if validator.validEmail(action.mail_to):
                         logging.info('executing action: ' + action.key.id())
                         try:
                             parameters = datastore.Parameters.get_by_id('DefaultConfig')
-                            mail.send_mail(parameters.mail_from, action.mailTo, action.mailSubject, action.mailBody)
+                            mail.send_mail(parameters.mail_from, action.mail_to, action.mailSubject, action.mailBody)
                             action.mailSent = True
                             action.put()
                             logging.info('Mail sent successfully.')
                         except:
                             logging.error("Failed to send mail")
                     else:
-                        logging.error("Invalid email address: " + action.mailTo)
+                        logging.error("Invalid email address: " + action.mail_to)
 
                 elif action.action_type == 'webhook' and action.webhookActivated is False:
 

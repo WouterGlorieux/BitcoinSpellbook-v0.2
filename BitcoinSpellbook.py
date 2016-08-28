@@ -999,8 +999,8 @@ class saveAction(webapp2.RequestHandler):
                 if self.request.get('reveal_link_url', None) is not None:
                     settings['reveal_link_url'] = self.request.get('reveal_link_url')
 
-                if self.request.get('mailTo', None) is not None:
-                    settings['mailTo'] = self.request.get('mailTo')
+                if self.request.get('mail_to', None) is not None:
+                    settings['mail_to'] = self.request.get('mail_to')
 
                 if self.request.get('mailSubject', None) is not None:
                     settings['mailSubject'] = self.request.get('mailSubject')
