@@ -52,7 +52,7 @@ def distributerToDict(distributer):
                         'creator': distributer.creator,
                         'creator_email': distributer.creator_email,
                         'youtube': distributer.youtube,
-                        'feeAddress': distributer.feeAddress,
+                        'fee_address': distributer.fee_address,
                         'fee_percentage': distributer.fee_percentage,
                         'maximum_transaction_fee': distributer.maximum_transaction_fee,
                         'date': int(time.mktime(distributer.date.timetuple()))}
@@ -210,10 +210,10 @@ class Distributer():
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'feeAddress' in settings and (validator.validAddress(settings['feeAddress']) or settings['feeAddress'] == ''):
-                distributer.feeAddress = settings['feeAddress']
-            elif 'feeAddress' in settings:
-                self.error = 'Invalid feeAddress'
+            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+                distributer.fee_address = settings['fee_address']
+            elif 'fee_address' in settings:
+                self.error = 'Invalid fee_address'
 
             if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
                 distributer.maximum_transaction_fee = settings['maximum_transaction_fee']
@@ -405,13 +405,13 @@ class DoDistributing():
         optimal = []
         value_to_distribute = amount-distributer.maximum_transaction_fee
 
-        if distributer.fee_percentage != 0 and distributer.feeAddress != '':
+        if distributer.fee_percentage != 0 and distributer.fee_address != '':
             distributing_fee = int(value_to_distribute * (distributer.fee_percentage / 100.0))
             if distributing_fee < 10000:
                 distributing_fee = 10000
 
             value_to_distribute -= distributing_fee
-            optimal.append({'address': distributer.feeAddress, 'value': distributing_fee})
+            optimal.append({'address': distributer.fee_address, 'value': distributing_fee})
 
         if value_to_distribute < distributer.minimum_amount:
             self.error = 'minimum_amount is lower than the amount available to distribute.'

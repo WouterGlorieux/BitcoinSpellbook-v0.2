@@ -625,8 +625,8 @@ class saveForwarder(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('feeAddress', None) is not None:
-                    settings['feeAddress'] = self.request.get('feeAddress')
+                if self.request.get('fee_address', None) is not None:
+                    settings['fee_address'] = self.request.get('fee_address')
 
                 if self.request.get('confirmAmount'):
                     try:
@@ -787,8 +787,8 @@ class saveDistributer(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('feeAddress', None) is not None:
-                    settings['feeAddress'] = self.request.get('feeAddress')
+                if self.request.get('fee_address', None) is not None:
+                    settings['fee_address'] = self.request.get('fee_address')
 
                 if self.request.get('maximum_transaction_fee'):
                     try:
@@ -1120,8 +1120,8 @@ class saveWriter(webapp2.RequestHandler):
                     except ValueError:
                         response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('feeAddress', None) is not None:
-                    settings['feeAddress'] = self.request.get('feeAddress')
+                if self.request.get('fee_address', None) is not None:
+                    settings['fee_address'] = self.request.get('fee_address')
 
                 if self.request.get('maximum_transaction_fee'):
                     try:

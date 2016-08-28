@@ -45,7 +45,7 @@ def forwarderToDict(forwarder):
                       'youtube': forwarder.youtube,
                       'status': forwarder.status,
                       'confirmAmount': forwarder.confirmAmount,
-                      'feeAddress': forwarder.feeAddress,
+                      'fee_address': forwarder.fee_address,
                       'fee_percentage': forwarder.fee_percentage,
                       'minimum_amount': forwarder.minimum_amount,
                       'xpub': forwarder.xpub,
@@ -189,10 +189,10 @@ class BlockForward():
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'feeAddress' in settings and (validator.validAddress(settings['feeAddress']) or settings['feeAddress'] == ''):
-                forwarder.feeAddress = settings['feeAddress']
-            elif 'feeAddress' in settings:
-                self.error = 'Invalid feeAddress'
+            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+                forwarder.fee_address = settings['fee_address']
+            elif 'fee_address' in settings:
+                self.error = 'Invalid fee_address'
 
             if 'confirmAmount' in settings and validator.validAmount(settings['confirmAmount']):
                 forwarder.confirmAmount = settings['confirmAmount']
@@ -328,10 +328,10 @@ class DoForwarding():
                                 "Insufficient amount to send, please remove UTXO manually as soon as possible.")
 
                     elif len(to_addresses) > 0:
-                        if forwarder.fee_percentage > 0.0 and forwarder.feeAddress != '':
+                        if forwarder.fee_percentage > 0.0 and forwarder.fee_address != '':
                             fee = int(amounts[0] * forwarder.fee_percentage / 100)
                             amounts = [amounts[0] - fee, fee]
-                            to_addresses.append(forwarder.feeAddress)
+                            to_addresses.append(forwarder.fee_address)
                             logging.info("Forwarding Fee: " + str(amounts[1]) + " -> " + str(to_addresses[1]))
 
                         if forwarder.confirmAmount > 0:

@@ -85,8 +85,8 @@ def writerToDict(writer):
     if writer.youtube:
         writer_dict['youtube'] = writer.youtube
 
-    if writer.feeAddress:
-        writer_dict['feeAddress'] = writer.feeAddress
+    if writer.fee_address:
+        writer_dict['fee_address'] = writer.fee_address
 
     if writer.fee_percentage:
         writer_dict['fee_percentage'] = writer.fee_percentage
@@ -236,10 +236,10 @@ class Writer():
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'feeAddress' in settings and (validator.validAddress(settings['feeAddress']) or settings['feeAddress'] == ''):
-                writer.feeAddress = settings['feeAddress']
-            elif 'feeAddress' in settings:
-                self.error = 'Invalid feeAddress'
+            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+                writer.fee_address = settings['fee_address']
+            elif 'fee_address' in settings:
+                self.error = 'Invalid fee_address'
 
             if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
                 writer.maximum_transaction_fee = settings['maximum_transaction_fee']
