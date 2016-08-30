@@ -32,7 +32,7 @@ class BlockVoter():
             self.error = 'Options must be of type: List'
 
         if isinstance(vote_cost, int) and vote_cost >= MINIMUM_VOTE_COST:
-            self.voteCost = vote_cost
+            self.vote_cost = vote_cost
         else:
             self.error = 'Invalid vote_cost, must be minimum ' + str(MINIMUM_VOTE_COST) + ' Satoshis'
 
@@ -43,11 +43,11 @@ class BlockVoter():
 
         self.weight_values = []
 
-    def setWeights(self, weights='Equal', registration_address="", registration_block_height=0, registration_xpub=""):
-        if weights in ['Value', 'Equal', 'sil', 'LBL', 'LRL', 'LSL']:
+    def set_weights(self, weights='Equal', registration_address="", registration_block_height=0, registration_xpub=""):
+        if weights in ['Value', 'Equal', 'SIL', 'LBL', 'LRL', 'LSL']:
             self.weights = weights
 
-            if weights in ['sil', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
+            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
 
                 if isinstance(registration_block_height, int) and registration_block_height >= 0:
                     self.registration_address = registration_address
@@ -60,31 +60,32 @@ class BlockVoter():
                 else:
                     self.error = 'Registration block_height must be a integer greater than or equal to zero.'
 
-            elif weights in ['sil', 'LBL', 'LRL', 'LSL']:
+            elif weights in ['SIL', 'LBL', 'LRL', 'LSL']:
                 self.error = 'Invalid registration address'
 
-    def getOptions(self):
+    def get_options(self):
         options_dict = {}
         for i in range(0, len(self.options)):
             option = {'description': self.options[i],
-                      'amount': self.voteCost + i}
-            option['QR'] = "http://www.btcfrog.com/qr/bitcoinPNG.php?address=" + str(self.address) + "&amount=" + str(option['amount']/1e8) + "&error=H"
+                      'amount': self.vote_cost + i}
+            option['QR'] = "http://www.btcfrog.com/qr/bitcoinPNG.php?address={0}&amount={1}&error=H".format(
+                str(self.address), str(option['amount'] / 1e8))
             options_dict[i] = option
 
         return sorted(options_dict.iteritems())
 
-    def getProposalHash(self):
+    def get_proposal_hash(self):
         proposal_data = self.address + self.proposal + str(self.options)
         proposal_hash = hashlib.sha256(proposal_data).hexdigest()
         return proposal_hash
 
-    def getProposal(self):
+    def get_proposal(self):
         response = {'success': 0}
         if self.error == '':
             proposal = {'address': self.address,
                         'proposal': self.proposal,
-                        'options': self.getOptions(),
-                        'voteCost': self.voteCost}
+                        'options': self.get_options(),
+                        'vote_cost': self.vote_cost}
 
             if self.weights != '':
                 proposal['weights'] = self.weights
@@ -95,7 +96,7 @@ class BlockVoter():
             if self.registration_block_height != 0:
                 proposal['registration_block_height'] = self.registration_block_height
 
-            proposal['proposalHash'] = self.getProposalHash()
+            proposal['proposalHash'] = self.get_proposal_hash()
 
             response['proposal'] = proposal
             response['success'] = 1
@@ -104,7 +105,7 @@ class BlockVoter():
 
         return response
 
-    def getResults(self, block_height=0):
+    def get_results(self, block_height=0):
         response = {'success': 0}
 
         digits = len(str(len(self.options)))
@@ -116,8 +117,9 @@ class BlockVoter():
             else:
                 self.error = latest_block_data['error']
 
-        if self.weights in ['sil', 'LBL', 'LRL', 'LSL']:
-            if self.weights == 'sil':
+        if self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
+            weights_data = {}
+            if self.weights == 'SIL':
                 weights_data = BlockInputs.get_sil(self.registration_address, self.registration_block_height)
             elif self.weights == 'LBL':
                 weights_data = BlockLinker.BlockLinker(self.registration_address,
@@ -145,18 +147,18 @@ class BlockVoter():
         else:
             self.error = 'Unable to retrieve transactions for address ' + self.address
 
-        votes = self.convertTXS2Votes(txs, block_height, digits)
-        results = self.calcResults(votes)
+        votes = self.txs_to_votes(txs, block_height, digits)
+        results = self.calc_results(votes)
 
         if self.error == '':
             response['votes'] = votes
             response['results'] = results
-            response['options'] = self.getOptions()
-            response['voteCost'] = self.voteCost
+            response['options'] = self.get_options()
+            response['vote_cost'] = self.vote_cost
             response['block_height'] = block_height
             response['proposal'] = self.proposal
             response['address'] = self.address
-            response['proposalHash'] = self.getProposalHash()
+            response['proposalHash'] = self.get_proposal_hash()
 
             if self.weights != '':
                 response['weights'] = self.weights
@@ -174,7 +176,7 @@ class BlockVoter():
 
         return response
 
-    def convertTXS2Votes(self, txs, block_height, significant_digits=1):
+    def txs_to_votes(self, txs, block_height, significant_digits=1):
         votes = {}
         if self.error == '':
             for i in range(0, len(txs)):
@@ -183,7 +185,7 @@ class BlockVoter():
                     vote = str(txs[i]['receivedValue'])[-significant_digits:]
                     value = txs[i]['receivedValue'] - int(vote)
 
-                    if (self.weights == 'Value' and value >= self.voteCost) or value == self.voteCost:
+                    if (self.weights == 'Value' and value >= self.vote_cost) or value == self.vote_cost:
                         if voter in votes:
                             votes[voter]['lastVote'] = vote
                             votes[voter]['value'] += value
@@ -192,7 +194,7 @@ class BlockVoter():
 
         return votes
 
-    def calcResults(self, votes):
+    def calc_results(self, votes):
         results = {}
         for voter in votes:
 
@@ -213,7 +215,7 @@ class BlockVoter():
                 else:
                     results[option] = 1
 
-            elif self.weights in ['sil', 'LBL', 'LRL', 'LSL']:
+            elif self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
                 value = 0
                 for tx_input in self.weight_values:
                     if tx_input[0] == voter:

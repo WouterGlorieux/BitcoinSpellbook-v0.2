@@ -25,7 +25,7 @@ class BlockLinker():
             sil_data = BlockInputs.get_sil(self.address, self.block_height)
 
             if 'success' in sil_data and sil_data['success'] == 1:
-                self.sil = sil_data['sil']
+                self.sil = sil_data['SIL']
 
                 self.address_list = BIP44.get_addresses_from_xpub(self.xpub, len(self.sil))
 

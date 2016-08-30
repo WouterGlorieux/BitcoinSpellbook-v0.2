@@ -28,7 +28,7 @@ def get_sil(address, block=0):
         response['error'] = 'Invalid address: ' + address
 
     if 'error' not in response:
-        response['sil'] = sil
+        response['SIL'] = sil
         response['success'] = 1
 
     return response

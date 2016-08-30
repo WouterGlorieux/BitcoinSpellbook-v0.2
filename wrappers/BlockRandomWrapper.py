@@ -28,7 +28,7 @@ class BlockRandomWrapper():
 
     def fromSIL(self, address, block_height=0, rng_block_height=0):
         response = {'success': 0}
-        parameters = {'source': 'sil',
+        parameters = {'source': 'SIL',
                       'address': address,
                       'block_height': str(block_height),
                       'rng_block_height': str(rng_block_height)}

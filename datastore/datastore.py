@@ -65,7 +65,7 @@ class Distributer(ndb.Model):
     creator = ndb.StringProperty(default='')
     creator_email = ndb.StringProperty(default='')
     address = ndb.StringProperty(indexed=True)
-    distribution_source = ndb.StringProperty(choices=['Custom', 'sil', 'LBL', 'LRL', 'LSL'], default='Custom')
+    distribution_source = ndb.StringProperty(choices=['Custom', 'SIL', 'LBL', 'LRL', 'LSL'], default='Custom')
     distribution = ndb.JsonProperty(default=[])
     registration_address = ndb.StringProperty(default='')
     registration_xpub = ndb.StringProperty(default='')

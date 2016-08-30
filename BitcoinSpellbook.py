@@ -396,7 +396,7 @@ class proportionalRandom(webapp2.RequestHandler):
             block_height = 0
             rng_block_height = 0
             xpub = ''
-            source = 'sil'
+            source = 'SIL'
 
             if self.request.get('block_height'):
                 try:
@@ -413,7 +413,7 @@ class proportionalRandom(webapp2.RequestHandler):
             if self.request.get('xpub'):
                 xpub = self.request.get('xpub')
 
-            if self.request.get('source') and self.request.get('source') in ['sil', 'LBL', 'LRL', 'LSL']:
+            if self.request.get('source') and self.request.get('source') in ['SIL', 'LBL', 'LRL', 'LSL']:
                 source = self.request.get('source')
 
             response = BlockRandom.Random(address, block_height, xpub).proportional_random(source, rng_block_height)
@@ -483,9 +483,9 @@ class proposal(webapp2.RequestHandler):
             registration_xpub = self.request.get('registration_xpub')
 
         blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
-        blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)
+        blockvoter.set_weights(weights, registration_address, registration_block_height, registration_xpub)
 
-        response = blockvoter.getProposal()
+        response = blockvoter.get_proposal()
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -540,9 +540,9 @@ class results(webapp2.RequestHandler):
             registration_xpub = self.request.get('registration_xpub')
 
         blockvoter = BlockVoter.BlockVoter(address, proposal, options, vote_cost)
-        blockvoter.setWeights(weights, registration_address, registration_block_height, registration_xpub)
+        blockvoter.set_weights(weights, registration_address, registration_block_height, registration_xpub)
 
-        response = blockvoter.getResults(block_height)
+        response = blockvoter.get_results(block_height)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -733,7 +733,7 @@ class saveDistributer(webapp2.RequestHandler):
 
                 settings = {}
 
-                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'sil', 'Custom']:
+                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
                     settings['distribution_source'] = self.request.get('distribution_source')
 
                 if self.request.get('registration_address', None) is not None:
