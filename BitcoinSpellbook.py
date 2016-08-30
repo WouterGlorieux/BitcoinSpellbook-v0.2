@@ -1191,12 +1191,12 @@ class Profile(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockProfile.Profile(address, block_height)
+                    response = BlockProfile.get_profile(address, block_height)
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockProfile.Profile(address)
+                response = BlockProfile.get_profile(address)
 
         else:
             response['error'] = 'You must provide an address.'

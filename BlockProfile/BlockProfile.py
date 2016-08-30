@@ -4,7 +4,7 @@ from BlockData import BlockData
 from validators import validators as validator
 
 
-def Profile(address, block=0):
+def get_profile(address, block=0):
     response = {'success': 0}
     profile = []
 
@@ -20,7 +20,7 @@ def Profile(address, block=0):
         txs_data = BlockData.transactions(address)
         if 'success' in txs_data and txs_data['success'] == 1:
             txs = txs_data['TXS']
-            profile = TXS2profile(txs, address, block)
+            profile = txs_to_profile(txs, address, block)
         else:
             response['error'] = 'Unable to retrieve transactions'
 
@@ -34,8 +34,8 @@ def Profile(address, block=0):
     return response
 
 
-def TXS2profile(txs, address, block_height=0):
-    sorted_txs = sortTXS(txs)
+def txs_to_profile(txs, address, block_height=0):
+    sorted_txs = sort_txs(txs)
     profile = {}
     for tx in sorted_txs:
         if (block_height == 0 or tx['block_height'] <= block_height) and tx['block_height'] is not None:
@@ -71,7 +71,7 @@ def components(message):
     return re.split('[@:=]+', message)
 
 
-def sortTXS(txs):
+def sort_txs(txs):
     block_txs = {}
     for tx in txs:
         if tx['block_height'] in block_txs:
