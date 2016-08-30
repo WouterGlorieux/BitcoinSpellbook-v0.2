@@ -119,7 +119,7 @@ class Distributer():
                     if distributing_relation['relation'] == 'receiving address':
                         distributing_relation['share'] = share
 
-                    if distributer.registration_address == address and distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
+                    if distributer.registration_address == address and distributer.distribution_source in ['sil', 'LBL', 'LRL', 'LSL']:
                         distributing_relation['relation'] = 'registration address'
 
                 response[address] = distributing_relation
@@ -138,7 +138,7 @@ class Distributer():
         if self.error == '':
             distributer = datastore.Distributer.get_or_insert(self.name, parent=datastore.distributers_key())
 
-            if 'distribution_source' in settings and settings['distribution_source'] in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
+            if 'distribution_source' in settings and settings['distribution_source'] in ['LBL', 'LRL', 'LSL', 'sil', 'Custom']:
                 distributer.distribution_source = settings['distribution_source']
             elif 'distribution_source' in settings:
                 self.error = 'Invalid distribution_source'
@@ -276,12 +276,12 @@ class Distributer():
 
             if distributer:
                 distribution = distributer.distribution
-                if distributer.distribution_source == 'SIL':
+                if distributer.distribution_source == 'sil':
                     SIL_data = BlockInputs.get_sil(distributer.registration_address, distributer.registration_block_height)
                     if 'success' in SIL_data and SIL_data['success'] == 1:
-                        distribution = SIL_data['SIL']
+                        distribution = SIL_data['sil']
                     else:
-                        self.error = 'Unable to retrieve SIL'
+                        self.error = 'Unable to retrieve sil'
 
                 elif distributer.distribution_source in ['LBL', 'LRL', 'LSL']:
                     linker = BlockLinker.BlockLinker(distributer.registration_address,
@@ -289,11 +289,11 @@ class Distributer():
                                                      distributer.registration_block_height)
                     linker_data = {}
                     if distributer.distribution_source == 'LBL':
-                        linker_data = linker.LBL()
+                        linker_data = linker.get_lbl()
                     elif distributer.distribution_source == 'LRL':
-                        linker_data = linker.LRL()
+                        linker_data = linker.get_lrl()
                     elif distributer.distribution_source == 'LSL':
-                        linker_data = linker.LSL()
+                        linker_data = linker.get_lsl()
 
                     if 'success' in linker_data and linker_data['success'] == 1:
                         distribution = linker_data[distributer.distribution_source]
@@ -351,7 +351,7 @@ class DoDistributing():
                 'Starting distribution of {0} Satoshis, minimum output value: {1}'.format(str(total_input_value),
                                                                                           str(distributer.minimum_amount)))
 
-            if distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
+            if distributer.distribution_source in ['sil', 'LBL', 'LRL', 'LSL']:
                 distribution_data = Distributer(distributer.key.id()).update_distribution()
                 if 'success' in distribution_data and distribution_data['success'] == 1:
                     distribution = distribution_data['distribution']
@@ -372,7 +372,7 @@ class DoDistributing():
                 elif distributer.address_type == 'BIP44':
                     private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.wallet_index)
 
-                if distributer.distribution_source == 'SIL' and distributer.address == distributer.registration_address:
+                if distributer.distribution_source == 'sil' and distributer.address == distributer.registration_address:
                     self.error = 'Dark magic detected! Ponzi schemes are illegal!!'
 
                 if len(optimal_outputs) > 0 and self.error == '':

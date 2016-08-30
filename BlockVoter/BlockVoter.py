@@ -44,10 +44,10 @@ class BlockVoter():
         self.weight_values = []
 
     def setWeights(self, weights='Equal', registration_address="", registration_block_height=0, registration_xpub=""):
-        if weights in ['Value', 'Equal', 'SIL', 'LBL', 'LRL', 'LSL']:
+        if weights in ['Value', 'Equal', 'sil', 'LBL', 'LRL', 'LSL']:
             self.weights = weights
 
-            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
+            if weights in ['sil', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
 
                 if isinstance(registration_block_height, int) and registration_block_height >= 0:
                     self.registration_address = registration_address
@@ -60,7 +60,7 @@ class BlockVoter():
                 else:
                     self.error = 'Registration block_height must be a integer greater than or equal to zero.'
 
-            elif weights in ['SIL', 'LBL', 'LRL', 'LSL']:
+            elif weights in ['sil', 'LBL', 'LRL', 'LSL']:
                 self.error = 'Invalid registration address'
 
     def getOptions(self):
@@ -116,21 +116,21 @@ class BlockVoter():
             else:
                 self.error = latest_block_data['error']
 
-        if self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
-            if self.weights == 'SIL':
+        if self.weights in ['sil', 'LBL', 'LRL', 'LSL']:
+            if self.weights == 'sil':
                 weights_data = BlockInputs.get_sil(self.registration_address, self.registration_block_height)
             elif self.weights == 'LBL':
                 weights_data = BlockLinker.BlockLinker(self.registration_address,
                                                        self.registration_xpub,
-                                                       self.registration_block_height).LBL()
+                                                       self.registration_block_height).get_lbl()
             elif self.weights == 'LRL':
                 weights_data = BlockLinker.BlockLinker(self.registration_address,
                                                        self.registration_xpub,
-                                                       self.registration_block_height).LRL()
+                                                       self.registration_block_height).get_lrl()
             elif self.weights == 'LSL':
                 weights_data = BlockLinker.BlockLinker(self.registration_address,
                                                        self.registration_xpub,
-                                                       self.registration_block_height).LSL()
+                                                       self.registration_block_height).get_lsl()
 
             if 'success' in weights_data and weights_data['success'] == 1:
                 self.weight_values = weights_data[self.weights]
@@ -213,7 +213,7 @@ class BlockVoter():
                 else:
                     results[option] = 1
 
-            elif self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
+            elif self.weights in ['sil', 'LBL', 'LRL', 'LSL']:
                 value = 0
                 for tx_input in self.weight_values:
                     if tx_input[0] == voter:

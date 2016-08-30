@@ -83,14 +83,14 @@ class Random():
         distribution = []
         if self.error == '':
             data = {}
-            if source == 'SIL':
+            if source == 'sil':
                 data = BlockInputs.get_sil(self.address, self.block_height)
             elif source == 'LBL':
-                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).LBL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).get_lbl()
             elif source == 'LRL':
-                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).LRL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).get_lrl()
             elif source == 'LBL':
-                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).LSL()
+                data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).get_lsl()
             else:
                 self.error = 'Unknown distribution source'
 

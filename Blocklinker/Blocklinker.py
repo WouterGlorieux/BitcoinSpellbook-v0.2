@@ -15,95 +15,95 @@ class BlockLinker():
         self.xpub = xpub
         self.block_height = block_height
 
-        self.SIL = []
+        self.sil = []
         self.balances = {}
         self.address_list = []
 
         self.error = ''
 
         if validator.validAddress(self.address) and validator.validXPUB(self.xpub):
-            SIL_data = BlockInputs.get_sil(self.address, self.block_height)
+            sil_data = BlockInputs.get_sil(self.address, self.block_height)
 
-            if 'success' in SIL_data and SIL_data['success'] == 1:
-                self.SIL = SIL_data['SIL']
+            if 'success' in sil_data and sil_data['success'] == 1:
+                self.sil = sil_data['sil']
 
-                self.address_list = BIP44.get_addresses_from_xpub(self.xpub, len(self.SIL))
+                self.address_list = BIP44.get_addresses_from_xpub(self.xpub, len(self.sil))
 
-                balances_data = BlockData.balances(concatAddresses(self.address_list))
+                balances_data = BlockData.balances(concat_addresses(self.address_list))
                 if 'success' in balances_data and balances_data['success'] == 1:
                     self.balances = balances_data['balances']
                 else:
                     self.error = 'Unable to retrieve balances'
 
             else:
-                self.error = 'Unable to retrieve SIL'
+                self.error = 'Unable to retrieve sil'
         elif not validator.validAddress(self.address):
             self.error = 'Invalid address: ' + self.address
         elif not validator.validXPUB(self.xpub):
             self.error = 'Invalid xpub: ' + self.xpub
 
-    def LBL(self):
+    def get_lbl(self):
         response = {'success': 0}
-        LBL = []
+        lbl = []
         if self.error == '':
-            for i in range(0, len(self.SIL)):
-                LBL.append([self.SIL[i][0], self.balances[self.address_list[i]]['balance']])
+            for i in range(0, len(self.sil)):
+                lbl.append([self.sil[i][0], self.balances[self.address_list[i]]['balance']])
 
-            total = float(total_value(LBL))
-            for row in LBL:
+            total = float(total_value(lbl))
+            for row in lbl:
                 row.append(row[1]/total)
 
-            response['LBL'] = LBL
+            response['lbl'] = lbl
             response['success'] = 1
         else:
             response['error'] = self.error
 
         return response
 
-    def LRL(self):
+    def get_lrl(self):
         response = {'success': 0}
-        LRL = []
+        lrl = []
         if self.error == '':
-            for i in range(0, len(self.SIL)):
-                LRL.append([self.SIL[i][0], self.balances[self.address_list[i]]['received']])
+            for i in range(0, len(self.sil)):
+                lrl.append([self.sil[i][0], self.balances[self.address_list[i]]['received']])
 
-            total = float(total_value(LRL))
-            for row in LRL:
+            total = float(total_value(lrl))
+            for row in lrl:
                 row.append(row[1]/total)
 
-            response['LRL'] = LRL
+            response['lrl'] = lrl
             response['success'] = 1
         else:
             response['error'] = self.error
 
         return response
 
-    def LSL(self):
+    def get_lsl(self):
         response = {'success': 0}
-        LSL = []
+        lsl = []
         if self.error == '':
-            for i in range(0, len(self.SIL)):
-                LSL.append([self.SIL[i][0], self.balances[self.address_list[i]]['sent']])
+            for i in range(0, len(self.sil)):
+                lsl.append([self.sil[i][0], self.balances[self.address_list[i]]['sent']])
 
-            total = float(total_value(LSL))
-            for row in LSL:
+            total = float(total_value(lsl))
+            for row in lsl:
                 row.append(row[1]/total)
 
-            response['LSL'] = LSL
+            response['lsl'] = lsl
             response['success'] = 1
         else:
             response['error'] = self.error
 
         return response
 
-    def LAL(self):
+    def get_lal(self):
         response = {'success': 0}
-        LAL = []
+        lal = []
         if self.error == '':
-            for i in range(0, len(self.SIL)):
-                LAL.append([self.SIL[i][0], self.address_list[i]])
+            for i in range(0, len(self.sil)):
+                lal.append([self.sil[i][0], self.address_list[i]])
 
-            response['LAL'] = LAL
+            response['lal'] = lal
             response['success'] = 1
         else:
             response['error'] = self.error
@@ -119,8 +119,8 @@ def total_value(linked_list):
     return total
 
 
-#this function will concatenate all adresses and put '|' between them
-def concatAddresses(addresses):
+#this function will concatenate all addresses and put '|' between them
+def concat_addresses(addresses):
     address_string = ''
     for address in addresses:
         address_string += address + '|'

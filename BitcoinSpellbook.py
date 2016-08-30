@@ -306,12 +306,12 @@ class LBL(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, block_height).LBL()
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).get_lbl()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockLinker.BlockLinker(address, xpub).LBL()
+                response = BlockLinker.BlockLinker(address, xpub).get_lbl()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -329,12 +329,12 @@ class LRL(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, block_height).LRL()
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).get_lrl()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockLinker.BlockLinker(address, xpub).LRL()
+                response = BlockLinker.BlockLinker(address, xpub).get_lrl()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -352,12 +352,12 @@ class LSL(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, block_height).LSL()
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).get_lsl()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockLinker.BlockLinker(address, xpub).LSL()
+                response = BlockLinker.BlockLinker(address, xpub).get_lsl()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -375,12 +375,12 @@ class LAL(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockLinker.BlockLinker(address, xpub, block_height).LAL()
+                    response = BlockLinker.BlockLinker(address, xpub, block_height).get_lal()
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockLinker.BlockLinker(address, xpub).LAL()
+                response = BlockLinker.BlockLinker(address, xpub).get_lal()
 
         else:
             response['error'] = 'You must provide an address and an xpub key.'
@@ -396,7 +396,7 @@ class proportionalRandom(webapp2.RequestHandler):
             block_height = 0
             rng_block_height = 0
             xpub = ''
-            source = 'SIL'
+            source = 'sil'
 
             if self.request.get('block_height'):
                 try:
@@ -413,7 +413,7 @@ class proportionalRandom(webapp2.RequestHandler):
             if self.request.get('xpub'):
                 xpub = self.request.get('xpub')
 
-            if self.request.get('source') and self.request.get('source') in ['SIL', 'LBL', 'LRL', 'LSL']:
+            if self.request.get('source') and self.request.get('source') in ['sil', 'LBL', 'LRL', 'LSL']:
                 source = self.request.get('source')
 
             response = BlockRandom.Random(address, block_height, xpub).proportionalRandom(source, rng_block_height)
@@ -733,7 +733,7 @@ class saveDistributer(webapp2.RequestHandler):
 
                 settings = {}
 
-                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
+                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'sil', 'Custom']:
                     settings['distribution_source'] = self.request.get('distribution_source')
 
                 if self.request.get('registration_address', None) is not None:
@@ -1219,7 +1219,7 @@ app = webapp2.WSGIApplication([
     ('/data/balances', balances),
     ('/data/utxos', utxos),
 
-    ('/SIL/SIL', SIL),
+    ('/sil/sil', SIL),
 
     ('/linker/LBL', LBL),
     ('/linker/LRL', LRL),

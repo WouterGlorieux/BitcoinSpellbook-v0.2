@@ -105,11 +105,11 @@ class BlockForward():
                     forwarding_relation['relation'] = 'forwarding address'
                 else:
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
-                    LAL_data = linker.LAL()
+                    LAL_data = linker.get_lal()
                     if 'success' in LAL_data and LAL_data['success'] == 1:
                         LAL = LAL_data['LAL']
 
-                    LBL_data = linker.LBL()
+                    LBL_data = linker.get_lbl()
                     if 'success' in LBL_data and LBL_data['success'] == 1:
                         LBL = LBL_data['LBL']
 
@@ -284,7 +284,7 @@ class DoForwarding():
                 if primeInputAddress != forwarder.address:
 
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
-                    LAL_data = linker.LAL()
+                    LAL_data = linker.get_lal()
                     if 'success' in LAL_data and LAL_data['success'] == 1:
                         LAL = LAL_data['LAL']
                     else:

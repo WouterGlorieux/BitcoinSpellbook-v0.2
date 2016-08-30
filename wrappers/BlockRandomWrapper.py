@@ -28,7 +28,7 @@ class BlockRandomWrapper():
 
     def fromSIL(self, address, block_height=0, rng_block_height=0):
         response = {'success': 0}
-        parameters = {'source': 'SIL',
+        parameters = {'source': 'sil',
                       'address': address,
                       'block_height': str(block_height),
                       'rng_block_height': str(rng_block_height)}
@@ -40,7 +40,7 @@ class BlockRandomWrapper():
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
         except:
-            response['error'] = 'Unable to retrieve random address from SIL'
+            response['error'] = 'Unable to retrieve random address from sil'
 
         return response
 
