@@ -204,7 +204,7 @@ def get_service_address(service, index):
     address = None
     if parameters.master_seed:
         xpub_key = BIP44.get_xpub_key(parameters.master_seed, '', service)
-        address = BIP44.getAddressFromXPUB(xpub_key, index)
+        address = BIP44.get_address_from_xpub(xpub_key, index)
 
     return address
 
@@ -214,6 +214,6 @@ def get_service_private_key(service, index):
     private_key = None
     if parameters.master_seed:
         xpriv_key = BIP44.get_xpriv_key(parameters.master_seed, '', service)
-        private_key = BIP44.getPrivKey(xpriv_key, index)
+        private_key = BIP44.get_private_key(xpriv_key, index)
 
     return private_key

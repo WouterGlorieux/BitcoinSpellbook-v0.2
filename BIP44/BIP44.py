@@ -22,12 +22,12 @@ class Wallet():
         self.mnemonic = mnemonic
         self.passphrase = passphrase
         self.account = account
-        self.xpub_keys = getXPUBKeys(self.mnemonic, self.passphrase, account+1)
-        self.xpriv_keys = getXPRIVKeys(self.mnemonic, self.passphrase, account+1)
+        self.xpub_keys = get_xpub_keys(self.mnemonic, self.passphrase, account+1)
+        self.xpriv_keys = get_xpriv_keys(self.mnemonic, self.passphrase, account+1)
 
         self.n = n
-        self.addresses = getAddressesFromXPUB(self.xpub_keys[account], self.n)
-        self.change_addresses = getChangeAddressesFromXPUB(self.xpub_keys[account], self.n)
+        self.addresses = get_addresses_from_xpub(self.xpub_keys[account], self.n)
+        self.change_addresses = get_change_addresses_from_xpub(self.xpub_keys[account], self.n)
         #showDetails(self.mnemonic, self.passphrase, 3)
 
     def scan(self):
@@ -46,7 +46,7 @@ class Wallet():
                 for j in range(0, len(data['addresses'])):
                     if data['addresses'][j]['final_balance'] > 0:
                         key_index = addressList.index(data['addresses'][j]['address'])
-                        private_key = getPrivKey(self.xpriv_keys[self.account], key_index, k)
+                        private_key = get_private_key(self.xpriv_keys[self.account], key_index, k)
                         unspent_outputs[data['addresses'][j]['address']] = {'value': data['addresses'][j]['final_balance'],
                                                                             'i': key_index,
                                                                             'private_key': private_key[data['addresses'][j]['address']],
@@ -68,13 +68,11 @@ class Wallet():
 
         return unspent_outputs
 
-
-
     def sweep(self, to_address):
         pass
 
 
-def getAddressFromXPUB(xpub, i):
+def get_address_from_xpub(xpub, i):
     pub0 = bitcoin.bip32_ckd(xpub, 0)
     public_key = bitcoin.bip32_ckd(pub0, i)
     hex_key = bitcoin.encode_pubkey(bitcoin.bip32_extract_key(public_key), 'hex_compressed')
@@ -83,7 +81,7 @@ def getAddressFromXPUB(xpub, i):
     return address
 
 
-def getAddressesFromXPUB(xpub, i=100):
+def get_addresses_from_xpub(xpub, i=100):
     address_list = []
     pub0 = bitcoin.bip32_ckd(xpub, 0)
 
@@ -96,7 +94,7 @@ def getAddressesFromXPUB(xpub, i=100):
     return address_list
 
 
-def getChangeAddressesFromXPUB(xpub, i=100):
+def get_change_addresses_from_xpub(xpub, i=100):
     address_list = []
     pub0 = bitcoin.bip32_ckd(xpub, 1)
 
@@ -109,7 +107,7 @@ def getChangeAddressesFromXPUB(xpub, i=100):
     return address_list
 
 
-def getXPRIVKeys(mnemonic, passphrase="", i=1):
+def get_xpriv_keys(mnemonic, passphrase="", i=1):
 
     seed = hexlify(bitcoin.mnemonic_to_seed(mnemonic, passphrase=passphrase))
     private_key = bitcoin.bip32_master_key(unhexlify(seed))
@@ -129,7 +127,7 @@ def get_xpriv_key(mnemonic, passphrase="", account=0):
     return xpriv_key
 
 
-def getPrivKey(xpriv, i, k=0):
+def get_private_key(xpriv, i, k=0):
     private_keys = {}
     priv0 = bitcoin.bip32_ckd(xpriv, k)
 
@@ -141,7 +139,7 @@ def getPrivKey(xpriv, i, k=0):
     return private_keys
 
 
-def getXPUBKeys(mnemonic, passphrase="", i=1):
+def get_xpub_keys(mnemonic, passphrase="", i=1):
 
     seed = hexlify(bitcoin.mnemonic_to_seed(mnemonic, passphrase=passphrase))
     priv = bitcoin.bip32_master_key(unhexlify(seed))
@@ -160,7 +158,7 @@ def get_xpub_key(mnemonic, passphrase="", account=0):
     return xpub_key
 
 
-def showDetails(mnemonic, passphrase="", i=1):
+def show_details(mnemonic, passphrase="", i=1):
 
     seed = hexlify(bitcoin.mnemonic_to_seed(mnemonic, passphrase=passphrase))
     print 'Seed:\t\t\t\t', seed
@@ -206,6 +204,3 @@ def showDetails(mnemonic, passphrase="", i=1):
         xpubs.append(xpub)
 
     return xpubs
-
-
-

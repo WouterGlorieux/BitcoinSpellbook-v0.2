@@ -27,7 +27,7 @@ class BlockLinker():
             if 'success' in SIL_data and SIL_data['success'] == 1:
                 self.SIL = SIL_data['SIL']
 
-                self.address_list = BIP44.getAddressesFromXPUB(self.xpub, len(self.SIL))
+                self.address_list = BIP44.get_addresses_from_xpub(self.xpub, len(self.SIL))
 
                 balances_data = BlockData.balances(concatAddresses(self.address_list))
                 if 'success' in balances_data and balances_data['success'] == 1:
