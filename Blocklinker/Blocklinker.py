@@ -22,7 +22,7 @@ class BlockLinker():
         self.error = ''
 
         if validator.validAddress(self.address) and validator.validXPUB(self.xpub):
-            SIL_data = BlockInputs.SIL(self.address, self.block_height)
+            SIL_data = BlockInputs.get_sil(self.address, self.block_height)
 
             if 'success' in SIL_data and SIL_data['success'] == 1:
                 self.SIL = SIL_data['SIL']

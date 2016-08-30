@@ -283,12 +283,12 @@ class SIL(webapp2.RequestHandler):
             if self.request.get('block_height'):
                 try:
                     block_height = int(self.request.get('block_height'))
-                    response = BlockInputs.SIL(address, block_height)
+                    response = BlockInputs.get_sil(address, block_height)
                 except ValueError:
                     response['error'] = 'block_height must be a positive integer.'
 
             else:
-                response = BlockInputs.SIL(address)
+                response = BlockInputs.get_sil(address)
 
         else:
             response['error'] = 'You must provide an address.'

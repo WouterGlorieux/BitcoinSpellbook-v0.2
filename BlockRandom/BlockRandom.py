@@ -84,7 +84,7 @@ class Random():
         if self.error == '':
             data = {}
             if source == 'SIL':
-                data = BlockInputs.SIL(self.address, self.block_height)
+                data = BlockInputs.get_sil(self.address, self.block_height)
             elif source == 'LBL':
                 data = BlockLinker.BlockLinker(self.address, self.xpub, self.block_height).LBL()
             elif source == 'LRL':

@@ -4,9 +4,9 @@ from BlockData import BlockData
 from validators import validators as validator
 
 
-def SIL(address, block=0):
+def get_sil(address, block=0):
     response = {'success': 0}
-    SIL = []
+    sil = []
 
     if validator.validAddress(address):
         if block == 0:
@@ -20,7 +20,7 @@ def SIL(address, block=0):
         txs_data = BlockData.transactions(address)
         if 'success' in txs_data and txs_data['success'] == 1:
             txs = txs_data['TXS']
-            SIL = txs_2_SIL(txs, block)
+            sil = txs_2_sil(txs, block)
         else:
             response['error'] = 'Unable to retrieve transactions'
 
@@ -28,44 +28,44 @@ def SIL(address, block=0):
         response['error'] = 'Invalid address: ' + address
 
     if 'error' not in response:
-        response['SIL'] = SIL
+        response['sil'] = sil
         response['success'] = 1
 
     return response
 
 
-def txs_2_SIL(txs, block=0):
+def txs_2_sil(txs, block=0):
 
-    sorted_txs = sortTXS(txs)
-    SIL = []
+    sorted_txs = sort_txs(txs)
+    sil = []
     for tx in sorted_txs:
-        if tx['receiving'] == True and (block == 0 or tx['block_height'] <= block) and tx['block_height'] is not None:
+        if tx['receiving'] is True and (block == 0 or tx['block_height'] <= block) and tx['block_height'] is not None:
             recurring = False
-            for i in range(0, len(SIL)):
-                if SIL[i][0] == tx['primeInputAddress']:
-                    SIL[i][1] += tx['receivedValue']
+            for i in range(0, len(sil)):
+                if sil[i][0] == tx['primeInputAddress']:
+                    sil[i][1] += tx['receivedValue']
                     recurring = True
 
             if not recurring:
-                SIL.append([tx['primeInputAddress'], tx['receivedValue'], 0, tx['block_height']])
+                sil.append([tx['primeInputAddress'], tx['receivedValue'], 0, tx['block_height']])
 
-    total = float(totalReceived(SIL))
+    total = float(total_received(sil))
 
-    for row in SIL:
+    for row in sil:
         row[2] = row[1]/total
 
-    return SIL
+    return sil
 
 
-def totalReceived(SIL):
+def total_received(sil):
     total = 0
-    for tx_input in SIL:
+    for tx_input in sil:
         total += tx_input[1]
 
     return total
 
 
-def sortTXS(txs):
+def sort_txs(txs):
     block_txs = {}
     for tx in txs:
         if tx['block_height'] in block_txs:

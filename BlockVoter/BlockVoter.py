@@ -118,7 +118,7 @@ class BlockVoter():
 
         if self.weights in ['SIL', 'LBL', 'LRL', 'LSL']:
             if self.weights == 'SIL':
-                weights_data = BlockInputs.SIL(self.registration_address, self.registration_block_height)
+                weights_data = BlockInputs.get_sil(self.registration_address, self.registration_block_height)
             elif self.weights == 'LBL':
                 weights_data = BlockLinker.BlockLinker(self.registration_address,
                                                        self.registration_xpub,
