@@ -11,7 +11,7 @@ class BlockLinkerWrapper():
     def __init__(self, url):
         self.url = url
 
-    def LBL(self, address, xpub, block_height=0):
+    def get_lbl(self, address, xpub, block_height=0):
         response = {'success': 0}
         parameters = {'address': address,
                       'xpub': xpub,
@@ -28,7 +28,7 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LRL(self, address, xpub, block_height=0):
+    def get_lrl(self, address, xpub, block_height=0):
         response = {'success': 0}
         parameters = {'address': address,
                       'xpub': xpub,
@@ -45,7 +45,7 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LSL(self, address, xpub, block_height=0):
+    def get_lsl(self, address, xpub, block_height=0):
         response = {'success': 0}
         parameters = {'address': address,
                       'xpub': xpub,
@@ -62,7 +62,7 @@ class BlockLinkerWrapper():
 
         return response
 
-    def LAL(self, address, xpub, block_height=0):
+    def get_lal(self, address, xpub, block_height=0):
         response = {'success': 0}
         parameters = {'address': address,
                       'xpub': xpub,
