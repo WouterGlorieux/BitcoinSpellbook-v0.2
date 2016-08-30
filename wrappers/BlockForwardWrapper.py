@@ -14,7 +14,7 @@ class BlockForwardWrapper():
     def __init__(self, url):
         self.url = url
 
-    def getForwarders(self):
+    def get_forwarders(self):
         response = {'success': 0}
         parameters = {}
 
@@ -29,7 +29,7 @@ class BlockForwardWrapper():
 
         return response
 
-    def getForwarder(self, name):
+    def get_forwarder(self, name):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -44,7 +44,7 @@ class BlockForwardWrapper():
 
         return response
 
-    def checkAddress(self, name, address):
+    def check_address(self, name, address):
         response = {'success': 0}
         parameters = {'name': name,
                       'address': address}
@@ -60,7 +60,7 @@ class BlockForwardWrapper():
 
         return response
 
-    def saveForwarder(self, name, settings=None, api_key='', api_secret=''):
+    def save_forwarder(self, name, settings=None, api_key='', api_secret=''):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -87,7 +87,7 @@ class BlockForwardWrapper():
 
         return response
 
-    def deleteForwarder(self, name, api_key='', api_secret=''):
+    def delete_forwarder(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -112,7 +112,7 @@ class BlockForwardWrapper():
 
         return response
 
-    def doForwarding(self, name=''):
+    def do_forwarding(self, name=''):
         response = {'success': 0}
         parameters = {'name': name}
 
