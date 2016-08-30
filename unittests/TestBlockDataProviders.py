@@ -43,14 +43,14 @@ def difference(a, b):
 
 
 api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
-print api.saveProvider('Blocktrail.com', 0, 'Blocktrail.com', 'a8a84ed2929da8313d75d16e04be2a26c4cc4ea4', key, secret)
-print api.saveProvider('Blockchain.info', 1, 'Blockchain.info', '', key, secret)
-print api.saveProvider('Blockexplorer.com', 2, 'Insight', 'https://www.blockexplorer.com/api', key, secret)
-print api.saveProvider('Bitpay.com', 3, 'Insight', 'https://insight.bitpay.com/api', key, secret)
+print api.save_provider('Blocktrail.com', 0, 'Blocktrail.com', 'a8a84ed2929da8313d75d16e04be2a26c4cc4ea4', key, secret)
+print api.save_provider('Blockchain.info', 1, 'Blockchain.info', '', key, secret)
+print api.save_provider('Blockexplorer.com', 2, 'Insight', 'https://www.blockexplorer.com/api', key, secret)
+print api.save_provider('Bitpay.com', 3, 'Insight', 'https://insight.bitpay.com/api', key, secret)
 
 
 print '=============get providers========================'
-providers = api.getProviders()
+providers = api.get_providers()
 providerNames = []
 for i in range(0, len(providers['providersList'])):
     providerNames.append(providers['providersList'][i]['name'])
@@ -74,7 +74,7 @@ compare_data(blockData)
 print '==============latestBlock======================='
 latestBlockData = []
 for i in range(0, len(providerNames)):
-    data = api.latestBlock(providerNames[i])
+    data = api.latest_block(providerNames[i])
     if 'success' in data and data['success'] == 1:
         latestBlockData.append(data['latestBlock'])
         print latestBlockData[i]

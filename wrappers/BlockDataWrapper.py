@@ -96,7 +96,7 @@ class BlockDataWrapper():
 
         return response
 
-    def latestBlock(self, provider=''):
+    def latest_block(self, provider=''):
         response = {'success': 0}
         parameters = {'provider': provider}
 
@@ -111,7 +111,7 @@ class BlockDataWrapper():
 
         return response
 
-    def primeInputAddress(self, txid, provider=''):
+    def prime_input_address(self, txid, provider=''):
         response = {'success': 0}
         parameters = {'txid': txid,
                       'provider': provider}
@@ -127,7 +127,7 @@ class BlockDataWrapper():
 
         return response
 
-    def saveProvider(self, name, priority, provider_type, param="", api_key='', api_secret=''):
+    def save_provider(self, name, priority, provider_type, param="", api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name,
                       'priority': priority,
@@ -157,7 +157,7 @@ class BlockDataWrapper():
 
         return response
 
-    def deleteProvider(self, name, api_key='', api_secret=''):
+    def delete_provider(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -182,7 +182,7 @@ class BlockDataWrapper():
 
         return response
 
-    def getProviders(self):
+    def get_providers(self):
         response = {'success': 0}
         parameters = {}
 
