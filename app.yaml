@@ -50,7 +50,7 @@ handlers:
   login: admin
 
 
-- url: /SIL/SIL
+- url: /inputs/SIL
   script: BitcoinSpellbook.app
 
 - url: /linker/LBL

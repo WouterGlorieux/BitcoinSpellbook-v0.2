@@ -1220,7 +1220,7 @@ app = webapp2.WSGIApplication([
     ('/data/balances', Balances),
     ('/data/utxos', Utxos),
 
-    ('/sil/sil', SIL),
+    ('/inputs/SIL', SIL),
 
     ('/linker/LBL', LBL),
     ('/linker/LRL', LRL),

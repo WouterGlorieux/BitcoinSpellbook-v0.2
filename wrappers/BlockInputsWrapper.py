@@ -17,7 +17,7 @@ class BlockInputsWrapper():
                       'block_height': str(block_height)}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/sil/sil?" + query_string
+        url = self.url + "/inputs/SIL?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
