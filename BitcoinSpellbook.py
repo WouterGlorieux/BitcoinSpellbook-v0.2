@@ -549,7 +549,7 @@ class results(webapp2.RequestHandler):
 
 class getForwarders(webapp2.RequestHandler):
     def get(self):
-        response = BlockForward.getForwarders()
+        response = BlockForward.get_forwarders()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -573,7 +573,7 @@ class checkForwarderAddress(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-        response = BlockForward.BlockForward(name).checkAddress(address)
+        response = BlockForward.BlockForward(name).check_address(address)
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -646,7 +646,7 @@ class saveForwarder(webapp2.RequestHandler):
                 if self.request.get('private_key', None) is not None:
                     settings['private_key'] = self.request.get('private_key')
 
-                response = BlockForward.BlockForward(name).saveForwarder(settings)
+                response = BlockForward.BlockForward(name).save_forwarder(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -668,7 +668,7 @@ class deleteForwarder(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = BlockForward.BlockForward(name).deleteForwarder()
+                response = BlockForward.BlockForward(name).delete_forwarder()
         else:
             response['error'] = authentication['error']
 

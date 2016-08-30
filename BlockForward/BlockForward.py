@@ -23,7 +23,7 @@ REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 TRANSACTION_FEE = 10000  # in Satoshis
 
 
-def getNextIndex():
+def get_next_index():
     forwarders_query = datastore.Forwarder.query(ancestor=datastore.forwarders_key()).order(
         -datastore.Forwarder.wallet_index)
     forwarders = forwarders_query.fetch()
@@ -36,7 +36,7 @@ def getNextIndex():
     return i
 
 
-def forwarderToDict(forwarder):
+def forwarder_to_dict(forwarder):
     forwarder_dict = {'name': forwarder.key.id(),
                       'address': forwarder.address,
                       'description': forwarder.description,
@@ -55,7 +55,7 @@ def forwarderToDict(forwarder):
     return forwarder_dict
 
 
-def getForwarders():
+def get_forwarders():
     response = {'success': 0}
     forwarders = []
 
@@ -64,7 +64,7 @@ def getForwarders():
                                                  ancestor=datastore.forwarders_key()).order(-datastore.Forwarder.date)
     data = forwarders_query.fetch()
     for forwarder in data:
-        forwarders.append(forwarderToDict(forwarder))
+        forwarders.append(forwarder_to_dict(forwarder))
 
     response['forwarders'] = forwarders
     response['success'] = 1
@@ -87,14 +87,14 @@ class BlockForward():
             forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
 
             if forwarder:
-                response['forwarder'] = forwarderToDict(forwarder)
+                response['forwarder'] = forwarder_to_dict(forwarder)
                 response['success'] = 1
             else:
                 response['error'] = 'No forwarder with that name found.'
 
         return response
 
-    def checkAddress(self, address):
+    def check_address(self, address):
         response = {'success': 0}
         if self.error == '':
             forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
@@ -136,7 +136,7 @@ class BlockForward():
 
         return response
 
-    def saveForwarder(self, settings=None):
+    def save_forwarder(self, settings=None):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -218,7 +218,7 @@ class BlockForward():
                 forwarder.address = bitcoin.privtoaddr(forwarder.private_key)
             elif forwarder.address_type == 'BIP44':
                 if forwarder.wallet_index == 0:
-                    forwarder.wallet_index = getNextIndex()
+                    forwarder.wallet_index = get_next_index()
                 forwarder.address = datastore.get_service_address(datastore.Services.BlockForward,
                                                                   forwarder.wallet_index)
 
@@ -227,7 +227,7 @@ class BlockForward():
 
             if self.error == '':
                 forwarder.put()
-                response['forwarder'] = forwarderToDict(forwarder)
+                response['forwarder'] = forwarder_to_dict(forwarder)
                 response['success'] = 1
 
             else:
@@ -235,7 +235,7 @@ class BlockForward():
 
         return response
 
-    def deleteForwarder(self):
+    def delete_forwarder(self):
         response = {'success': 0}
 
         if self.error == '':
