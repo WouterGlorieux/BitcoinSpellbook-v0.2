@@ -24,7 +24,7 @@ REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 TRANSACTION_FEE = 10000  # in Satoshis
 
 
-def getNextIndex():
+def get_next_index():
     distributers_query = datastore.Distributer.query(ancestor=datastore.distributers_key()).order(-datastore.Distributer.wallet_index)
     distributers = distributers_query.fetch()
 
@@ -36,7 +36,7 @@ def getNextIndex():
     return i
 
 
-def distributerToDict(distributer):
+def distributer_to_dict(distributer):
     distributer_dict = {'name': distributer.key.id(),
                         'address': distributer.address,
                         'distribution_source': distributer.distribution_source,
@@ -60,7 +60,7 @@ def distributerToDict(distributer):
     return distributer_dict
 
 
-def getDistributers():
+def get_distributers():
     response = {'success': 0}
     distributers = []
 
@@ -69,7 +69,7 @@ def getDistributers():
                                                      ancestor=datastore.distributers_key()).order(-datastore.Distributer.date)
     data = distributers_query.fetch()
     for distributer in data:
-        distributers.append(distributerToDict(distributer))
+        distributers.append(distributer_to_dict(distributer))
 
     response['distributers'] = distributers
     response['success'] = 1
@@ -92,14 +92,14 @@ class Distributer():
             distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
 
             if distributer:
-                response['distributer'] = distributerToDict(distributer)
+                response['distributer'] = distributer_to_dict(distributer)
                 response['success'] = 1
             else:
                 response['error'] = 'No distributer with that name found.'
 
         return response
 
-    def checkAddress(self, address):
+    def check_address(self, address):
         response = {'success': 0}
         if self.error == '':
             distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
@@ -130,7 +130,7 @@ class Distributer():
 
         return response
 
-    def saveDistributer(self, settings=None):
+    def save_distributer(self, settings=None):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -239,7 +239,7 @@ class Distributer():
                 distributer.address = bitcoin.privtoaddr(distributer.private_key)
             elif distributer.address_type == 'BIP44':
                 if distributer.wallet_index == 0:
-                    distributer.wallet_index = getNextIndex()
+                    distributer.wallet_index = get_next_index()
                 distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.wallet_index)
 
             if not validator.validAddress(distributer.address):
@@ -247,14 +247,14 @@ class Distributer():
 
             if self.error == '':
                 distributer.put()
-                response['distributer'] = distributerToDict(distributer)
+                response['distributer'] = distributer_to_dict(distributer)
                 response['success'] = 1
             else:
                 response['error'] = self.error
 
         return response
 
-    def deleteDistributer(self):
+    def delete_distributer(self):
         response = {'success': 0}
 
         if self.error == '':
@@ -268,7 +268,7 @@ class Distributer():
 
         return response
 
-    def updateDistribution(self):
+    def update_distribution(self):
         response = {'success': 0}
 
         if self.error == '':
@@ -352,7 +352,7 @@ class DoDistributing():
                                                                                           str(distributer.minimum_amount)))
 
             if distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
-                distribution_data = Distributer(distributer.key.id()).updateDistribution()
+                distribution_data = Distributer(distributer.key.id()).update_distribution()
                 if 'success' in distribution_data and distribution_data['success'] == 1:
                     distribution = distribution_data['distribution']
                 else:
@@ -362,7 +362,7 @@ class DoDistributing():
 
             if validator.validDistribution(distribution):
                 logging.info("distribution: " + str(distribution))
-                optimal_outputs = self.optimalOutputs(total_input_value, distribution, distributer)
+                optimal_outputs = self.optimal_outputs(total_input_value, distribution, distributer)
                 logging.info("optimal outputs: " + str(optimal_outputs))
 
                 private_keys = {}
@@ -401,7 +401,7 @@ class DoDistributing():
 
         return success
 
-    def optimalOutputs(self, amount, distribution, distributer):
+    def optimal_outputs(self, amount, distribution, distributer):
         optimal = []
         value_to_distribute = amount-distributer.maximum_transaction_fee
 

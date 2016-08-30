@@ -689,7 +689,7 @@ class doForwarding(webapp2.RequestHandler):
 
 class getDistributers(webapp2.RequestHandler):
     def get(self):
-        response = BlockDistribute.getDistributers()
+        response = BlockDistribute.get_distributers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -713,7 +713,7 @@ class checkDistributerAddress(webapp2.RequestHandler):
         if self.request.get('address'):
             address = self.request.get('address')
 
-        response = BlockDistribute.Distributer(name).checkAddress(address)
+        response = BlockDistribute.Distributer(name).check_address(address)
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -808,7 +808,7 @@ class saveDistributer(webapp2.RequestHandler):
                 if self.request.get('private_key', None) is not None:
                     settings['private_key'] = self.request.get('private_key')
 
-                response = BlockDistribute.Distributer(name).saveDistributer(settings)
+                response = BlockDistribute.Distributer(name).save_distributer(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -830,7 +830,7 @@ class deleteDistributer(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = BlockDistribute.Distributer(name).deleteDistributer()
+                response = BlockDistribute.Distributer(name).delete_distributer()
         else:
             response['error'] = authentication['error']
 
@@ -849,7 +849,7 @@ class updateDistribution(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = BlockDistribute.Distributer(name).updateDistribution()
+                response = BlockDistribute.Distributer(name).update_distribution()
         else:
             response['error'] = authentication['error']
 
