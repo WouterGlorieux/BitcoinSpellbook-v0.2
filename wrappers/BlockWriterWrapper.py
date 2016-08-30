@@ -14,7 +14,7 @@ class BlockWriterWrapper():
     def __init__(self, url):
         self.url = url
 
-    def getWriters(self):
+    def get_writers(self):
         response = {'success': 0}
         parameters = {}
 
@@ -29,7 +29,7 @@ class BlockWriterWrapper():
 
         return response
 
-    def getWriter(self, name=''):
+    def get_writer(self, name=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -44,7 +44,7 @@ class BlockWriterWrapper():
 
         return response
 
-    def saveWriter(self, name, settings=None, api_key='', api_secret=''):
+    def save_writer(self, name, settings=None, api_key='', api_secret=''):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -71,7 +71,7 @@ class BlockWriterWrapper():
 
         return response
 
-    def deleteWriter(self, name, api_key='', api_secret=''):
+    def delete_writer(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -96,7 +96,7 @@ class BlockWriterWrapper():
 
         return response
 
-    def doWriting(self, name=''):
+    def do_writing(self, name=''):
         response = {'success': 0}
         parameters = {'name': name}
 
