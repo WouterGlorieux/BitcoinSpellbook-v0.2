@@ -1061,7 +1061,7 @@ class checkTriggers(webapp2.RequestHandler):
 
 class getWriters(webapp2.RequestHandler):
     def get(self):
-        response = BlockWriter.getWriters()
+        response = BlockWriter.get_writers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -1141,7 +1141,7 @@ class saveWriter(webapp2.RequestHandler):
                 if self.request.get('private_key', None) is not None:
                     settings['private_key'] = self.request.get('private_key')
 
-                response = BlockWriter.Writer(name).saveWriter(settings)
+                response = BlockWriter.Writer(name).save_writer(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -1163,7 +1163,7 @@ class deleteWriter(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = BlockWriter.Writer(name).deleteWriter()
+                response = BlockWriter.Writer(name).delete_writer()
         else:
             response['error'] = authentication['error']
 

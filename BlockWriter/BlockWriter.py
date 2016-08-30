@@ -20,8 +20,8 @@ REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 TRANSACTION_FEE = 10000  # in Satoshis
 
 
-def getAvailableAddressIndex():
-    checkActiveAddresses()
+def get_available_address_index():
+    check_active_addresses()
     wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.module == 'BlockWriter',
                                                          datastore.WalletAddress.status == 'Available',
                                                          ancestor=datastore.address_key()).order(datastore.WalletAddress.i)
@@ -46,21 +46,23 @@ def getAvailableAddressIndex():
     return index
 
 
-def checkActiveAddresses():
+def check_active_addresses():
     writers_query = datastore.Writer.query(datastore.Writer.address_type == 'BIP44',
                                            datastore.Writer.status == 'Active',
                                            ancestor=datastore.writers_key()).order(datastore.Writer.wallet_index)
     writers = writers_query.fetch()
 
     for writer in writers:
-        wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index, parent=datastore.address_key())
+        wallet_address = datastore.WalletAddress.get_by_id(u'BlockWriter_{0:d}'.format(writer.wallet_index),
+                                                           parent=datastore.address_key())
         if wallet_address and wallet_address.status != 'InUse':
-            logging.warning("Found active writer with address not InUse status! %i %s" % (wallet_address.i, wallet_address.address))
+            logging.warning("Found active writer with address not InUse status! {0:d} {1:s}".format(wallet_address.i,
+                                                                                                    wallet_address.address))
             wallet_address.status = 'InUse'
             wallet_address.put()
 
 
-def writerToDict(writer):
+def writer_to_dict(writer):
     writer_dict = {'name': str(writer.key.id()),
                    'address': writer.address,
                    'outputs': writer.outputs,
@@ -96,14 +98,16 @@ def writerToDict(writer):
     return writer_dict
 
 
-def getWriters():
+def get_writers():
     response = {'success': 0}
     writers = []
 
-    writers_query = datastore.Writer.query(datastore.Writer.visibility == 'Public', datastore.Writer.status == 'Active', ancestor=datastore.writers_key()).order(-datastore.Writer.date)
+    writers_query = datastore.Writer.query(datastore.Writer.visibility == 'Public',
+                                           datastore.Writer.status == 'Active',
+                                           ancestor=datastore.writers_key()).order(-datastore.Writer.date)
     data = writers_query.fetch()
     for writer in data:
-        writers.append(writerToDict(writer))
+        writers.append(writer_to_dict(writer))
 
     response['writers'] = writers
     response['success'] = 1
@@ -111,7 +115,7 @@ def getWriters():
     return response
 
 
-def estimateTXsize(outputs, message):
+def estimate_tx_size(outputs, message):
     dummy_outputs = []
     total_output_value = 0
     for output in outputs:
@@ -160,14 +164,14 @@ class Writer():
             writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
 
             if writer:
-                response['writer'] = writerToDict(writer)
+                response['writer'] = writer_to_dict(writer)
                 response['success'] = 1
             else:
                 response['error'] = 'No writer with that name found.'
 
         return response
 
-    def saveWriter(self, settings=None):
+    def save_writer(self, settings=None):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -189,7 +193,7 @@ class Writer():
                     total_output_value += output[1]
 
                 writer.amount = total_output_value
-                writer.recommended_fee = int((estimateTXsize(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
+                writer.recommended_fee = int((estimate_tx_size(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
                 if writer.recommended_fee > writer.maximum_transaction_fee:
                     writer.transaction_fee = writer.maximum_transaction_fee
@@ -266,7 +270,7 @@ class Writer():
 
             elif writer.address_type == 'BIP44':
                 if writer.wallet_index == 0:
-                    writer.wallet_index = getAvailableAddressIndex()
+                    writer.wallet_index = get_available_address_index()
                 writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.wallet_index)
 
             if not validator.validAddress(writer.address):
@@ -279,7 +283,7 @@ class Writer():
 
             if self.error == '':
                 writer.put()
-                response['writer'] = writerToDict(writer)
+                response['writer'] = writer_to_dict(writer)
                 response['success'] = 1
 
             else:
@@ -287,7 +291,7 @@ class Writer():
 
         return response
 
-    def deleteWriter(self):
+    def delete_writer(self):
         response = {'success': 0}
 
         if self.error == '':
@@ -323,7 +327,8 @@ class DoWriting():
                 logging.info("Starting writer %s" % writer.address)
                 self.run(writer)
 
-    def run(self, writer):
+    @staticmethod
+    def run(writer):
         success = False
 
         if not validator.validOP_RETURN(writer.message):
