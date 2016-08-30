@@ -14,7 +14,7 @@ class BlockTriggerWrapper():
     def __init__(self, url):
         self.url = url
 
-    def getTriggers(self):
+    def get_triggers(self):
         response = {'success': 0}
         parameters = {}
 
@@ -29,7 +29,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def getTrigger(self, name):
+    def get_trigger(self, name):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -44,7 +44,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def saveTrigger(self, name, settings=None, api_key='', api_secret=''):
+    def save_trigger(self, name, settings=None, api_key='', api_secret=''):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -71,7 +71,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def deleteTrigger(self, name, api_key='', api_secret=''):
+    def delete_trigger(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -96,7 +96,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def saveAction(self, trigger_name, action_name, settings=None, api_key='', api_secret=''):
+    def save_action(self, trigger_name, action_name, settings=None, api_key='', api_secret=''):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -124,7 +124,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def deleteAction(self, trigger_name, action_name, api_key='', api_secret=''):
+    def delete_action(self, trigger_name, action_name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'trigger_name': trigger_name,
                       'action_name': action_name}
@@ -150,7 +150,7 @@ class BlockTriggerWrapper():
 
         return response
 
-    def checkTriggers(self, name=''):
+    def check_triggers(self, name=''):
         response = {'success': 0}
         parameters = {'name': name}
 
