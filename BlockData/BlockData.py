@@ -194,5 +194,5 @@ def txs_2_json(txs, address):
     json_obj = []
     for i in range(0, len(txs)):
         tx = txs[i]
-        json_obj.append(tx.toDict(address))
+        json_obj.append(tx.to_dict(address))
     return json_obj

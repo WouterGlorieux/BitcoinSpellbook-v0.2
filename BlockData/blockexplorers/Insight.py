@@ -89,7 +89,7 @@ class API:
 
                 tx.outputs.append(tx_out)
 
-            txs.insert(0, tx.toDict(address))
+            txs.insert(0, tx.to_dict(address))
 
         if nTx != len(txs):
             logging.error('Insight: Warning: not all transactions are retreived! ' + str(len(txs)) + ' of ' +  str(nTx))

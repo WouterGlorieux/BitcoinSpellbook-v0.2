@@ -92,7 +92,7 @@ compareData(latestBlockData)
 print '===============primeInputAddress======================'
 primeInputAddressData = []
 for i in range(0, len(providerNames)):
-    data = api.primeInputAddress(txid, providerNames[i])
+    data = api.prime_input_address(txid, providerNames[i])
     if 'success' in data and data['success'] == 1:
         primeInputAddressData.append(data['PrimeInputAddress'])
         print primeInputAddressData[i]

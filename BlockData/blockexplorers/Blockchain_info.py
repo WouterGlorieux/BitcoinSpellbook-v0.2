@@ -82,7 +82,7 @@ class API:
                 tx_out['spent'] = out['spent']
                 tx.outputs.append(tx_out)
 
-            txs.insert(0, tx.toDict(address))
+            txs.insert(0, tx.to_dict(address))
 
         if nTx != len(txs):
             logging.warning('Blockchain.info: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx))

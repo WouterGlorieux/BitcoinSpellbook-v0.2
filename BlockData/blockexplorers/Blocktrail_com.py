@@ -68,7 +68,7 @@ class API:
 
                     tx.outputs.append(tx_out)
 
-                txs.append(tx.toDict(address))
+                txs.append(tx.to_dict(address))
 
             if page < pages:
                 url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(LIMIT) + '&sort_dir=asc'
