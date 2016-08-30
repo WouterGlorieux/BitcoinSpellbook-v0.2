@@ -8,6 +8,9 @@ MAX_TRANSACTION_FEE = 10000  # in Satoshis
 
 
 class Services:
+    def __init__(self):
+        pass
+
     BlockForward = 1
     BlockDistribute = 2
     BlockWriter = 3
@@ -28,7 +31,9 @@ class Parameters(ndb.Model):
 class Providers(ndb.Model):
     #Model for 3rd party data providers parameters
     priority = ndb.IntegerProperty(indexed=True, default=0)
-    provider_type = ndb.StringProperty(indexed=True, choices=['Blocktrail.com', 'Blockchain.info', 'Insight'], default='Blocktrail.com')
+    provider_type = ndb.StringProperty(indexed=True,
+                                       choices=['Blocktrail.com', 'Blockchain.info', 'Insight'],
+                                       default='Blocktrail.com')
     blocktrail_key = ndb.StringProperty(indexed=False, default="")
     insight_url = ndb.StringProperty(indexed=False, default="")
 
@@ -162,11 +167,13 @@ def writers_key():
 
 
 class WalletAddress(ndb.Model):
-    module = ndb.StringProperty(indexed=True, choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'], default=None)
+    module = ndb.StringProperty(indexed=True, choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'],
+                                default=None)
     address = ndb.StringProperty(indexed=True)
     i = ndb.IntegerProperty(indexed=True)
     k = ndb.IntegerProperty(indexed=True, default=0)
-    status = ndb.StringProperty(indexed=True, choices=['Available', 'InUse', 'Cooldown', 'Unavailable'], default='InUse')
+    status = ndb.StringProperty(indexed=True, choices=['Available', 'InUse', 'Cooldown', 'Unavailable'],
+                                default='InUse')
     balance = ndb.IntegerProperty(default=0)
     received = ndb.IntegerProperty(default=0)
     sent = ndb.IntegerProperty(default=0)
@@ -178,20 +185,25 @@ def address_key():
     return ndb.Key('WalletAddress', 'WalletAddress')
 
 
-def consistencyCheck(module):
+def consistency_check(module):
     success = True
     if module == 'BlockWriter':
-        writers_query = Writer.query(Writer.status == 'Active', Writer.wallet_index != 0, ancestor=writers_key()).order(Writer.wallet_index)
+        writers_query = Writer.query(Writer.status == 'Active', Writer.wallet_index != 0, ancestor=writers_key()).order(
+            Writer.wallet_index)
         writers = writers_query.fetch()
 
         if len(writers) > 0:
             tmp_index = 0
             for i in range(0, len(writers)):
                 if writers[i].wallet_index == tmp_index:
-                    message = 'Consistency check failed: multiple active writers with same wallet_index! wallet_index = %i' % tmp_index
+                    message = u'Warning: multiple active writers with same wallet_index! wallet_index = {0:d}'.format(
+                        tmp_index)
                     logging.error(message)
                     parameters = Parameters.get_by_id('DefaultConfig')
-                    mail.send_mail(parameters.mail_from, 'wouter.glorieux@gmail.com', 'BlockWriter consistency check failed!', message)
+                    mail.send_mail(parameters.mail_from,
+                                   'wouter.glorieux@gmail.com',  # ToDo: add mail_to to parameters
+                                   'BlockWriter consistency check failed!',
+                                   message)
                     success = False
 
                 tmp_index = writers[i].wallet_index
