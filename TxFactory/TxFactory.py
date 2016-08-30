@@ -1,20 +1,18 @@
 import logging
 import bitcoin
 
-
-
 from bitcoin.transaction import *
 
 
-def makeCustomTransaction(private_keys, inputs, outputs, fee=0, op_return_data=''):
+def make_custom_tx(private_keys, inputs, outputs, fee=0, op_return_data=''):
     #input format= txid:i
     tx = None
     total_input_value = 0
-    UTXOs = []
+    utxos = []
     for tx_input in inputs:
         if 'spend' not in tx_input:
             total_input_value += tx_input['value']
-            UTXOs.append(tx_input)
+            utxos.append(tx_input)
 
     total_output_value = 0
     for tx_output in outputs:
@@ -28,7 +26,7 @@ def makeCustomTransaction(private_keys, inputs, outputs, fee=0, op_return_data='
     else:
         all_keys_present = True
         all_inputs_confirmed = True
-        for tx_input in UTXOs:
+        for tx_input in utxos:
             if tx_input['address'] not in private_keys:
                 all_keys_present = False
 
@@ -36,16 +34,16 @@ def makeCustomTransaction(private_keys, inputs, outputs, fee=0, op_return_data='
                 all_inputs_confirmed = False
 
         if all_keys_present is True and all_inputs_confirmed is True:
-            tx = bitcoin.mktx(UTXOs, outputs)
+            tx = bitcoin.mktx(utxos, outputs)
 
             if op_return_data != '' and len(op_return_data) <= 80:
-                tx = addOP_RETURN(op_return_data, tx)
+                tx = add_op_return(op_return_data, tx)
             else:
                 logging.error('OP_RETURN data is longer than 80 characters')
                 return None
 
-            for i in range(0, len(UTXOs)):
-                tx = bitcoin.sign(tx, i, str(private_keys[UTXOs[i]['address']]))
+            for i in range(0, len(utxos)):
+                tx = bitcoin.sign(tx, i, str(private_keys[utxos[i]['address']]))
 
         elif not all_keys_present:
             logging.error("At least 1 private key is missing.")
@@ -55,7 +53,7 @@ def makeCustomTransaction(private_keys, inputs, outputs, fee=0, op_return_data='
     return tx
 
 
-def sendTransaction(tx):
+def send_tx(tx):
     success = False
     response = {}
     try:
@@ -71,7 +69,8 @@ def sendTransaction(tx):
     return success
 
 
-def decodeOP_RETURN(hex_data):
+def decode_op_return(hex_data):
+    unhex_data = None
     if hex_data[:2] == '6a':
         if hex_data[2:4] == '4c':
             data = hex_data[6:]
@@ -89,10 +88,13 @@ def decodeOP_RETURN(hex_data):
         unhex_data = binascii.unhexlify(data)
 
         if len(unhex_data) != int(check_length, 16):
-            logging.error('OP_RETURN data is not the correct length! ' + str(len(unhex_data)) + ' -> should be ' + str(int(check_length, 16)))
+            logging.error('OP_RETURN data is not the correct length! {0} -> should be {1}'.format(str(len(unhex_data)),
+                                                                                                  str(int(check_length,
+                                                                                                          16))))
             unhex_data = None
 
     return unhex_data
+
 
 #extra functions for op_return from a fork of pybitcointools
 #https://github.com/wizardofozzie/pybitcointools
@@ -123,7 +125,7 @@ def wrap_script(hexdata):
     return num_to_op_push(len(hexdata)) + hexdata
 
 
-def addOP_RETURN(msg, tx_hex=None):
+def add_op_return(msg, tx_hex=None):
     """Makes OP_RETURN script from msg, embeds in Tx hex"""
     hex_data = binascii.hexlify(b'\x6a' + wrap_script(msg))
 
@@ -131,7 +133,7 @@ def addOP_RETURN(msg, tx_hex=None):
         return hex_data
     else:
         if not re.match("^[0-9a-fA-F]*$", tx_hex):
-            return binascii.unhexlify(addOP_RETURN(msg, binascii.hexlify(tx_hex)))
+            return binascii.unhexlify(add_op_return(msg, binascii.hexlify(tx_hex)))
         elif isinstance(tx_hex, dict):
             txo = tx_hex
             outs = txo.get('outs')
@@ -140,7 +142,7 @@ def addOP_RETURN(msg, tx_hex=None):
 
         txo = deserialize(tx_hex)
         assert (len(outs) > 0) and sum(multiaccess(outs, 'value')) > 0 \
-                and not any([o for o in outs if o.get("script")[:2] == '6a']), \
-                "Tx limited to *1* OP_RETURN, and only whilst the other outputs send funds"
+            and not any([o for o in outs if o.get("script")[:2] == '6a']), \
+            "Tx limited to *1* OP_RETURN, and only whilst the other outputs send funds"
         txo['outs'].append({'script': hex_data, 'value': 0})
         return serialize(txo)
