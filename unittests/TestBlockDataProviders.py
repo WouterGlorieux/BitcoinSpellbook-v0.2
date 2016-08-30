@@ -6,7 +6,6 @@ from wrappers import SpellbookWrapper as SpellbookWrapper
 import difflib
 
 
-
 #local parameters, these will need to be changed
 url = 'http://localhost:34080'
 key = 'GW8S1SV40FG4TPDI'
@@ -19,7 +18,7 @@ txid = '39bb5f5d50882227f93b980df15ea676414f0363770a0174a13c8f55c877b598'
 addresses = ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', '1SansacmMr38bdzGkzruDVajEsZuiZHx9', '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8']
 
 
-def compareData(data):
+def compare_data(data):
     if len(data) >= 2:
         result = 'OK'
         baseline = data[0]
@@ -31,19 +30,16 @@ def compareData(data):
 
         print result
 
+
 def difference(a, b):
-    print('{} => {}'.format(a,b))
-    for i,s in enumerate(difflib.ndiff(str(a), str(b))):
-        if s[0]==' ': continue
-        elif s[0]=='-':
-            print(u'Delete "{}" from position {}'.format(s[-1],i))
-        elif s[0]=='+':
-            print(u'Add "{}" to position {}'.format(s[-1],i))
-
-
-
-
-api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
+    print('{} => {}'.format(a, b))
+    for i, s in enumerate(difflib.ndiff(str(a), str(b))):
+        if s[0] == ' ':
+            continue
+        elif s[0] == '-':
+            print(u'Delete "{}" from position {}'.format(s[-1], i))
+        elif s[0] == '+':
+            print(u'Add "{}" to position {}'.format(s[-1], i))
 
 
 api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
@@ -72,7 +68,7 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(blockData)
+compare_data(blockData)
 
 
 print '==============latestBlock======================='
@@ -85,8 +81,7 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(latestBlockData)
-
+compare_data(latestBlockData)
 
 
 print '===============primeInputAddress======================'
@@ -99,7 +94,7 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(primeInputAddressData)
+compare_data(primeInputAddressData)
 
 
 print '================transactions====================='
@@ -112,8 +107,7 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(transactionsData)
-
+compare_data(transactionsData)
 
 
 print '================balances====================='
@@ -126,8 +120,7 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(balancesData)
-
+compare_data(balancesData)
 
 
 print '================utxos====================='
@@ -140,4 +133,4 @@ for i in range(0, len(providerNames)):
     else:
         print providerNames[i] + ' failed!!'
 
-compareData(utxosData)
+compare_data(utxosData)
