@@ -6,13 +6,11 @@ import os
 import jinja2
 import webapp2
 import json
-
 import string
 import random
 import hashlib
 import hmac
 import base64
-from BIP44 import BIP44
 import urllib2
 import logging
 
@@ -21,7 +19,7 @@ from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
 
-import BlockData.BlockData as data
+import BlockData.BlockData as BlockData
 import BlockInputs.BlockInputs as BlockInputs
 import BlockLinker.BlockLinker as BlockLinker
 import BlockRandom.BlockRandom as BlockRandom
@@ -46,15 +44,17 @@ def authenticate(headers, body):
         api_key = headers['API_Key']
 
         authentication = None
-        APIKey = datastore.APIKeys.query(datastore.APIKeys.api_key == api_key).fetch(limit=1)
-        if len(APIKey) == 1:
-            authentication = APIKey[0]
+        apikey = datastore.APIKeys.query(datastore.APIKeys.api_key == api_key).fetch(limit=1)
+        if len(apikey) == 1:
+            authentication = apikey[0]
 
         if authentication:
             if 'API_Sign' in headers:
                 signature = str(headers['API_Sign'])
                 message = hashlib.sha256(body).digest()
-                if signature != base64.b64encode(hmac.new(base64.b64decode(authentication.api_secret), message, hashlib.sha512).digest()):
+                if signature != base64.b64encode(hmac.new(base64.b64decode(authentication.api_secret),
+                                                          message,
+                                                          hashlib.sha512).digest()):
                     response['error'] = 'Invalid signature'
                 else:
                     response['success'] = 1
@@ -69,12 +69,12 @@ def authenticate(headers, body):
     return response
 
 
-class mainPage(webapp2.RequestHandler):
+class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.write("You shouldn't be here, go away!")
 
 
-class block(webapp2.RequestHandler):
+class Block(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         provider = ''
@@ -84,7 +84,7 @@ class block(webapp2.RequestHandler):
         if self.request.get('height'):
             try:
                 block_height = int(self.request.get('height'))
-                response = data.block(block_height, provider)
+                response = BlockData.block(block_height, provider)
                 self.response.write(json.dumps(response, sort_keys=True))
 
             except ValueError:
@@ -95,17 +95,17 @@ class block(webapp2.RequestHandler):
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-class latestBlock(webapp2.RequestHandler):
+class LatestBlock(webapp2.RequestHandler):
     def get(self):
         provider = ''
         if self.request.get('provider'):
             provider = self.request.get('provider')
 
-        response = data.latest_block(provider)
+        response = BlockData.latest_block(provider)
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class primeInputAddress(webapp2.RequestHandler):
+class PrimeInputAddress(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         provider = ''
@@ -114,14 +114,14 @@ class primeInputAddress(webapp2.RequestHandler):
 
         if self.request.get('txid'):
             txid = self.request.get('txid')
-            response = data.prime_input_address(txid, provider)
+            response = BlockData.prime_input_address(txid, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify a txid.'
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-class transactions(webapp2.RequestHandler):
+class Transactions(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         provider = ''
@@ -130,14 +130,14 @@ class transactions(webapp2.RequestHandler):
 
         if self.request.get('address'):
             address = self.request.get('address')
-            response = data.transactions(address, provider)
+            response = BlockData.transactions(address, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify an address.'
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-class balances(webapp2.RequestHandler):
+class Balances(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         provider = ''
@@ -146,14 +146,14 @@ class balances(webapp2.RequestHandler):
 
         if self.request.get('addresses'):
             addresses = self.request.get('addresses')
-            response = data.balances(addresses, provider)
+            response = BlockData.balances(addresses, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify one or more addresses.'
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-class utxos(webapp2.RequestHandler):
+class Utxos(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         provider = ''
@@ -162,14 +162,14 @@ class utxos(webapp2.RequestHandler):
 
         if self.request.get('addresses'):
             addresses = self.request.get('addresses')
-            response = data.utxos(addresses, provider)
+            response = BlockData.utxos(addresses, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify one or more addresses.'
             self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveProvider(webapp2.RequestHandler):
+class SaveProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -192,7 +192,7 @@ class saveProvider(webapp2.RequestHandler):
                 provider_type = self.request.get('provider_type')
                 param = self.request.get('param')
 
-                if data.save_provider(name, priority, provider_type, param):
+                if BlockData.save_provider(name, priority, provider_type, param):
                     response['success'] = 1
 
             else:
@@ -203,7 +203,7 @@ class saveProvider(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteProvider(webapp2.RequestHandler):
+class DeleteProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -215,7 +215,7 @@ class deleteProvider(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                if data.delete_provider(name):
+                if BlockData.delete_provider(name):
                     response['success'] = 1
 
             else:
@@ -226,11 +226,11 @@ class deleteProvider(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getProviders(webapp2.RequestHandler):
+class GetProviders(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         try:
-            response['providersList'] = data.get_providers()
+            response['providersList'] = BlockData.get_providers()
             response['success'] = 1
         except:
             response['error'] = 'Unable to retrieve providers.'
@@ -238,7 +238,7 @@ class getProviders(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class initialize(webapp2.RequestHandler):
+class Initialize(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
 
@@ -257,8 +257,9 @@ class initialize(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class updateRecommendedFee(webapp2.RequestHandler):
-    def get(self):
+class UpdateRecommendedFee(webapp2.RequestHandler):
+    @staticmethod
+    def get():
         parameters = datastore.Parameters.get_or_insert('DefaultConfig')
         blocktrail_key = datastore.Providers.get_by_id('Blocktrail.com').blocktrail_key
         fee_data = {}
@@ -388,7 +389,7 @@ class LAL(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class proportionalRandom(webapp2.RequestHandler):
+class ProportionalRandom(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         if self.request.get('address'):
@@ -424,7 +425,7 @@ class proportionalRandom(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class randomFromBlock(webapp2.RequestHandler):
+class RandomFromBlock(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         rng_block_height = 0
@@ -440,7 +441,7 @@ class randomFromBlock(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class proposal(webapp2.RequestHandler):
+class Proposal(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
 
@@ -490,7 +491,7 @@ class proposal(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class results(webapp2.RequestHandler):
+class Results(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
 
@@ -547,13 +548,13 @@ class results(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getForwarders(webapp2.RequestHandler):
+class GetForwarders(webapp2.RequestHandler):
     def get(self):
         response = BlockForward.get_forwarders()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getForwarder(webapp2.RequestHandler):
+class GetForwarder(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -563,7 +564,7 @@ class getForwarder(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class checkForwarderAddress(webapp2.RequestHandler):
+class CheckForwarderAddress(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -577,7 +578,7 @@ class checkForwarderAddress(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveForwarder(webapp2.RequestHandler):
+class SaveForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -656,7 +657,7 @@ class saveForwarder(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteForwarder(webapp2.RequestHandler):
+class DeleteForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -675,7 +676,7 @@ class deleteForwarder(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class doForwarding(webapp2.RequestHandler):
+class DoForwarding(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -687,13 +688,13 @@ class doForwarding(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getDistributers(webapp2.RequestHandler):
+class GetDistributers(webapp2.RequestHandler):
     def get(self):
         response = BlockDistribute.get_distributers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getDistributer(webapp2.RequestHandler):
+class GetDistributer(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -703,7 +704,7 @@ class getDistributer(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class checkDistributerAddress(webapp2.RequestHandler):
+class CheckDistributerAddress(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -718,7 +719,7 @@ class checkDistributerAddress(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveDistributer(webapp2.RequestHandler):
+class SaveDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -794,7 +795,7 @@ class saveDistributer(webapp2.RequestHandler):
                     try:
                         settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
                     except ValueError:
-                        response['error'] = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'maximum_transaction_fee must be a greater than or equal to 0 (in Satoshis)'
 
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
@@ -818,7 +819,7 @@ class saveDistributer(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteDistributer(webapp2.RequestHandler):
+class DeleteDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -837,7 +838,7 @@ class deleteDistributer(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class updateDistribution(webapp2.RequestHandler):
+class UpdateDistribution(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -856,7 +857,7 @@ class updateDistribution(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class doDistributing(webapp2.RequestHandler):
+class DoDistributing(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -868,13 +869,13 @@ class doDistributing(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getTriggers(webapp2.RequestHandler):
+class GetTriggers(webapp2.RequestHandler):
     def get(self):
         response = BlockTrigger.get_triggers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getTrigger(webapp2.RequestHandler):
+class GetTrigger(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -884,7 +885,7 @@ class getTrigger(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveTrigger(webapp2.RequestHandler):
+class SaveTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -950,7 +951,7 @@ class saveTrigger(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteTrigger(webapp2.RequestHandler):
+class DeleteTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -969,7 +970,7 @@ class deleteTrigger(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveAction(webapp2.RequestHandler):
+class SaveAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -1026,7 +1027,7 @@ class saveAction(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteAction(webapp2.RequestHandler):
+class DeleteAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -1047,7 +1048,7 @@ class deleteAction(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class checkTriggers(webapp2.RequestHandler):
+class CheckTriggers(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -1059,13 +1060,13 @@ class checkTriggers(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getWriters(webapp2.RequestHandler):
+class GetWriters(webapp2.RequestHandler):
     def get(self):
         response = BlockWriter.get_writers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class getWriter(webapp2.RequestHandler):
+class GetWriter(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -1075,7 +1076,7 @@ class getWriter(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class saveWriter(webapp2.RequestHandler):
+class SaveWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -1127,7 +1128,7 @@ class saveWriter(webapp2.RequestHandler):
                     try:
                         settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
                     except ValueError:
-                        response['error'] = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
+                        response['error'] = 'maximum_transaction_fee must be greater than or equal to 0 (in Satoshis)'
 
                 if self.request.get('address_type'):
                     settings['address_type'] = self.request.get('address_type')
@@ -1151,7 +1152,7 @@ class saveWriter(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class deleteWriter(webapp2.RequestHandler):
+class DeleteWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
@@ -1170,7 +1171,7 @@ class deleteWriter(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class doWriting(webapp2.RequestHandler):
+class DoWriting(webapp2.RequestHandler):
     def get(self):
         name = ''
         if self.request.get('name'):
@@ -1205,19 +1206,19 @@ class Profile(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', mainPage),
-    ('/admin/initialize', initialize),
-    ('/admin/updateRecommendedFee', updateRecommendedFee),
+    ('/', MainPage),
+    ('/admin/initialize', Initialize),
+    ('/admin/updateRecommendedFee', UpdateRecommendedFee),
 
-    ('/data/saveProvider', saveProvider),
-    ('/data/deleteProvider', deleteProvider),
-    ('/data/getProviders', getProviders),
-    ('/data/block', block),
-    ('/data/latestBlock', latestBlock),
-    ('/data/primeInputAddress', primeInputAddress),
-    ('/data/transactions', transactions),
-    ('/data/balances', balances),
-    ('/data/utxos', utxos),
+    ('/data/saveProvider', SaveProvider),
+    ('/data/deleteProvider', DeleteProvider),
+    ('/data/getProviders', GetProviders),
+    ('/data/block', Block),
+    ('/data/latestBlock', LatestBlock),
+    ('/data/primeInputAddress', PrimeInputAddress),
+    ('/data/transactions', Transactions),
+    ('/data/balances', Balances),
+    ('/data/utxos', Utxos),
 
     ('/sil/sil', SIL),
 
@@ -1226,40 +1227,40 @@ app = webapp2.WSGIApplication([
     ('/linker/LSL', LSL),
     ('/linker/LAL', LAL),
 
-    ('/random/proportional', proportionalRandom),
-    ('/random/block', randomFromBlock),
+    ('/random/proportional', ProportionalRandom),
+    ('/random/block', RandomFromBlock),
 
-    ('/voter/proposal', proposal),
-    ('/voter/results', results),
+    ('/voter/proposal', Proposal),
+    ('/voter/results', Results),
 
-    ('/forwarder/getForwarders', getForwarders),
-    ('/forwarder/getForwarder', getForwarder),
-    ('/forwarder/checkAddress', checkForwarderAddress),
-    ('/forwarder/saveForwarder', saveForwarder),
-    ('/forwarder/deleteForwarder', deleteForwarder),
-    ('/forwarder/doForwarding', doForwarding),
+    ('/forwarder/getForwarders', GetForwarders),
+    ('/forwarder/getForwarder', GetForwarder),
+    ('/forwarder/checkAddress', CheckForwarderAddress),
+    ('/forwarder/saveForwarder', SaveForwarder),
+    ('/forwarder/deleteForwarder', DeleteForwarder),
+    ('/forwarder/doForwarding', DoForwarding),
 
-    ('/distributer/getDistributers', getDistributers),
-    ('/distributer/getDistributer', getDistributer),
-    ('/distributer/checkAddress', checkDistributerAddress),
-    ('/distributer/saveDistributer', saveDistributer),
-    ('/distributer/deleteDistributer', deleteDistributer),
-    ('/distributer/updateDistribution', updateDistribution),
-    ('/distributer/doDistributing', doDistributing),
+    ('/distributer/getDistributers', GetDistributers),
+    ('/distributer/getDistributer', GetDistributer),
+    ('/distributer/checkAddress', CheckDistributerAddress),
+    ('/distributer/saveDistributer', SaveDistributer),
+    ('/distributer/deleteDistributer', DeleteDistributer),
+    ('/distributer/updateDistribution', UpdateDistribution),
+    ('/distributer/doDistributing', DoDistributing),
 
-    ('/trigger/getTriggers', getTriggers),
-    ('/trigger/getTrigger', getTrigger),
-    ('/trigger/saveTrigger', saveTrigger),
-    ('/trigger/deleteTrigger', deleteTrigger),
-    ('/trigger/saveAction', saveAction),
-    ('/trigger/deleteAction', deleteAction),
-    ('/trigger/checkTriggers', checkTriggers),
+    ('/trigger/getTriggers', GetTriggers),
+    ('/trigger/getTrigger', GetTrigger),
+    ('/trigger/saveTrigger', SaveTrigger),
+    ('/trigger/deleteTrigger', DeleteTrigger),
+    ('/trigger/saveAction', SaveAction),
+    ('/trigger/deleteAction', DeleteAction),
+    ('/trigger/checkTriggers', CheckTriggers),
 
-    ('/writer/getWriters', getWriters),
-    ('/writer/getWriter', getWriter),
-    ('/writer/saveWriter', saveWriter),
-    ('/writer/deleteWriter', deleteWriter),
-    ('/writer/doWriting', doWriting),
+    ('/writer/getWriters', GetWriters),
+    ('/writer/getWriter', GetWriter),
+    ('/writer/saveWriter', SaveWriter),
+    ('/writer/deleteWriter', DeleteWriter),
+    ('/writer/doWriting', DoWriting),
 
     ('/profile/profile', Profile),
 
