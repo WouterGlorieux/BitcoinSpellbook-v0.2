@@ -11,10 +11,10 @@ class Services:
     def __init__(self):
         pass
 
-    BlockForward = 1
-    BlockDistribute = 2
-    BlockWriter = 3
-    BlockTrigger = 4
+    blockforward = 1
+    blockdistribute = 2
+    blockwriter = 3
+    blocktrigger = 4
 
 
 class APIKeys(ndb.Model):

@@ -11,7 +11,7 @@ logging.basicConfig(filename='unittests.log', level=logging.DEBUG)
 class BlockDataTests(unittest.TestCase):
 
     def test_blockdata_genesisblock(self):
-        api = SpellbookWrapper.SpellbookWrapper().BlockData()
+        api = SpellbookWrapper.SpellbookWrapper().blockdata()
         for provider in PROVIDERS:
             data = api.block(0, provider)
 

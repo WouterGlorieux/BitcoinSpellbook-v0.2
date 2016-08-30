@@ -271,7 +271,7 @@ class Writer():
             elif writer.address_type == 'BIP44':
                 if writer.wallet_index == 0:
                     writer.wallet_index = get_available_address_index()
-                writer.address = datastore.get_service_address(datastore.Services.BlockWriter, writer.wallet_index)
+                writer.address = datastore.get_service_address(datastore.Services.blockwriter, writer.wallet_index)
 
             if not validator.validAddress(writer.address):
                 self.error = 'Unable to get address for writer'
@@ -375,7 +375,7 @@ class DoWriting():
             if writer.address_type == 'PrivKey':
                 private_keys = {writer.address: writer.private_key}
             elif writer.address_type == 'BIP44':
-                private_keys = datastore.get_service_private_key(datastore.Services.BlockWriter, writer.wallet_index)
+                private_keys = datastore.get_service_private_key(datastore.Services.blockwriter, writer.wallet_index)
 
             logging.info("Sending " + str(total_input_value) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transaction_fee) + ' with OP_RETURN message: ' + writer.message)
             tx = TxFactory.makeCustomTransaction(private_keys, utxos, outputs, transaction_fee, writer.message)

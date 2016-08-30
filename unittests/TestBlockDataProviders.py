@@ -42,7 +42,7 @@ def difference(a, b):
             print(u'Add "{}" to position {}'.format(s[-1], i))
 
 
-api = SpellbookWrapper.SpellbookWrapper(url).BlockData()
+api = SpellbookWrapper.SpellbookWrapper(url).blockdata()
 print api.save_provider('Blocktrail.com', 0, 'Blocktrail.com', 'a8a84ed2929da8313d75d16e04be2a26c4cc4ea4', key, secret)
 print api.save_provider('Blockchain.info', 1, 'Blockchain.info', '', key, secret)
 print api.save_provider('Blockexplorer.com', 2, 'Insight', 'https://www.blockexplorer.com/api', key, secret)

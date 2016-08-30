@@ -240,7 +240,7 @@ class Distributer():
             elif distributer.address_type == 'BIP44':
                 if distributer.wallet_index == 0:
                     distributer.wallet_index = get_next_index()
-                distributer.address = datastore.get_service_address(datastore.Services.BlockDistribute, distributer.wallet_index)
+                distributer.address = datastore.get_service_address(datastore.Services.blockdistribute, distributer.wallet_index)
 
             if not validator.validAddress(distributer.address):
                 self.error = 'Unable to get address for distributer'
@@ -370,7 +370,7 @@ class DoDistributing():
                     private_keys = {distributer.address: distributer.private_key}
 
                 elif distributer.address_type == 'BIP44':
-                    private_keys = datastore.get_service_private_key(datastore.Services.BlockDistribute, distributer.wallet_index)
+                    private_keys = datastore.get_service_private_key(datastore.Services.blockdistribute, distributer.wallet_index)
 
                 if distributer.distribution_source == 'SIL' and distributer.address == distributer.registration_address:
                     self.error = 'Dark magic detected! Ponzi schemes are illegal!!'

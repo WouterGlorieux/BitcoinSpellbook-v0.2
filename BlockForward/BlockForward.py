@@ -219,7 +219,7 @@ class BlockForward():
             elif forwarder.address_type == 'BIP44':
                 if forwarder.wallet_index == 0:
                     forwarder.wallet_index = get_next_index()
-                forwarder.address = datastore.get_service_address(datastore.Services.BlockForward,
+                forwarder.address = datastore.get_service_address(datastore.Services.blockforward,
                                                                   forwarder.wallet_index)
 
             if not validator.validAddress(forwarder.address):
@@ -302,7 +302,7 @@ class DoForwarding():
                     if forwarder.address_type == 'PrivKey':
                         private_keys = {forwarder.address: forwarder.private_key}
                     elif forwarder.address_type == 'BIP44':
-                        private_keys = datastore.get_service_private_key(datastore.Services.BlockForward,
+                        private_keys = datastore.get_service_private_key(datastore.Services.blockforward,
                                                                          forwarder.wallet_index)
 
                     if len(amounts) > 0 and forwarder.minimum_amount > 0 and amounts[0] < forwarder.minimum_amount + TRANSACTION_FEE:

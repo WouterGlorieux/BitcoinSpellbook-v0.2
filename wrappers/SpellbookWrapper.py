@@ -17,32 +17,32 @@ class SpellbookWrapper():
     def __init__(self, url='http://bitcoinspellbook.appspot.com'):
         self.url = url
 
-    def BlockData(self):
+    def blockdata(self):
         return BlockDataWrapper(self.url)
 
-    def BlockInputs(self):
+    def blockinputs(self):
         return BlockInputsWrapper(self.url)
 
-    def BlockLinker(self):
+    def blocklinker(self):
         return BlockLinkerWrapper(self.url)
 
-    def BlockRandom(self):
+    def blockrandom(self):
         return BlockRandomWrapper(self.url)
 
-    def BlockVoter(self):
+    def blockvoter(self):
         return BlockVoterWrapper(self.url)
 
-    def BlockForward(self):
+    def blockforward(self):
         return BlockForwardWrapper(self.url)
 
-    def BlockDistribute(self):
+    def blockdistribute(self):
         return BlockDistributeWrapper(self.url)
 
-    def BlockTrigger(self):
+    def blocktrigger(self):
         return BlockTriggerWrapper(self.url)
 
-    def BlockWriter(self):
+    def blockwriter(self):
         return BlockWriterWrapper(self.url)
 
-    def BlockProfile(self):
+    def blockprofile(self):
         return BlockProfileWrapper(self.url)
