@@ -5,16 +5,16 @@
 # [input, expected_output, description]
 
 address_test_vectors = [
-    ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y',True, "Normal valid address"],
-    [u'1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y',True, "unicode valid address"],
+    ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', True, "Normal valid address"],
+    [u'1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', True, "unicode valid address"],
     ['1SansacmMr38bdzGkzruDVajEsZuiZHx9', True, "Normal valid address"],
     ['1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8', True, "Normal valid address"],
     ['3AL6xh1qn4m83ni9vfTh6WarHBn1Ew1CZk', True, "Multisig valid address"],
     ['4Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', False, "invalid address, starts with 4"],
     ['1Rlbbk6PuJst6ot6ay2DcVugv8nxfJh5y', False, "invalid address, contains l"],
-    ['1RObbk6PuJst6ot6ay2DcVugv8nxfJh5y',False,"invalid address, contains O"],
-    ['1RIbbk6PuJst6ot6ay2DcVugv8nxfJh5y', False,"invalid address, contains I"],
-    ['123456789a123456789a12345', False,"address shorter than 26 characters"],
+    ['1RObbk6PuJst6ot6ay2DcVugv8nxfJh5y', False, "invalid address, contains O"],
+    ['1RIbbk6PuJst6ot6ay2DcVugv8nxfJh5y', False, "invalid address, contains I"],
+    ['123456789a123456789a12345', False, "address shorter than 26 characters"],
     ['123456789a123456789a123456789a123456', False, "address longer than 35 characters"],
     ['', False, 'empty string'],
     [None, False, 'None value'],
