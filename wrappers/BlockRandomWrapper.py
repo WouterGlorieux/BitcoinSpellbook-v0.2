@@ -11,7 +11,7 @@ class BlockRandomWrapper():
     def __init__(self, url):
         self.url = url
 
-    def fromBlock(self, rng_block_height=0):
+    def from_block(self, rng_block_height=0):
         response = {'success': 0}
         parameters = {'rng_block_height': str(rng_block_height)}
 
@@ -26,7 +26,7 @@ class BlockRandomWrapper():
 
         return response
 
-    def fromSIL(self, address, block_height=0, rng_block_height=0):
+    def from_sil(self, address, block_height=0, rng_block_height=0):
         response = {'success': 0}
         parameters = {'source': 'SIL',
                       'address': address,
@@ -44,7 +44,7 @@ class BlockRandomWrapper():
 
         return response
 
-    def fromLBL(self, address, xpub, block_height=0, rng_block_height=0):
+    def from_lbl(self, address, xpub, block_height=0, rng_block_height=0):
         response = {'success': 0}
         parameters = {'source': 'LBL',
                       'address': address,
@@ -63,7 +63,7 @@ class BlockRandomWrapper():
 
         return response
 
-    def fromLRL(self, address, xpub, block_height=0, rng_block_height=0):
+    def from_lrl(self, address, xpub, block_height=0, rng_block_height=0):
         response = {'success': 0}
         parameters = {'source': 'LRL',
                       'address': address,
@@ -82,7 +82,7 @@ class BlockRandomWrapper():
 
         return response
 
-    def fromLSL(self, address, xpub, block_height=0, rng_block_height=0):
+    def from_lsl(self, address, xpub, block_height=0, rng_block_height=0):
         response = {'success': 0}
         parameters = {'source': 'LRL',
                       'address': address,
