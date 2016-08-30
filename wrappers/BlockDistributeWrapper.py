@@ -14,7 +14,7 @@ class BlockDistributeWrapper():
     def __init__(self, url):
         self.url = url
 
-    def getDistributers(self):
+    def get_distributers(self):
         response = {'success': 0}
         parameters = {}
 
@@ -29,7 +29,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def getDistributer(self, name):
+    def get_distributer(self, name):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -44,7 +44,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def checkAddress(self, name, address):
+    def check_address(self, name, address):
         response = {'success': 0}
         parameters = {'name': name,
                       'address': address}
@@ -60,7 +60,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def saveDistributer(self, name, settings=None, api_key='', api_secret=''):
+    def save_distributer(self, name, settings=None, api_key='', api_secret=''):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -87,7 +87,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def deleteDistributer(self, name, api_key='', api_secret=''):
+    def delete_distributer(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -112,7 +112,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def updateDistribution(self, name, api_key='', api_secret=''):
+    def update_distribution(self, name, api_key='', api_secret=''):
         response = {'success': 0}
         parameters = {'name': name}
 
@@ -137,7 +137,7 @@ class BlockDistributeWrapper():
 
         return response
 
-    def doDistributing(self, name=''):
+    def do_distributing(self, name=''):
         response = {'success': 0}
         parameters = {'name': name}
 
