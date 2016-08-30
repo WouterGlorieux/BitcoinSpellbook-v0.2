@@ -299,7 +299,7 @@ class CheckTriggers():
     def run(self, trigger):
         if not trigger.triggered:
             if trigger.trigger_type == 'block_height':
-                latest_block_data = BlockData.latestBlock()
+                latest_block_data = BlockData.latest_block()
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
                     latest_block_height = latest_block_data['latestBlock']['height']
                     if trigger.block_height + trigger.confirmations <= latest_block_height:

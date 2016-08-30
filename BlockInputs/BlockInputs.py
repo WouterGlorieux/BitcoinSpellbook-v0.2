@@ -10,7 +10,7 @@ def SIL(address, block=0):
 
     if validator.validAddress(address):
         if block == 0:
-            latest_block = BlockData.latestBlock()
+            latest_block = BlockData.latest_block()
 
             if 'success' in latest_block and latest_block['success'] == 1:
                 block = latest_block['latestBlock']['height']

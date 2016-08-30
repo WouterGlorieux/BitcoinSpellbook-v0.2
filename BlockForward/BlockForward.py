@@ -278,7 +278,7 @@ class DoForwarding():
             to_addresses = []
             amounts = []
 
-            prime_input_address_data = BlockData.primeInputAddress(utxo['output'].split(":")[0])
+            prime_input_address_data = BlockData.prime_input_address(utxo['output'].split(":")[0])
             if 'success' in prime_input_address_data and prime_input_address_data['success'] == 1:
                 primeInputAddress = prime_input_address_data['PrimeInputAddress']
                 if primeInputAddress != forwarder.address:

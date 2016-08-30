@@ -110,7 +110,7 @@ class BlockVoter():
         digits = len(str(len(self.options)))
 
         if block_height == 0:
-            latest_block_data = BlockData.latestBlock()
+            latest_block_data = BlockData.latest_block()
             if 'success' in latest_block_data and latest_block_data['success'] == 1:
                 block_height = latest_block_data['latestBlock']['height']
             else:

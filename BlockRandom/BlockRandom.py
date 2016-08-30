@@ -58,7 +58,7 @@ class Random():
         if rng_block_height != 0:
             block_data = BlockData.block(rng_block_height)
         else:
-            block_data = BlockData.latestBlock()
+            block_data = BlockData.latest_block()
 
         if 'success' in block_data and block_data['success'] == 1:
             if rng_block_height != 0:

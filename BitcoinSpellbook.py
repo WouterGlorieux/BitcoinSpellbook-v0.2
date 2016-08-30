@@ -101,7 +101,7 @@ class latestBlock(webapp2.RequestHandler):
         if self.request.get('provider'):
             provider = self.request.get('provider')
 
-        response = data.latestBlock(provider)
+        response = data.latest_block(provider)
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -114,7 +114,7 @@ class primeInputAddress(webapp2.RequestHandler):
 
         if self.request.get('txid'):
             txid = self.request.get('txid')
-            response = data.primeInputAddress(txid, provider)
+            response = data.prime_input_address(txid, provider)
             self.response.write(json.dumps(response, sort_keys=True))
         else:
             response['error'] = 'You must specify a txid.'
@@ -192,7 +192,7 @@ class saveProvider(webapp2.RequestHandler):
                 provider_type = self.request.get('provider_type')
                 param = self.request.get('param')
 
-                if data.saveProvider(name, priority, provider_type, param):
+                if data.save_provider(name, priority, provider_type, param):
                     response['success'] = 1
 
             else:
@@ -215,7 +215,7 @@ class deleteProvider(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                if data.deleteProvider(name):
+                if data.delete_provider(name):
                     response['success'] = 1
 
             else:
@@ -230,7 +230,7 @@ class getProviders(webapp2.RequestHandler):
     def get(self):
         response = {'success': 0}
         try:
-            response['providersList'] = data.getProvidersList()
+            response['providersList'] = data.get_providers()
             response['success'] = 1
         except:
             response['error'] = 'Unable to retrieve providers.'

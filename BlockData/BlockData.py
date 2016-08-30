@@ -1,21 +1,17 @@
 
 import logging
-
-
+import datastore.datastore as datastore
+import blockexplorers.Blocktrail_com as Blocktrail_com
+import blockexplorers.Blockchain_info as Blockchain_info
+import blockexplorers.Insight as Insight
+from validators import validators as validator
 
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
 
-import datastore.datastore as datastore
-import blockexplorers.Blocktrail_com as Blocktrail_com
-import blockexplorers.Blockchain_info as Blockchain_info
-import blockexplorers.Insight as Insight
 
-from validators import validators as validator
-
-
-def getProviderAPI(name):
+def get_provider_api(name):
     provider = datastore.Providers.get_by_id(name)
 
     if provider and provider.provider_type == 'Blocktrail.com':
@@ -30,7 +26,7 @@ def getProviderAPI(name):
     return provider_api
 
 
-def getProviderNames():
+def get_provider_names():
     providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
@@ -41,7 +37,7 @@ def getProviderNames():
     return provider_names
 
 
-def getProvidersList():
+def get_providers():
     providers_query = datastore.Providers.query().order(datastore.Providers.priority)
     providers = providers_query.fetch()
 
@@ -52,16 +48,16 @@ def getProvidersList():
                         'provider_type': provider.provider_type}
 
         if provider.provider_type == 'Blocktrail.com':
-            tmp_provider['Blocktrail_key'] = provider.blocktrail_key
+            tmp_provider['blocktrail_key'] = provider.blocktrail_key
         elif provider.provider_type == 'Insight':
-            tmp_provider['Insight_url'] = provider.insight_url
+            tmp_provider['insight_url'] = provider.insight_url
 
         providers_list.append(tmp_provider)
 
     return providers_list
 
 
-def saveProvider(name, priority, provider_type, param=''):
+def save_provider(name, priority, provider_type, param=''):
 
     provider = datastore.Providers.get_or_insert(name)
     provider.priority = priority
@@ -79,7 +75,7 @@ def saveProvider(name, priority, provider_type, param=''):
         return False
 
 
-def deleteProvider(name):
+def delete_provider(name):
     try:
         provider = datastore.Providers.get_by_id(name)
         provider.key.delete()
@@ -90,7 +86,7 @@ def deleteProvider(name):
 
 def query(query_type, param='', provider=''):
     response = {'success': 0}
-    providers = getProviderNames()
+    providers = get_provider_names()
 
     if provider != '' and provider in providers:
         providers = [provider]
@@ -99,14 +95,14 @@ def query(query_type, param='', provider=''):
         return response
 
     for i in range(0, len(providers)):
-        provider_api = getProviderAPI(providers[i])
+        provider_api = get_provider_api(providers[i])
         if provider_api:
             data = {}
             if query_type == 'block':
                 data = provider_api.getBlock(param)
-            elif query_type == 'latestBlock':
+            elif query_type == 'latest_block':
                 data = provider_api.getLatestBlock()
-            elif query_type == 'primeInputAddress':
+            elif query_type == 'prime_input_address':
                 data = provider_api.getPrimeInputAddress(param)
             elif query_type == 'balances':
                 data = provider_api.getBalances(param)
@@ -143,15 +139,15 @@ def block(block_height, provider=''):
     return response
 
 
-def latestBlock(provider=''):
-    response = query('latestBlock', '', provider)
+def latest_block(provider=''):
+    response = query('latest_block', '', provider)
     return response
 
 
-def primeInputAddress(txid, provider=''):
+def prime_input_address(txid, provider=''):
     response = {'success': 0}
     if validator.validTxid(txid):
-        response = query('primeInputAddress', txid, provider)
+        response = query('prime_input_address', txid, provider)
     else:
         response['error'] = 'Invalid txid'
 
