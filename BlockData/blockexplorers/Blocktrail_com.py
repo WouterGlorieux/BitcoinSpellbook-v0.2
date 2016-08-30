@@ -1,4 +1,3 @@
-__author__ = 'Wouter'
 import urllib2
 import json
 import binascii
@@ -10,12 +9,12 @@ import logging
 API_URL = 'https://api.blocktrail.com/'
 API_VERSION = 'v1'
 
+
 class API:
     def __init__(self, key='', secret=''):
         self.error = ''
         self.key = key
         self.secret = secret
-
 
     def getTXS(self, address):
         LIMIT = 200 #max 200 for Blocktrail.com

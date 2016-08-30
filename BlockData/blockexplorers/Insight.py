@@ -1,5 +1,3 @@
-__author__ = 'Wouter'
-
 import urllib2
 import json
 import TxFactory.TxFactory as TxFactory
