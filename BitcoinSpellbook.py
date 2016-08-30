@@ -416,7 +416,7 @@ class proportionalRandom(webapp2.RequestHandler):
             if self.request.get('source') and self.request.get('source') in ['sil', 'LBL', 'LRL', 'LSL']:
                 source = self.request.get('source')
 
-            response = BlockRandom.Random(address, block_height, xpub).proportionalRandom(source, rng_block_height)
+            response = BlockRandom.Random(address, block_height, xpub).proportional_random(source, rng_block_height)
 
         else:
             response['error'] = 'You must provide an address.'
@@ -435,7 +435,7 @@ class randomFromBlock(webapp2.RequestHandler):
             except ValueError:
                 response['error'] = 'rng_block_height must be a positive integer.'
 
-        response = BlockRandom.Random().fromBlock(rng_block_height)
+        response = BlockRandom.Random().from_block(rng_block_height)
 
         self.response.write(json.dumps(response, sort_keys=True))
 

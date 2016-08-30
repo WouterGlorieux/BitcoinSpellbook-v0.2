@@ -26,9 +26,9 @@ class Random():
         else:
             self.xpub = xpub
 
-    def fromBlock(self, rng_block_height=0):
+    def from_block(self, rng_block_height=0):
         response = {'success': 0}
-        random = self.RNG(rng_block_height)
+        random = self.rng(rng_block_height)
 
         if self.error == '':
             response['random'] = random
@@ -38,10 +38,10 @@ class Random():
 
         return response
 
-    def proportionalRandom(self, source, rng_block_height=0):
+    def proportional_random(self, source, rng_block_height=0):
         response = {'success': 0}
-        distribution = self.getDistribution(source)
-        rand = self.RNG(rng_block_height)
+        distribution = self.get_distribution(source)
+        rand = self.rng(rng_block_height)
         winner = self.winner(distribution, rand)
 
         if self.error == '':
@@ -52,7 +52,7 @@ class Random():
 
         return response
 
-    def RNG(self, rng_block_height=0):
+    def rng(self, rng_block_height=0):
         rand = 0.0
 
         if rng_block_height != 0:
@@ -79,7 +79,7 @@ class Random():
 
         return rand
 
-    def getDistribution(self, source):
+    def get_distribution(self, source):
         distribution = []
         if self.error == '':
             data = {}
@@ -96,13 +96,14 @@ class Random():
 
             if 'success' in data and data['success'] == 1:
                 distribution = data[source]
-                distribution = self.addCumulative(distribution)
+                distribution = self.add_cumulative(distribution)
             else:
                 self.error = 'Unable to retrieve distribution'
 
         return distribution
 
-    def addCumulative(self, distribution):
+    @staticmethod
+    def add_cumulative(distribution):
         cumulative = 0
         for i in range(0, len(distribution)):
             cumulative += distribution[i][1]
@@ -117,23 +118,29 @@ class Random():
         winner_address = ''
         total_value = 0
         if n_distribution > 0:
-            values = self.extractValues(distribution)
+            values = self.extract_values(distribution)
             total_value = sum(values)
-            winner_index = self.getWinnerIndex(rand, values)
+            winner_index = self.get_winner_index(rand, values)
             winner_address = distribution[winner_index][0]
 
-        winner = {'distribution': distribution, 'winnerAddress': winner_address, 'winnerIndex': winner_index, 'random': rand, 'target': total_value*rand}
+        winner = {'distribution': distribution,
+                  'winner_address': winner_address,
+                  'winner_index': winner_index,
+                  'random': rand,
+                  'target': total_value*rand}
 
         return winner
 
-    def extractValues(self, distribution):
+    @staticmethod
+    def extract_values(distribution):
         values = []
         for i in range(0, len(distribution)):
             values.append(distribution[i][1])
 
         return values
 
-    def getWinnerIndex(self, rand, values):
+    @staticmethod
+    def get_winner_index(rand, values):
 
         choice = 0
         total = sum(values)
