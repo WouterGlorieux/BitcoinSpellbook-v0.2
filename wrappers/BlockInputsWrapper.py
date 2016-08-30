@@ -11,7 +11,7 @@ class BlockInputsWrapper():
     def __init__(self, url):
         self.url = url
 
-    def SIL(self, address, block_height=0):
+    def get_sil(self, address, block_height=0):
         response = {'success': 0}
         parameters = {'address': address,
                       'block_height': str(block_height)}
