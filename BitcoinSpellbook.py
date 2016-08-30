@@ -870,7 +870,7 @@ class doDistributing(webapp2.RequestHandler):
 
 class getTriggers(webapp2.RequestHandler):
     def get(self):
-        response = BlockTrigger.getTriggers()
+        response = BlockTrigger.get_triggers()
         self.response.write(json.dumps(response, sort_keys=True))
 
 
@@ -940,7 +940,7 @@ class saveTrigger(webapp2.RequestHandler):
                 if self.request.get('status'):
                     settings['status'] = self.request.get('status')
 
-                response = BlockTrigger.BlockTrigger(name).saveTrigger(settings)
+                response = BlockTrigger.BlockTrigger(name).save_trigger(settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -962,7 +962,7 @@ class deleteTrigger(webapp2.RequestHandler):
         if authentication_ok:
             if self.request.get('name'):
                 name = self.request.get('name')
-                response = BlockTrigger.BlockTrigger(name).deleteTrigger()
+                response = BlockTrigger.BlockTrigger(name).delete_trigger()
         else:
             response['error'] = authentication['error']
 
@@ -1016,7 +1016,7 @@ class saveAction(webapp2.RequestHandler):
                 if self.request.get('webhook', None) is not None:
                     settings['webhook'] = self.request.get('webhook')
 
-                response = BlockTrigger.BlockTrigger(trigger_name).saveAction(action_name, settings)
+                response = BlockTrigger.BlockTrigger(trigger_name).save_action(action_name, settings)
 
             else:
                 response['error'] = 'Invalid parameters'
@@ -1040,7 +1040,7 @@ class deleteAction(webapp2.RequestHandler):
                 trigger_name = self.request.get('trigger_name')
                 action_name = self.request.get('action_name')
 
-                response = BlockTrigger.BlockTrigger(trigger_name).deleteAction(action_name)
+                response = BlockTrigger.BlockTrigger(trigger_name).delete_action(action_name)
         else:
             response['error'] = authentication['error']
 

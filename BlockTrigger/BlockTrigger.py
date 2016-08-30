@@ -21,7 +21,7 @@ urlfetch.set_default_fetch_deadline(60)
 REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 
 
-def triggerToDict(trigger):
+def trigger_to_dict(trigger):
     trigger_dict = {'name': trigger.key.id(),
                     'trigger_type': trigger.trigger_type,
                     'address': trigger.address,
@@ -41,12 +41,12 @@ def triggerToDict(trigger):
 
     trigger_dict['actions'] = []
     for action in actions:
-        trigger_dict['actions'].append(actionToDict(action))
+        trigger_dict['actions'].append(action_to_dict(action))
 
     return trigger_dict
 
 
-def actionToDict(action):
+def action_to_dict(action):
     action_dict = {'triggerName': action.trigger,
                    'actionName': action.key.id(),
                    'action_type': action.action_type,
@@ -68,7 +68,7 @@ def actionToDict(action):
     return action_dict
 
 
-def getTriggers():
+def get_triggers():
     response = {'success': 0}
     triggers = []
 
@@ -77,7 +77,7 @@ def getTriggers():
                                              ancestor=datastore.triggers_key()).order(-datastore.Trigger.date)
     data = triggers_query.fetch()
     for trigger in data:
-        triggers.append(triggerToDict(trigger))
+        triggers.append(trigger_to_dict(trigger))
 
     response['triggers'] = triggers
     response['success'] = 1
@@ -100,14 +100,14 @@ class BlockTrigger():
             trigger = datastore.Trigger.get_by_id(self.name, parent=datastore.triggers_key())
 
             if trigger:
-                response['trigger'] = triggerToDict(trigger)
+                response['trigger'] = trigger_to_dict(trigger)
                 response['success'] = 1
             else:
                 response['error'] = 'No trigger with that name found.'
 
         return response
 
-    def saveTrigger(self, settings=None):
+    def save_trigger(self, settings=None):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -172,7 +172,7 @@ class BlockTrigger():
 
             if self.error == '':
                 trigger.put()
-                response['trigger'] = triggerToDict(trigger)
+                response['trigger'] = trigger_to_dict(trigger)
                 response['success'] = 1
 
             else:
@@ -180,7 +180,7 @@ class BlockTrigger():
 
         return response
 
-    def deleteTrigger(self):
+    def delete_trigger(self):
         response = {'success': 0}
 
         if self.error == '':
@@ -194,7 +194,7 @@ class BlockTrigger():
 
         return response
 
-    def saveAction(self, action_name, settings=None):
+    def save_action(self, action_name, settings=None):
         if not settings:
             settings = {}
         response = {'success': 0}
@@ -257,7 +257,7 @@ class BlockTrigger():
 
             if self.error == '':
                 action.put()
-                response['action'] = actionToDict(action)
+                response['action'] = action_to_dict(action)
                 response['success'] = 1
 
             else:
@@ -265,7 +265,7 @@ class BlockTrigger():
 
         return response
 
-    def deleteAction(self, action_name):
+    def delete_action(self, action_name):
         response = {'success': 0}
 
         if self.error == '':
@@ -303,7 +303,7 @@ class CheckTriggers():
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
                     latest_block_height = latest_block_data['latestBlock']['height']
                     if trigger.block_height + trigger.confirmations <= latest_block_height:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: ' +  ' current block_height:' + str(latest_block_height))
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: current block_height:' + str(latest_block_height))
                         trigger.triggered = True
                         trigger.put()
                         self.activate(trigger)
@@ -324,13 +324,14 @@ class CheckTriggers():
                         value = balances['sent']
 
                     if trigger.amount <= value:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: ' +  ' current value:' + str(value))
+                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: current value:' + str(value))
                         trigger.triggered = True
                         trigger.put()
                 else:
                     logging.error('Unable to retrieve balances for address: ' + trigger.address)
 
-    def activate(self, trigger):
+    @staticmethod
+    def activate(trigger):
             actions_query = datastore.Action.query(ancestor=trigger.key)
             actions = actions_query.fetch()
 
