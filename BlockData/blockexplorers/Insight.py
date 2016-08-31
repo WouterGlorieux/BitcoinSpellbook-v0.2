@@ -147,7 +147,7 @@ class API:
             data = json.loads(ret.read())
         except:
             logging.error('Insight: unable to retrieve block {0}'.format(str(height)))
-            self.eror = 'unable to retrieve block {0}'.format(str(height))
+            self.error = 'unable to retrieve block {0}'.format(str(height))
 
         if 'blockHash' in data:
             block['height'] = height

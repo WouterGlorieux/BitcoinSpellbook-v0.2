@@ -57,7 +57,7 @@ profile_message_test_vectors = [
 
 txid_test_vectors = [
     ['bdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b7', True, 'valid txid'],
-    ['Bdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b7', False, 'captital B'],
+    ['Bdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b7', False, 'capital B'],
     ['gdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b7', False, 'letter g'],
     ['bdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b', False, '63 characters'],
     ['bdd523f0171814cc1dcd28cb851ba9e68eb8f26eca03e4d3b0d0c6ca7d20d0b77', False, '64 characters'],
