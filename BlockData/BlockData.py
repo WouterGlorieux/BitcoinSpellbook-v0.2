@@ -131,7 +131,7 @@ def query(query_type, param='', provider=''):
 
 def block(block_height, provider=''):
     response = {'success': 0}
-    if validator.validBlockHeight(block_height):
+    if validator.valid_block_height(block_height):
         response = query('block', block_height, provider)
     else:
         response['error'] = 'block_height must be a positive integer.'
@@ -146,7 +146,7 @@ def latest_block(provider=''):
 
 def prime_input_address(txid, provider=''):
     response = {'success': 0}
-    if validator.validTxid(txid):
+    if validator.valid_txid(txid):
         response = query('prime_input_address', txid, provider)
     else:
         response['error'] = 'Invalid txid'
@@ -156,7 +156,7 @@ def prime_input_address(txid, provider=''):
 
 def transactions(address, provider=''):
     response = {'success': 0}
-    if validator.validAddress(address):
+    if validator.valid_address(address):
         response = query('transactions', address, provider)
     else:
         response['error'] = 'Invalid address'
@@ -169,7 +169,7 @@ def transactions(address, provider=''):
 
 def balances(addresses, provider=''):
     response = {'success': 0}
-    if validator.validAddresses(addresses):
+    if validator.valid_addresses(addresses):
         response = query('balances', addresses, provider)
     else:
         response['error'] = 'Invalid addresses'
@@ -179,7 +179,7 @@ def balances(addresses, provider=''):
 
 def utxos(addresses, provider=''):
     response = {'success': 0}
-    if validator.validAddresses(addresses):
+    if validator.valid_addresses(addresses):
         response = query('utxos', addresses, provider)
     else:
         response['error'] = 'Invalid addresses'

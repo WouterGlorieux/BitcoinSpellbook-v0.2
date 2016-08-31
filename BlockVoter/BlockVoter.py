@@ -16,7 +16,7 @@ class BlockVoter():
             options = []
         self.error = ''
 
-        if address != '' and validator.validAddress(address):
+        if address != '' and validator.valid_address(address):
             self.address = address
         else:
             self.error = 'Invalid address'
@@ -47,13 +47,13 @@ class BlockVoter():
         if weights in ['Value', 'Equal', 'SIL', 'LBL', 'LRL', 'LSL']:
             self.weights = weights
 
-            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.validAddress(registration_address):
+            if weights in ['SIL', 'LBL', 'LRL', 'LSL'] and validator.valid_address(registration_address):
 
                 if isinstance(registration_block_height, int) and registration_block_height >= 0:
                     self.registration_address = registration_address
                     self.registration_block_height = registration_block_height
 
-                    if weights in ['LBL', 'LRL', 'LSL'] and validator.validXPUB(registration_xpub):
+                    if weights in ['LBL', 'LRL', 'LSL'] and validator.valid_xpub(registration_xpub):
                         self.registration_xpub = registration_xpub
                     elif weights in ['LBL', 'LRL', 'LSL']:
                         self.error = 'Invalid registration XPUB'

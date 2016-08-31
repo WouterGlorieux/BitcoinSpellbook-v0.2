@@ -120,37 +120,37 @@ class BlockTrigger():
             elif 'trigger_type' in settings:
                 self.error = 'trigger_type must be Balance, Received or Sent'
 
-            if 'address' in settings and (validator.validAddress(settings['address']) or settings['address'] == ''):
+            if 'address' in settings and (validator.valid_address(settings['address']) or settings['address'] == ''):
                 trigger.address = settings['address']
             elif 'address' in settings:
                 self.error = 'Invalid address'
 
-            if 'amount' in settings and validator.validAmount(settings['amount']):
+            if 'amount' in settings and validator.valid_amount(settings['amount']):
                 trigger.amount = settings['amount']
             elif 'amount' in settings:
                 self.error = 'amount must be greater than or equal to 0 (in Satoshis)'
 
-            if 'confirmations' in settings and validator.validAmount(settings['confirmations']):
+            if 'confirmations' in settings and validator.valid_amount(settings['confirmations']):
                 trigger.confirmations = settings['confirmations']
             elif 'confirmations' in settings:
                 self.error = 'confirmations must be a positive integer or equal to 0'
 
-            if 'description' in settings and validator.validDescription(settings['description']):
+            if 'description' in settings and validator.valid_description(settings['description']):
                 trigger.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
-            if 'creator' in settings and validator.validCreator(settings['creator']):
+            if 'creator' in settings and validator.valid_creator(settings['creator']):
                 trigger.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+            if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
                 trigger.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
-            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
+            if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
                 trigger.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
@@ -210,37 +210,37 @@ class BlockTrigger():
             elif 'action_type' in settings:
                 self.error = 'action_type must be reveal_text, reveal_link, send_mail or webhook'
 
-            if 'description' in settings and validator.validDescription(settings['description']):
+            if 'description' in settings and validator.valid_description(settings['description']):
                 action.description = settings['description']
             elif 'description' in settings:
                 self.error = 'invalid description'
 
-            if 'reveal_text' in settings and validator.validText(settings['reveal_text']):
+            if 'reveal_text' in settings and validator.valid_text(settings['reveal_text']):
                 action.reveal_text = settings['reveal_text']
             elif 'reveal_text' in settings:
                 self.error = 'invalid reveal_text'
 
-            if 'reveal_link_text' in settings and validator.validText(settings['reveal_link_text']):
+            if 'reveal_link_text' in settings and validator.valid_text(settings['reveal_link_text']):
                 action.reveal_link_text = settings['reveal_link_text']
             elif 'reveal_link_text' in settings:
                 self.error = 'invalid reveal_link_text'
 
-            if 'reveal_link_url' in settings and validator.validURL(settings['reveal_link_url']):
+            if 'reveal_link_url' in settings and validator.valid_url(settings['reveal_link_url']):
                 action.reveal_link_url = settings['reveal_link_url']
             elif 'reveal_link_url' in settings:
                 self.error = 'invalid reveal_link_url'
 
-            if 'mail_to' in settings and validator.validEmail(settings['mail_to']):
+            if 'mail_to' in settings and validator.valid_email(settings['mail_to']):
                 action.mail_to = settings['mail_to']
             elif 'mail_to' in settings:
                 self.error = 'invalid mail_to address'
 
-            if 'mail_subject' in settings and validator.validText(settings['mail_subject']):
+            if 'mail_subject' in settings and validator.valid_text(settings['mail_subject']):
                 action.mail_subject = settings['mail_subject']
             elif 'mail_subject' in settings:
                 self.error = 'invalid mail_subject'
 
-            if 'mail_body' in settings and validator.validText(settings['mail_body']):
+            if 'mail_body' in settings and validator.valid_text(settings['mail_body']):
                 action.mail_body = settings['mail_body']
             elif 'mail_body' in settings:
                 self.error = 'invalid mail_body'
@@ -250,7 +250,7 @@ class BlockTrigger():
             elif 'mail_sent' in settings:
                 self.error = 'invalid mail_sent'
 
-            if 'webhook' in settings and validator.validURL(settings['webhook']):
+            if 'webhook' in settings and validator.valid_url(settings['webhook']):
                 action.webhook = settings['webhook']
             elif 'webhook' in settings:
                 self.error = 'invalid webhook'
@@ -343,7 +343,7 @@ class CheckTriggers():
                     action.put()
 
                 elif action.action_type == 'send_mail' and action.mail_sent is False:
-                    if validator.validEmail(action.mail_to):
+                    if validator.valid_email(action.mail_to):
                         logging.info('executing action: ' + action.key.id())
                         try:
                             parameters = datastore.Parameters.get_by_id('DefaultConfig')
@@ -358,7 +358,7 @@ class CheckTriggers():
 
                 elif action.action_type == 'webhook' and action.webhook_activated is False:
 
-                    if validator.validURL(action.webhook):
+                    if validator.valid_url(action.webhook):
                         logging.info('executing action: ' + action.key.id())
                         try:
                             logging.info('starting webhook')

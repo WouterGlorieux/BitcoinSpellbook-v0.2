@@ -180,12 +180,12 @@ class Writer():
             parameters = datastore.Parameters.get_by_id('DefaultConfig')
             writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
 
-            if 'message' in settings and validator.validOP_RETURN(settings['message']):
+            if 'message' in settings and validator.valid_op_return(settings['message']):
                 writer.message = settings['message']
             elif 'message' in settings:
                 self.error = 'Invalid message'
 
-            if 'outputs' in settings and validator.validOutputs(eval(settings['outputs'])):
+            if 'outputs' in settings and validator.valid_outputs(eval(settings['outputs'])):
                 writer.outputs = eval(settings['outputs'])
 
                 total_output_value = 0
@@ -215,37 +215,37 @@ class Writer():
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
 
-            if 'description' in settings and validator.validDescription(settings['description']):
+            if 'description' in settings and validator.valid_description(settings['description']):
                 writer.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
-            if 'creator' in settings and validator.validCreator(settings['creator']):
+            if 'creator' in settings and validator.valid_creator(settings['creator']):
                 writer.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+            if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
                 writer.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
-            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
+            if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
                 writer.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
-            if 'fee_percentage' in settings and validator.validPercentage(settings['fee_percentage']):
+            if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
                 writer.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+            if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
                 writer.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
-            if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
+            if 'maximum_transaction_fee' in settings and validator.valid_amount(settings['maximum_transaction_fee']):
                 writer.maximum_transaction_fee = settings['maximum_transaction_fee']
             elif 'maximum_transaction_fee' in settings:
                 self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
@@ -255,12 +255,12 @@ class Writer():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
                 writer.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+            if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
                 writer.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
@@ -273,7 +273,7 @@ class Writer():
                     writer.wallet_index = get_available_address_index()
                 writer.address = datastore.get_service_address(datastore.Services.blockwriter, writer.wallet_index)
 
-            if not validator.validAddress(writer.address):
+            if not validator.valid_address(writer.address):
                 self.error = 'Unable to get address for writer'
             else:
                 writer.extra_value_address = writer.address
@@ -331,11 +331,11 @@ class DoWriting():
     def run(writer):
         success = False
 
-        if not validator.validOP_RETURN(writer.message):
+        if not validator.valid_op_return(writer.message):
             logging.error('Invalid OP_RETURN message: ' + writer.message)
             return None
 
-        if not validator.validOutputs(writer.outputs):
+        if not validator.valid_outputs(writer.outputs):
             logging.error('Invalid outputs: ' + str(writer.outputs))
             return None
 

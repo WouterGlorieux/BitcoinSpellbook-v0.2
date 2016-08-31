@@ -21,7 +21,7 @@ class BlockLinker():
 
         self.error = ''
 
-        if validator.validAddress(self.address) and validator.validXPUB(self.xpub):
+        if validator.valid_address(self.address) and validator.valid_xpub(self.xpub):
             sil_data = BlockInputs.get_sil(self.address, self.block_height)
 
             if 'success' in sil_data and sil_data['success'] == 1:
@@ -37,9 +37,9 @@ class BlockLinker():
 
             else:
                 self.error = 'Unable to retrieve sil'
-        elif not validator.validAddress(self.address):
+        elif not validator.valid_address(self.address):
             self.error = 'Invalid address: ' + self.address
-        elif not validator.validXPUB(self.xpub):
+        elif not validator.valid_xpub(self.xpub):
             self.error = 'Invalid xpub: ' + self.xpub
 
     def get_lbl(self):

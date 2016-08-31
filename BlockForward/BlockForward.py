@@ -105,27 +105,27 @@ class BlockForward():
                     forwarding_relation['relation'] = 'forwarding address'
                 else:
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
-                    LAL_data = linker.get_lal()
-                    if 'success' in LAL_data and LAL_data['success'] == 1:
-                        LAL = LAL_data['LAL']
+                    lal_data = linker.get_lal()
+                    if 'success' in lal_data and lal_data['success'] == 1:
+                        lal = lal_data['LAL']
 
-                    LBL_data = linker.get_lbl()
-                    if 'success' in LBL_data and LBL_data['success'] == 1:
-                        LBL = LBL_data['LBL']
+                    lbl_data = linker.get_lbl()
+                    if 'success' in lbl_data and lbl_data['success'] == 1:
+                        lbl = lbl_data['LBL']
 
-                    for i in range(0, len(LAL)):
-                        if LAL[i][0] == address:
+                    for i in range(0, len(lal)):
+                        if lal[i][0] == address:
                             forwarding_relation['relation'] = 'sending address'
-                            forwarding_relation['sentTo'] = LAL[i][1]
-                            forwarding_relation['balance'] = LBL[i][1]
-                            forwarding_relation['share'] = LBL[i][2]
+                            forwarding_relation['sentTo'] = lal[i][1]
+                            forwarding_relation['balance'] = lbl[i][1]
+                            forwarding_relation['share'] = lbl[i][2]
                             break
 
-                        elif LAL[i][1] == address:
+                        elif lal[i][1] == address:
                             forwarding_relation['relation'] = 'receiving address'
-                            forwarding_relation['sentFrom'] = LAL[i][0]
-                            forwarding_relation['balance'] = LBL[i][1]
-                            forwarding_relation['share'] = LBL[i][2]
+                            forwarding_relation['sentFrom'] = lal[i][0]
+                            forwarding_relation['balance'] = lbl[i][1]
+                            forwarding_relation['share'] = lbl[i][2]
                             break
 
                 response[address] = forwarding_relation
@@ -144,32 +144,32 @@ class BlockForward():
         if self.error == '':
             forwarder = datastore.Forwarder.get_or_insert(self.name, parent=datastore.forwarders_key())
 
-            if 'xpub' in settings and validator.validXPUB(settings['xpub']):
+            if 'xpub' in settings and validator.valid_xpub(settings['xpub']):
                 forwarder.xpub = settings['xpub']
             elif 'xpub' in settings:
                 self.error = 'Invalid xpub key'
 
-            if 'description' in settings and validator.validDescription(settings['description']):
+            if 'description' in settings and validator.valid_description(settings['description']):
                 forwarder.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
-            if 'creator' in settings and validator.validCreator(settings['creator']):
+            if 'creator' in settings and validator.valid_creator(settings['creator']):
                 forwarder.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+            if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
                 forwarder.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
-            if 'minimum_amount' in settings and validator.validAmount(settings['minimum_amount']):
+            if 'minimum_amount' in settings and validator.valid_amount(settings['minimum_amount']):
                 forwarder.minimum_amount = settings['minimum_amount']
             elif 'minimum_amount' in settings:
                 self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
-            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
+            if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
                 forwarder.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
@@ -184,17 +184,17 @@ class BlockForward():
             elif 'status' in settings:
                 self.error = 'status must be Pending, Active or Disabled'
 
-            if 'fee_percentage' in settings and validator.validPercentage(settings['fee_percentage']):
+            if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
                 forwarder.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+            if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
                 forwarder.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
-            if 'confirm_amount' in settings and validator.validAmount(settings['confirm_amount']):
+            if 'confirm_amount' in settings and validator.valid_amount(settings['confirm_amount']):
                 forwarder.confirm_amount = settings['confirm_amount']
             elif 'confirm_amount' in settings:
                 self.error = 'confirm_amount must be greater than or equal to 0 (in Satoshis)'
@@ -204,12 +204,12 @@ class BlockForward():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
                 forwarder.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+            if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
                 forwarder.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
@@ -222,7 +222,7 @@ class BlockForward():
                 forwarder.address = datastore.get_service_address(datastore.Services.blockforward,
                                                                   forwarder.wallet_index)
 
-            if not validator.validAddress(forwarder.address):
+            if not validator.valid_address(forwarder.address):
                 self.error = 'Unable to get address for forwarder'
 
             if self.error == '':
@@ -280,22 +280,22 @@ class DoForwarding():
 
             prime_input_address_data = BlockData.prime_input_address(utxo['output'].split(":")[0])
             if 'success' in prime_input_address_data and prime_input_address_data['success'] == 1:
-                primeInputAddress = prime_input_address_data['PrimeInputAddress']
-                if primeInputAddress != forwarder.address:
+                prime_input_address = prime_input_address_data['PrimeInputAddress']
+                if prime_input_address != forwarder.address:
 
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
-                    LAL_data = linker.get_lal()
-                    if 'success' in LAL_data and LAL_data['success'] == 1:
-                        LAL = LAL_data['LAL']
+                    lal_data = linker.get_lal()
+                    if 'success' in lal_data and lal_data['success'] == 1:
+                        lal = lal_data['LAL']
                     else:
                         self.error = 'Unable to retrieve LAL for address ' + forwarder.address
 
-                    for i in range(0, len(LAL)):
-                        if LAL[i][0] == primeInputAddress:
-                            to_addresses.append(LAL[i][1])
+                    for i in range(0, len(lal)):
+                        if lal[i][0] == prime_input_address:
+                            to_addresses.append(lal[i][1])
                             amounts.append(utxo['value'])
 
-                    logging.info(forwarder.key.id() + ' : Starting forward from address ' + primeInputAddress
+                    logging.info(forwarder.key.id() + ' : Starting forward from address ' + prime_input_address
                                  + ', value: ' + str(amounts[0]) + ' Satoshis')
 
                     private_keys = {}
@@ -309,7 +309,7 @@ class DoForwarding():
                         logging.warning(
                             "{0} is below minimum of {1} + transaction fee of {2}! returning btc to sender".format(
                                 str(amounts[0]), str(forwarder.minimum_amount), str(TRANSACTION_FEE)))
-                        to_addresses = [primeInputAddress]
+                        to_addresses = [prime_input_address]
 
                         #if there is enough btc, subtract network fee, otherwise log a warning
                         if amounts[0] > TRANSACTION_FEE:
@@ -337,8 +337,8 @@ class DoForwarding():
                         if forwarder.confirm_amount > 0:
                             amounts[0] -= forwarder.confirm_amount
                             amounts.append(forwarder.confirm_amount)
-                            to_addresses.append(primeInputAddress)
-                            logging.info("Origin: " + str(forwarder.confirm_amount) + " -> " + primeInputAddress)
+                            to_addresses.append(prime_input_address)
+                            logging.info("Origin: " + str(forwarder.confirm_amount) + " -> " + prime_input_address)
 
                         #subtract transaction fee in satoshis from first amount
                         amounts[0] -= TRANSACTION_FEE

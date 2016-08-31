@@ -8,7 +8,7 @@ def get_profile(address, block=0):
     response = {'success': 0}
     profile = []
 
-    if validator.validAddress(address):
+    if validator.valid_address(address):
         if block == 0:
             latest_block = BlockData.latest_block()
 
@@ -45,7 +45,7 @@ def txs_to_profile(txs, address, block_height=0):
                     block_height = tx['block_height']
                     profile[prime_input_address] = {'lastUpdate': block_height}
                     message = output['OP_RETURN']
-                    if validator.validOP_RETURN(message) and validator.validBlockProfileMessage(message):
+                    if validator.valid_op_return(message) and validator.valid_blockprofile_message(message):
                         for message_part in message.split("|"):
                             (from_index, to_index, variable_name, variable_value) = components(message_part)
                             if from_index:

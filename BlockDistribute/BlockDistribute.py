@@ -143,34 +143,34 @@ class Distributer():
             elif 'distribution_source' in settings:
                 self.error = 'Invalid distribution_source'
 
-            if 'registration_address' in settings and (validator.validAddress(settings['registration_address']) or settings['registration_address'] == ''):
+            if 'registration_address' in settings and (validator.valid_address(settings['registration_address']) or settings['registration_address'] == ''):
                 distributer.registration_address = settings['registration_address']
             elif 'registration_address' in settings:
                 self.error = 'Invalid registration_address'
 
-            if 'registration_xpub' in settings and (validator.validXPUB(settings['registration_xpub']) or settings['registration_xpub'] == ''):
+            if 'registration_xpub' in settings and (validator.valid_xpub(settings['registration_xpub']) or settings['registration_xpub'] == ''):
                 distributer.registration_xpub = settings['registration_xpub']
             elif 'registration_xpub' in settings:
                 self.error = 'Invalid registration_xpub'
 
-            if 'registration_block_height' in settings and (validator.validBlockHeight(settings['registration_block_height'])):
+            if 'registration_block_height' in settings and (validator.valid_block_height(settings['registration_block_height'])):
                 distributer.registration_block_height = settings['registration_block_height']
             elif 'registration_block_height' in settings:
                 self.error = 'Invalid registration_block_height: ' + str(settings['registration_block_height'])
 
-            if 'distribution' in settings and validator.validDistribution(eval(settings['distribution'])):
+            if 'distribution' in settings and validator.valid_distribution(eval(settings['distribution'])):
                 distributer.distribution = eval(settings['distribution'])
             elif 'distribution' in settings and settings['distribution'] == u'[]':
                 distributer.distribution = []
             elif 'distribution' in settings:
                 self.error = 'Invalid distribution: ' + settings['distribution']
 
-            if 'minimum_amount' in settings and validator.validAmount(settings['minimum_amount']):
+            if 'minimum_amount' in settings and validator.valid_amount(settings['minimum_amount']):
                 distributer.minimum_amount = settings['minimum_amount']
             elif 'minimum_amount' in settings:
                 self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
-            if 'threshold' in settings and validator.validAmount(settings['threshold']):
+            if 'threshold' in settings and validator.valid_amount(settings['threshold']):
                 distributer.minimum_amount = settings['threshold']
             elif 'threshold' in settings:
                 self.error = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
@@ -185,37 +185,37 @@ class Distributer():
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
 
-            if 'description' in settings and validator.validDescription(settings['description']):
+            if 'description' in settings and validator.valid_description(settings['description']):
                 distributer.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
-            if 'creator' in settings and validator.validCreator(settings['creator']):
+            if 'creator' in settings and validator.valid_creator(settings['creator']):
                 distributer.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
-            if 'creator_email' in settings and validator.validEmail(settings['creator_email']):
+            if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
                 distributer.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
-            if 'youtube' in settings and validator.validYoutubeID(settings['youtube']):
+            if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
                 distributer.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
-            if 'fee_percentage' in settings and validator.validPercentage(settings['fee_percentage']):
+            if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
                 distributer.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
-            if 'fee_address' in settings and (validator.validAddress(settings['fee_address']) or settings['fee_address'] == ''):
+            if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
                 distributer.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
-            if 'maximum_transaction_fee' in settings and validator.validAmount(settings['maximum_transaction_fee']):
+            if 'maximum_transaction_fee' in settings and validator.valid_amount(settings['maximum_transaction_fee']):
                 distributer.maximum_transaction_fee = settings['maximum_transaction_fee']
             elif 'maximum_transaction_fee' in settings:
                 self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
@@ -225,12 +225,12 @@ class Distributer():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.validAmount(settings['wallet_index']):
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
                 distributer.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
-            if 'private_key' in settings and validator.validprivate_key(settings['private_key']):
+            if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
                 distributer.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
@@ -242,7 +242,7 @@ class Distributer():
                     distributer.wallet_index = get_next_index()
                 distributer.address = datastore.get_service_address(datastore.Services.blockdistribute, distributer.wallet_index)
 
-            if not validator.validAddress(distributer.address):
+            if not validator.valid_address(distributer.address):
                 self.error = 'Unable to get address for distributer'
 
             if self.error == '':
@@ -277,9 +277,9 @@ class Distributer():
             if distributer:
                 distribution = distributer.distribution
                 if distributer.distribution_source == 'SIL':
-                    SIL_data = BlockInputs.get_sil(distributer.registration_address, distributer.registration_block_height)
-                    if 'success' in SIL_data and SIL_data['success'] == 1:
-                        distribution = SIL_data['SIL']
+                    sil_data = BlockInputs.get_sil(distributer.registration_address, distributer.registration_block_height)
+                    if 'success' in sil_data and sil_data['success'] == 1:
+                        distribution = sil_data['SIL']
                     else:
                         self.error = 'Unable to retrieve sil'
 
@@ -300,7 +300,7 @@ class Distributer():
                     else:
                         self.error = 'Unable to retrieve ' + distributer.distribution_source
 
-                if validator.validDistribution(distribution):
+                if validator.valid_distribution(distribution):
                     distributer.distribution = distribution
                     distributer.put()
                 else:
@@ -360,7 +360,7 @@ class DoDistributing():
             elif distributer.distribution_source == 'Custom':
                 distribution = distributer.distribution
 
-            if validator.validDistribution(distribution):
+            if validator.valid_distribution(distribution):
                 logging.info("distribution: " + str(distribution))
                 optimal_outputs = self.optimal_outputs(total_input_value, distribution, distributer)
                 logging.info("optimal outputs: " + str(optimal_outputs))

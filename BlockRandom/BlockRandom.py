@@ -11,7 +11,7 @@ class Random():
         self.address = ''
         self.xpub = ''
 
-        if address != '' and not validator.validAddress(address):
+        if address != '' and not validator.valid_address(address):
             self.error = 'Invalid address: ' + address
         else:
             self.address = address
@@ -21,7 +21,7 @@ class Random():
         else:
             self.error = 'block_height must be an integer greater than or equal to zero'
 
-        if xpub != '' and not validator.validXPUB(xpub):
+        if xpub != '' and not validator.valid_xpub(xpub):
             self.error = 'Invalid xpub: ' + xpub
         else:
             self.xpub = xpub

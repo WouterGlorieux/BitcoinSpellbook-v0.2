@@ -57,7 +57,7 @@ class API:
 
             if 'block_height' in transaction:
                 tx.block_height = transaction['block_height']
-                tx.confirmations = (latest_block_height - tx.block_height) +1
+                tx.confirmations = (latest_block_height - tx.block_height) + 1
             else:
                 tx.block_height = None
                 tx.confirmations = 0

@@ -13,7 +13,7 @@ BLOCKPROFILE_REGEX = "^[0-9]*@[0-9]+:[a-zA-Z0-9]+=[a-zA-Z0-9 ]+$"
 EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
 
-def validAddress(address):
+def valid_address(address):
     valid = False
 
     if isinstance(address, (str, unicode)) and re.match(ADDRESS_REGEX, address):
@@ -22,12 +22,12 @@ def validAddress(address):
     return valid
 
 
-def validAddresses(addresses):
+def valid_addresses(addresses):
     valid = False
 
     if isinstance(addresses, (str, unicode)):
         for address in addresses.split("|"):
-            if validAddress(address):
+            if valid_address(address):
                 valid = True
             else:
                 valid = False
@@ -36,7 +36,7 @@ def validAddresses(addresses):
     return valid
 
 
-def validTxid(txid):
+def valid_txid(txid):
     valid = False
 
     if isinstance(txid, (str, unicode)) and re.match(TXID_REGEX, txid):
@@ -45,7 +45,7 @@ def validTxid(txid):
     return valid
 
 
-def validXPUB(xpub):
+def valid_xpub(xpub):
     valid = False
     if isinstance(xpub, (str, unicode)) and xpub[:4] == "xpub":
         valid = True
@@ -53,7 +53,7 @@ def validXPUB(xpub):
     return valid
 
 
-def validDescription(description):
+def valid_description(description):
     valid = False
 
     if isinstance(description, (str, unicode)) and len(description) <= 250:
@@ -62,7 +62,7 @@ def validDescription(description):
     return valid
 
 
-def validOP_RETURN(message):
+def valid_op_return(message):
     valid = False
 
     if isinstance(message, (str, unicode)) and 0 < len(message) <= 80:
@@ -71,20 +71,20 @@ def validOP_RETURN(message):
     return valid
 
 
-def validBlockProfileMessage(message):
+def valid_blockprofile_message(message):
     valid = False
-    allValid = True
+    all_valid = True
     if isinstance(message, (str, unicode)):
         for message_part in message.split("|"):
             if re.match(BLOCKPROFILE_REGEX, message_part):
                 valid = True
             else:
-                allValid = False
+                all_valid = False
 
-    return valid and allValid
+    return valid and all_valid
 
 
-def validText(text):
+def valid_text(text):
     valid = False
 
     if isinstance(text, (str, unicode)):
@@ -93,7 +93,7 @@ def validText(text):
     return valid
 
 
-def validURL(url):
+def valid_url(url):
     valid = False
 
     if isinstance(url, (str, unicode)) and re.match(URL_REGEX, url):
@@ -102,7 +102,7 @@ def validURL(url):
     return valid
 
 
-def validCreator(creator):
+def valid_creator(creator):
     valid = False
 
     if isinstance(creator, (str, unicode)) and re.match(ALL_CHARACTERS_REGEX, creator):
@@ -111,7 +111,7 @@ def validCreator(creator):
     return valid
 
 
-def validEmail(email):
+def valid_email(email):
     valid = False
     if isinstance(email, (str, unicode)) and re.match(EMAIL_REGEX, email):
         valid = True
@@ -119,7 +119,7 @@ def validEmail(email):
     return valid
 
 
-def validAmount(amount):
+def valid_amount(amount):
     valid = False
 
     if isinstance(amount, int) and amount >= 0:
@@ -128,7 +128,7 @@ def validAmount(amount):
     return valid
 
 
-def validBlockHeight(block_height):
+def valid_block_height(block_height):
     valid = False
 
     if isinstance(block_height, int) and block_height >= 0:
@@ -137,7 +137,7 @@ def validBlockHeight(block_height):
     return valid
 
 
-def validPercentage(percentage):
+def valid_percentage(percentage):
     valid = False
 
     if isinstance(percentage, (int, float)) and 0.0 <= percentage <= 100.0:
@@ -146,7 +146,7 @@ def validPercentage(percentage):
     return valid
 
 
-def validYoutube(youtube):
+def valid_youtube(youtube):
     valid = False
 
     if isinstance(youtube, (str, unicode)) and re.match(YOUTUBE_REGEX, youtube):
@@ -155,7 +155,7 @@ def validYoutube(youtube):
     return valid
 
 
-def validYoutubeID(youtube):
+def valid_youtube_id(youtube):
     valid = False
 
     if isinstance(youtube, (str, unicode)) and re.match(YOUTUBE_ID_REGEX, youtube):
@@ -164,7 +164,7 @@ def validYoutubeID(youtube):
     return valid
 
 
-def validprivate_key(private_key):
+def valid_private_key(private_key):
     valid = False
 
     if isinstance(private_key, (str, unicode)) and len(private_key) > 0:
@@ -173,7 +173,7 @@ def validprivate_key(private_key):
     return valid
 
 
-def validDistribution(distribution):
+def valid_distribution(distribution):
     valid = False
 
     if isinstance(distribution, list):
@@ -192,7 +192,7 @@ def validDistribution(distribution):
     return valid
 
 
-def validOutputs(outputs):
+def valid_outputs(outputs):
     valid = False
 
     if isinstance(outputs, list):
@@ -200,7 +200,7 @@ def validOutputs(outputs):
             for recipient in outputs:
                 if isinstance(recipient, (tuple, list)):
                     if len(recipient) == 2:
-                        if validAddress(recipient[0]) and isinstance(recipient[1], int) and recipient[1] > 0:
+                        if valid_address(recipient[0]) and isinstance(recipient[1], int) and recipient[1] > 0:
                             valid = True
                         else:
                             valid = False

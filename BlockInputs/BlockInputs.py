@@ -8,7 +8,7 @@ def get_sil(address, block=0):
     response = {'success': 0}
     sil = []
 
-    if validator.validAddress(address):
+    if validator.valid_address(address):
         if block == 0:
             latest_block = BlockData.latest_block()
 
