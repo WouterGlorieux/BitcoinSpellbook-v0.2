@@ -1,11 +1,11 @@
 import urllib2
 import json
+from decimal import *
+import logging
+
 import TxFactory.TxFactory as TxFactory
 from BlockData import TX
 
-from pprint import pprint
-from decimal import *
-import logging
 
 API_URL = 'https://blockexplorer.com/api'
 
