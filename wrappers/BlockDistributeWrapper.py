@@ -19,7 +19,7 @@ class BlockDistributeWrapper():
         parameters = {}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/getDistributers?" + query_string
+        url = self.url + "/distributer/get_distributers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -34,7 +34,7 @@ class BlockDistributeWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/getDistributer?" + query_string
+        url = self.url + "/distributer/get_distributer?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -50,7 +50,7 @@ class BlockDistributeWrapper():
                       'address': address}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/checkAddress?" + query_string
+        url = self.url + "/distributer/check_address?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -67,7 +67,7 @@ class BlockDistributeWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/saveDistributer?" + query_string
+        url = self.url + "/distributer/save_distributer?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
@@ -92,7 +92,7 @@ class BlockDistributeWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/deleteDistributer?" + query_string
+        url = self.url + "/distributer/delete_distributer?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -117,7 +117,7 @@ class BlockDistributeWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/updateDistribution?" + query_string
+        url = self.url + "/distributer/update_distribution?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -142,7 +142,7 @@ class BlockDistributeWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/distributer/doDistributing?" + query_string
+        url = self.url + "/distributer/do_distributing?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

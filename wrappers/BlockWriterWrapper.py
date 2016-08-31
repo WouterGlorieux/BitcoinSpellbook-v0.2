@@ -19,7 +19,7 @@ class BlockWriterWrapper():
         parameters = {}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/writer/getWriters?" + query_string
+        url = self.url + "/writer/get_writers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -34,7 +34,7 @@ class BlockWriterWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/writer/getWriter?" + query_string
+        url = self.url + "/writer/get_writer?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -51,7 +51,7 @@ class BlockWriterWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/writer/saveWriter?" + query_string
+        url = self.url + "/writer/save_writer?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
@@ -76,7 +76,7 @@ class BlockWriterWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/writer/deleteWriter?" + query_string
+        url = self.url + "/writer/delete_writer?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -101,7 +101,7 @@ class BlockWriterWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/writer/doWriting?" + query_string
+        url = self.url + "/writer/do_writing?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

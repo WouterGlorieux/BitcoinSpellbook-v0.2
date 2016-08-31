@@ -19,7 +19,7 @@ class BlockTriggerWrapper():
         parameters = {}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/getTriggers?" + query_string
+        url = self.url + "/trigger/get_triggers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -34,7 +34,7 @@ class BlockTriggerWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/getTrigger?" + query_string
+        url = self.url + "/trigger/get_trigger?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -51,7 +51,7 @@ class BlockTriggerWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/saveTrigger?" + query_string
+        url = self.url + "/trigger/save_trigger?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
@@ -76,7 +76,7 @@ class BlockTriggerWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/deleteTrigger?" + query_string
+        url = self.url + "/trigger/delete_trigger?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -104,7 +104,7 @@ class BlockTriggerWrapper():
                       'action_name': action_name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/saveAction?" + query_string
+        url = self.url + "/trigger/save_action?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
@@ -130,7 +130,7 @@ class BlockTriggerWrapper():
                       'action_name': action_name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/deleteAction?" + query_string
+        url = self.url + "/trigger/delete_action?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -155,7 +155,7 @@ class BlockTriggerWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/trigger/checkTriggers?" + query_string
+        url = self.url + "/trigger/check_triggers?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

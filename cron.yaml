@@ -4,17 +4,17 @@ cron:
   schedule: every 30 minutes
 
 - description: BlockForwarder
-  url: /forwarder/doForwarding
+  url: /forwarder/do_forwarding
   schedule: every 10 minutes
 
 - description: BlockDistributer
-  url: /distributer/doDistributing
+  url: /distributer/do_distributing
   schedule: every 10 minutes
 
 - description: BlockTrigger
-  url: /trigger/checkTriggers
+  url: /trigger/check_triggers
   schedule: every 10 minutes
 
 - description: BlockWriter
-  url: /writer/doWriting
+  url: /writer/do_writing
   schedule: every 10 minutes

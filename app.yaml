@@ -32,13 +32,13 @@ handlers:
 - url: /data/utxos
   script: BitcoinSpellbook.app
 
-- url: /data/saveProvider
+- url: /data/save_provider
   script: BitcoinSpellbook.app
 
-- url: /data/deleteProvider
+- url: /data/delete_provider
   script: BitcoinSpellbook.app
 
-- url: /data/getProviders
+- url: /data/get_providers
   script: BitcoinSpellbook.app
 
 - url: /admin/initialize
@@ -77,88 +77,88 @@ handlers:
 - url: /voter/results
   script: BitcoinSpellbook.app
 
-- url: /forwarder/getForwarders
+- url: /forwarder/get_forwarders
   script: BitcoinSpellbook.app
 
-- url: /forwarder/getForwarder
+- url: /forwarder/get_forwarder
   script: BitcoinSpellbook.app
 
-- url: /forwarder/checkAddress
+- url: /forwarder/check_address
   script: BitcoinSpellbook.app
 
-- url: /forwarder/saveForwarder
+- url: /forwarder/save_forwarder
   script: BitcoinSpellbook.app
 
-- url: /forwarder/deleteForwarder
+- url: /forwarder/delete_forwarder
   script: BitcoinSpellbook.app
 
-- url: /forwarder/doForwarding
-  script: BitcoinSpellbook.app
-  login: admin
-
-
-- url: /distributer/getDistributers
-  script: BitcoinSpellbook.app
-
-- url: /distributer/getDistributer
-  script: BitcoinSpellbook.app
-
-- url: /distributer/checkAddress
-  script: BitcoinSpellbook.app
-
-- url: /distributer/saveDistributer
-  script: BitcoinSpellbook.app
-
-- url: /distributer/deleteDistributer
-  script: BitcoinSpellbook.app
-
-
-- url: /distributer/updateDistribution
-  script: BitcoinSpellbook.app
-
-- url: /distributer/doDistributing
+- url: /forwarder/do_forwarding
   script: BitcoinSpellbook.app
   login: admin
 
 
-- url: /trigger/getTriggers
+- url: /distributer/get_distributers
   script: BitcoinSpellbook.app
 
-- url: /trigger/getTrigger
+- url: /distributer/get_distributer
   script: BitcoinSpellbook.app
 
-- url: /trigger/saveTrigger
+- url: /distributer/check_address
   script: BitcoinSpellbook.app
 
-- url: /trigger/deleteTrigger
+- url: /distributer/save_distributer
   script: BitcoinSpellbook.app
 
-- url: /trigger/saveAction
-  script: BitcoinSpellbook.app
-
-- url: /trigger/deleteAction
+- url: /distributer/delete_distributer
   script: BitcoinSpellbook.app
 
 
-- url: /trigger/checkTriggers
+- url: /distributer/update_distribution
+  script: BitcoinSpellbook.app
+
+- url: /distributer/do_distributing
+  script: BitcoinSpellbook.app
+  login: admin
+
+
+- url: /trigger/get_triggers
+  script: BitcoinSpellbook.app
+
+- url: /trigger/get_trigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/save_trigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/delete_trigger
+  script: BitcoinSpellbook.app
+
+- url: /trigger/save_action
+  script: BitcoinSpellbook.app
+
+- url: /trigger/delete_action
+  script: BitcoinSpellbook.app
+
+
+- url: /trigger/check_triggers
   script: BitcoinSpellbook.app
   login: admin
 
 
 
-- url: /writer/getWriters
+- url: /writer/get_writers
   script: BitcoinSpellbook.app
 
-- url: /writer/getWriter
+- url: /writer/get_writer
   script: BitcoinSpellbook.app
 
-- url: /writer/saveWriter
+- url: /writer/save_writer
   script: BitcoinSpellbook.app
 
-- url: /writer/deleteWriter
+- url: /writer/delete_writer
   script: BitcoinSpellbook.app
 
-- url: /writer/doWriting
+- url: /writer/do_writing
   script: BitcoinSpellbook.app
   login: admin
 

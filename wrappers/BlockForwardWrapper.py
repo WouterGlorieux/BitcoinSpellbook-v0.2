@@ -19,7 +19,7 @@ class BlockForwardWrapper():
         parameters = {}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/getForwarders?" + query_string
+        url = self.url + "/forwarder/get_forwarders?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -34,7 +34,7 @@ class BlockForwardWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/getForwarder?" + query_string
+        url = self.url + "/forwarder/get_forwarder?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -50,7 +50,7 @@ class BlockForwardWrapper():
                       'address': address}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/checkAddress?" + query_string
+        url = self.url + "/forwarder/check_address?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -67,7 +67,7 @@ class BlockForwardWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/saveForwarder?" + query_string
+        url = self.url + "/forwarder/save_forwarder?" + query_string
 
         postdata = urllib.urlencode(settings)
         message = hashlib.sha256(postdata).digest()
@@ -92,7 +92,7 @@ class BlockForwardWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/deleteForwarder?" + query_string
+        url = self.url + "/forwarder/delete_forwarder?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -117,7 +117,7 @@ class BlockForwardWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/forwarder/doForwarding?" + query_string
+        url = self.url + "/forwarder/do_forwarding?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

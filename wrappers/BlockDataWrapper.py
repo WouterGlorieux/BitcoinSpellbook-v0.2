@@ -137,7 +137,7 @@ class BlockDataWrapper():
             parameters['param'] = param
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/data/saveProvider?" + query_string
+        url = self.url + "/data/save_provider?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -162,7 +162,7 @@ class BlockDataWrapper():
         parameters = {'name': name}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/data/deleteProvider?" + query_string
+        url = self.url + "/data/delete_provider?" + query_string
 
         postdata = urllib.urlencode(parameters)
         message = hashlib.sha256(postdata).digest()
@@ -187,7 +187,7 @@ class BlockDataWrapper():
         parameters = {}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/data/getProviders?" + query_string
+        url = self.url + "/data/get_providers?" + query_string
 
         try:
             request = urllib2.Request(url=url)
