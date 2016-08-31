@@ -99,17 +99,17 @@ def query(query_type, param='', provider=''):
         if provider_api:
             data = {}
             if query_type == 'block':
-                data = provider_api.getBlock(param)
+                data = provider_api.get_block(param)
             elif query_type == 'latest_block':
-                data = provider_api.getLatestBlock()
+                data = provider_api.get_latest_block
             elif query_type == 'prime_input_address':
-                data = provider_api.getPrimeInputAddress(param)
+                data = provider_api.get_prime_input_address(param)
             elif query_type == 'balances':
-                data = provider_api.getBalances(param)
+                data = provider_api.get_balances(param)
             elif query_type == 'transactions':
-                data = provider_api.getTXS(param)
+                data = provider_api.get_txs(param)
             elif query_type == 'utxos':
-                data = provider_api.getUTXOs(param)
+                data = provider_api.get_utxos(param)
 
             if 'success' in data and data['success'] == 1:
                 response = data

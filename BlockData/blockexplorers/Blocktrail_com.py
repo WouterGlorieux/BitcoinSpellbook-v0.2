@@ -16,25 +16,25 @@ class API:
         self.key = key
         self.secret = secret
 
-    def getTXS(self, address):
-        LIMIT = 200 #max 200 for Blocktrail.com
+    def get_txs(self, address):
+        limit = 200  # max 200 for Blocktrail.com
         pages = 0
         response = {'success': 0}
-        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&limit=' + str(LIMIT) + '&sort_dir=asc'
+        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&limit=' + str(limit) + '&sort_dir=asc'
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
-            jsonObj = json.loads(ret.read())
-            data = jsonObj['data']
-            nTx = jsonObj['total']
+            json_obj = json.loads(ret.read())
+            data = json_obj['data']
+            n_tx = json_obj['total']
 
-            if (nTx <= int(jsonObj['per_page'])):
+            if n_tx <= int(json_obj['per_page']):
                 pages = 1
             else:
-                pages = int((nTx-1) / jsonObj['per_page'])+1
+                pages = int((n_tx-1) / json_obj['per_page'])+1
 
         except:
             data = []
-            nTx = 0
+            n_tx = 0
             logging.warning('Blocktrail.com: unable to retrieve transactions')
             self.error = 'Unable to retrieve transactions'
 
@@ -48,19 +48,17 @@ class API:
                 tx.confirmations = data[i]['confirmations']
 
                 for tx_input in data[i]['inputs']:
-                    tx_in = {}
-                    tx_in['address'] = tx_input['address']
-                    tx_in['value'] = tx_input['value']
+                    tx_in = {'address': tx_input['address'],
+                             'value': tx_input['value']}
                     tx.inputs.append(tx_in)
 
                 for tx_output in data[i]['outputs']:
-                    tx_out = {}
-                    tx_out['address'] = tx_output['address']
-                    tx_out['value'] = tx_output['value']
+                    tx_out = {'address': tx_output['address'],
+                              'value': tx_output['value']}
                     if tx_output['script_hex'][:2] == '6a':
                         tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(tx_output['script_hex'])
 
-                    if tx_output['spent_hash'] == None:
+                    if tx_output['spent_hash'] is None:
                         tx_out['spent'] = False
                     else:
                         tx_out['spent'] = True
@@ -70,19 +68,19 @@ class API:
                 txs.append(tx.to_dict(address))
 
             if page < pages:
-                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(LIMIT) + '&sort_dir=asc'
+                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(limit) + '&sort_dir=asc'
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
-                    jsonObj = json.loads(ret.read())
-                    data = jsonObj['data']
+                    json_obj = json.loads(ret.read())
+                    data = json_obj['data']
                 except:
                     data = []
                     logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page))
                     self.error = 'Unable to retrieve page ' + str(page)
 
-        if nTx != len(txs):
-            logging.warning('Blocktrail.com: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx))
-            response['error'] = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx)
+        if n_tx != len(txs):
+            logging.warning('Blocktrail.com: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx))
+            response['error'] = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx)
         elif self.error == '':
             response = {'success': 1, 'TXS': txs}
         else:
@@ -90,9 +88,9 @@ class API:
 
         return response
 
-    def getLatestBlock(self):
+    def get_latest_block(self):
         response = {'success': 0}
-        latestBlock = {}
+        latest_block = {}
         data = {}
         url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/block/latest?api_key=' + self.key
         try:
@@ -103,16 +101,17 @@ class API:
             response['error'] = 'Unable to retrieve latest block'
 
         if 'height' in data:
-            latestBlock['height'] = data['height']
-            latestBlock['hash'] = data['hash']
-            latestBlock['time'] = int(time.mktime(datetime.datetime.strptime(data['block_time'], "%Y-%m-%dT%H:%M:%S+0000").timetuple()))
-            latestBlock['merkleroot'] = data['merkleroot']
-            latestBlock['size'] = data['byte_size']
-            response = {'success': 1, 'latestBlock': latestBlock}
+            latest_block['height'] = data['height']
+            latest_block['hash'] = data['hash']
+            latest_block['time'] = int(time.mktime(datetime.datetime.strptime(data['block_time'],
+                                                                              "%Y-%m-%dT%H:%M:%S+0000").timetuple()))
+            latest_block['merkleroot'] = data['merkleroot']
+            latest_block['size'] = data['byte_size']
+            response = {'success': 1, 'latestBlock': latest_block}
 
         return response
 
-    def getBlock(self, height):
+    def get_block(self, height):
         response = {'success': 0}
         block = {}
         data = {}
@@ -134,7 +133,7 @@ class API:
 
         return response
 
-    def getBalances(self, addresses):
+    def get_balances(self, addresses):
         response = {'success': 0}
         if len(addresses.split("|")) > 10:
             response['error'] = 'Max 10 addresses, api function for multiple address lookup not available at ' + API_URL
@@ -158,7 +157,6 @@ class API:
                     balances[data['address']]['received'] = data['received']
                     balances[data['address']]['sent'] = data['sent']
 
-
         if self.error == '':
             response['success'] = 1
             response['balances'] = balances
@@ -167,52 +165,50 @@ class API:
 
         return response
 
-    def getUTXOs(self, addresses, confirmations=3):
-        UTXOs = []
+    def get_utxos(self, addresses, confirmations=3):
+        utxos = []
         response = {'success': 0}
         if len(addresses.split("|")) > 10:
             self.error = 'Max 10 addresses, api function for multiple address utxo lookup not available at ' + API_URL
         else:
 
-            LIMIT = 200
+            limit = 200
 
             try:
-                latestBlock = self.getLatestBlock()['latestBlock']['height']
+                latest_block = self.get_latest_block()['latestBlock']['height']
             except:
                 logging.warning('Blocktrail.com: Unable to retrieve latest block')
                 self.error = 'Unable to retrieve latest block'
 
             counter = 0
-            unconfirmedCounter = 0
+            unconfirmed_counter = 0
             for address in addresses.split('|'):
                 response['success'] = 0
-                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&limit=' + str(LIMIT) + '&sort_dir=asc'
-                nUTXO = 0
+                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&limit=' + str(limit) + '&sort_dir=asc'
+                n_utxo = 0
                 pages = 1
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
-                    jsonObj = json.loads(ret.read())
-                    data = jsonObj['data']
-                    nUTXO = jsonObj['total']
+                    json_obj = json.loads(ret.read())
+                    data = json_obj['data']
+                    n_utxo = json_obj['total']
 
-                    if (nUTXO <= int(jsonObj['per_page'])):
+                    if n_utxo <= int(json_obj['per_page']):
                         pages = 1
                     else:
-                        pages = int((nUTXO-1) / jsonObj['per_page'])+1
+                        pages = int((n_utxo-1) / json_obj['per_page'])+1
 
                 except:
                     data = []
                     logging.warning('Blocktrail.com: Unable to retrieve UTXOs')
                     self.error = 'Unable to retrieve UTXOs'
 
-
                 for page in range(1, pages+1):
 
                     for i in range(0, len(data)):
-                        utxo = {}
-                        utxo['address'] = data[i]['address']
+                        utxo = {'address': data[i]['address']}
                         if data[i]['confirmations'] != 0:
-                            block_height = latestBlock - int(data[i]['confirmations']) + 1
+                            block_height = latest_block - int(data[i]['confirmations']) + 1
 
                         else:
                             block_height = None
@@ -221,42 +217,37 @@ class API:
                         utxo['output'] = data[i]['hash'] + ":" + str(data[i]['index'])
                         utxo['value'] = data[i]['value']
 
-
                         if utxo['confirmations'] >= confirmations:
-                            UTXOs.append(utxo)
+                            utxos.append(utxo)
                         else:
-                            unconfirmedCounter += 1
-
+                            unconfirmed_counter += 1
 
                     if page < pages:
-                        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(LIMIT) + '&sort_dir=asc'
+                        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(limit) + '&sort_dir=asc'
                         try:
                             ret = urllib2.urlopen(urllib2.Request(url))
-                            jsonObj = json.loads(ret.read())
-                            data = jsonObj['data']
+                            json_obj = json.loads(ret.read())
+                            data = json_obj['data']
                         except:
                             data = []
                             logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page) + ' of UTXOs')
                             self.error = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
 
-
-                if nUTXO != len(UTXOs)-counter + unconfirmedCounter:
-                    logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO))
-                    self.error = 'Warning: not all utxos are retrieved! ' + str(len(UTXOs)-counter) + ' of ' +  str(nUTXO)
+                if n_utxo != len(utxos)-counter + unconfirmed_counter:
+                    logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! ' + str(len(utxos)-counter) + ' of ' + str(n_utxo))
+                    self.error = 'Warning: not all utxos are retrieved! ' + str(len(utxos)-counter) + ' of ' + str(n_utxo)
                 else:
-                    counter += nUTXO
-
+                    counter += n_utxo
 
         if self.error == '':
             response['success'] = 1
-            response['UTXOs'] = UTXOs
+            response['UTXOs'] = utxos
         else:
             response['error'] = self.error
 
-
         return response
 
-    def getPrimeInputAddress(self, txid):
+    def get_prime_input_address(self, txid):
         url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/transaction/' + str(txid) + '?api_key=' + self.key
         data = {}
         response = {'success': 0}
@@ -270,14 +261,14 @@ class API:
         if 'inputs' in data:
             tx_inputs = data['inputs']
 
-            inputAddresses = []
+            input_addresses = []
             for i in range(0, len(tx_inputs)):
-                inputAddresses.append(tx_inputs[i]['address'])
+                input_addresses.append(tx_inputs[i]['address'])
 
-            primeInputAddress = ''
-            if len(inputAddresses) > 0:
-                primeInputAddress = sorted(inputAddresses)[0]
+            prime_input_address = ''
+            if len(input_addresses) > 0:
+                prime_input_address = sorted(input_addresses)[0]
 
-            response = {'success': 1, 'PrimeInputAddress': primeInputAddress}
+            response = {'success': 1, 'PrimeInputAddress': prime_input_address}
 
         return response
