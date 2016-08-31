@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import bitcoin
 from binascii import hexlify, unhexlify
 import json

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from google.appengine.api import mail
 from google.appengine.ext import ndb
 from BIP44 import BIP44

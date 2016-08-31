@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from BlockData import BlockData
 from BlockInputs import BlockInputs
