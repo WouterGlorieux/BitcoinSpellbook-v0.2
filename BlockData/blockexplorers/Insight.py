@@ -10,21 +10,22 @@ import logging
 API_URL = 'https://blockexplorer.com/api'
 #API_URL = 'https://insight.bitpay.com/api/' #don't use
 
+
 class API:
     def __init__(self, url=API_URL):
         self.url = url
         self.error = ''
         pass
 
-    def getTXS(self, address):
+    def get_txs(self, address):
         response = {'success': 0}
         txs = []
-        LIMIT = 10 #number of tx given by insight is 10
+        limit = 10  # number of tx given by insight is 10
 
         latest_block_height = -1
         try:
-            latestBlock = self.getLatestBlock()
-            latest_block_height = latestBlock['latestBlock']['height']
+            latest_block = self.get_latest_block()
+            latest_block_height = latest_block['latestBlock']['height']
         except:
             logging.error('Insight: Unable to retrieve latest block')
             self.error = 'Unable to retrieve latest block'
@@ -39,12 +40,11 @@ class API:
 
         if 'totalItems' in data:
             transactions = data['items']
-            nTx = data['totalItems']
+            n_tx = data['totalItems']
 
-
-            if nTx > LIMIT:
-                for i in range(1, int(nTx/LIMIT)+1):
-                    url =  self.url + '/addrs/' + address + '/txs?from=' + str(LIMIT*i) + '&to=' + str(LIMIT*(i+1))
+            if n_tx > limit:
+                for i in range(1, int(n_tx/limit)+1):
+                    url = self.url + '/addrs/' + address + '/txs?from=' + str(limit*i) + '&to=' + str(limit*(i+1))
                     try:
                         ret = urllib2.urlopen(urllib2.Request(url))
                         data = json.loads(ret.read())
@@ -63,10 +63,9 @@ class API:
             else:
                 tx.block_height = None
 
-            for input in transaction['vin']:
-                tx_in = {}
-                tx_in['address'] = input['addr']
-                tx_in['value'] = input['valueSat']
+            for tx_input in transaction['vin']:
+                tx_in = {'address': tx_input['addr'],
+                         'value': tx_input['valueSat']}
                 tx.inputs.append(tx_in)
 
             for out in transaction['vout']:
@@ -79,19 +78,18 @@ class API:
                         tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(out['scriptPubKey']['hex'])
 
                 tx_out['value'] = int(Decimal(out['value']) * Decimal(1e8))
-                if 'spentTxId' in out and out['spentTxId'] != None:
+                if 'spentTxId' in out and out['spentTxId'] is not None:
                     tx_out['spent'] = True
                 else:
                     tx_out['spent'] = False
-
 
                 tx.outputs.append(tx_out)
 
             txs.insert(0, tx.to_dict(address))
 
-        if nTx != len(txs):
-            logging.error('Insight: Warning: not all transactions are retreived! ' + str(len(txs)) + ' of ' +  str(nTx))
-            self.error = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' +  str(nTx)
+        if n_tx != len(txs):
+            logging.error('Insight: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx))
+            self.error = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx)
 
         if self.error == '':
             response['success'] = 1
@@ -101,9 +99,9 @@ class API:
 
         return response
 
-    def getLatestBlock(self):
+    def get_latest_block(self):
         response = {'success': 0}
-        latestBlock = {}
+        latest_block = {}
         data = {}
         url = self.url + '/status?q=getInfo'
         try:
@@ -114,34 +112,33 @@ class API:
             self.error = 'Unable to retrieve latest block'
 
         if 'info' in data:
-            latestBlock['height'] = data['info']['blocks']
+            latest_block['height'] = data['info']['blocks']
             data = {}
             try:
-                data = self.getBlock(latestBlock['height'])
+                data = self.get_block(latest_block['height'])
             except:
                 logging.warning('Insight: Unable to retrieve block')
                 self.error = 'Unable to retrieve block'
 
             if 'success' in data and data['success'] == 1:
-                latestBlock['hash'] = data['block']['hash']
-                latestBlock['time'] = data['block']['time']
-                latestBlock['merkleroot'] = data['block']['merkleroot']
-                latestBlock['size'] = data['block']['size']
+                latest_block['hash'] = data['block']['hash']
+                latest_block['time'] = data['block']['time']
+                latest_block['merkleroot'] = data['block']['merkleroot']
+                latest_block['size'] = data['block']['size']
             else:
                 self.error = 'Unable to retrieve block'
         else:
             self.error = 'Could not find info on latest block'
 
-
         if self.error == '':
             response['success'] = 1
-            response['latestBlock'] = latestBlock
+            response['latestBlock'] = latest_block
         else:
             response['error'] = self.error
 
         return response
 
-    def getBlock(self, height):
+    def get_block(self, height):
         response = {'success': 0}
         block = {}
         data = {}
@@ -153,18 +150,17 @@ class API:
             logging.error('Insight: unable to retrieve block ' + str(height))
             self.eror = 'unable to retrieve block ' + str(height)
 
-
         if 'blockHash' in data:
             block['height'] = height
             block['hash'] = data['blockHash']
 
-            url = self.url +  '/block/' + block['hash']
+            url = self.url + '/block/' + block['hash']
             try:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 data = json.loads(ret.read())
             except:
                 logging.error('Insight: Unable to retrieve block ' + block['hash'])
-                self.error ='Unable to retrieve block ' + block['hash']
+                self.error = 'Unable to retrieve block ' + block['hash']
 
             if 'hash' in data and data['hash'] == block['hash']:
                 block['time'] = data['time']
@@ -173,17 +169,15 @@ class API:
         else:
             self.error = 'Unable to retrieve block '+ str(height)
 
-
         if self.error == '':
             response['success'] = 1
             response['block'] = block
         else:
             response['error'] = self.error
 
-
         return response
 
-    def getBalances(self, addresses):
+    def get_balances(self, addresses):
         response = {'success': 0}
 
         if len(addresses.split("|")) > 10:
@@ -205,21 +199,19 @@ class API:
                     balances[data['addrStr']] = {}
                     balances[data['addrStr']]['balance'] = data['balanceSat']
 
-                    txs = self.getTXS(address)
+                    txs = self.get_txs(address)
                     received = 0
                     sent = 0
                     if 'success' in txs and txs['success'] == 1:
                         for tx in txs['TXS']:
-                            if tx['receiving'] == True and tx['confirmations'] > 0:
+                            if tx['receiving'] is True and tx['confirmations'] > 0:
                                 received += tx['receivedValue']
 
-                            elif tx['receiving'] == False and tx['confirmations'] > 0:
+                            elif tx['receiving'] is False and tx['confirmations'] > 0:
                                 sent += tx['sentValue']
 
                         balances[data['addrStr']]['received'] = received
                         balances[data['addrStr']]['sent'] = sent
-
-
                     else:
                         self.error = txs['error']
 
@@ -231,8 +223,7 @@ class API:
 
         return response
 
-
-    def getPrimeInputAddress(self, txid):
+    def get_prime_input_address(self, txid):
         response = {'success': 0}
         url = self.url + '/tx/' + str(txid)
         data = {}
@@ -241,46 +232,42 @@ class API:
             data = json.loads(ret.read())
         except:
             logging.error('Insight: Unable to retrieve prime input address of tx ' + txid)
-            self.error ='Unable to retrieve prime input address of tx ' + txid
+            self.error = 'Unable to retrieve prime input address of tx ' + txid
 
-
-        tx_inputs = []
         if 'txid' in data and data['txid'] == txid:
             tx_inputs = data['vin']
 
-            inputAddresses = []
+            input_addresses = []
             for i in range(0, len(tx_inputs)):
-                inputAddresses.append(tx_inputs[i]['addr'])
+                input_addresses.append(tx_inputs[i]['addr'])
 
-            primeInputAddress = []
-            if len(inputAddresses) > 0:
-                primeInputAddress = sorted(inputAddresses)[0]
-
+            prime_input_address = []
+            if len(input_addresses) > 0:
+                prime_input_address = sorted(input_addresses)[0]
 
         if self.error == '':
             response['success'] = 1
-            response['PrimeInputAddress'] = primeInputAddress
+            response['PrimeInputAddress'] = prime_input_address
         else:
             response['error'] = self.error
-
 
         return response
 
     #Multiple bitcoin addresses, separated by ","
-    def getUTXOs(self, addresses, confirmations=3):
+    def get_utxos(self, addresses, confirmations=3):
         response = {'success': 0}
         addresses = addresses.replace('|', ',')
 
         latest_block_height = 0
         try:
-            latestBlock = self.getLatestBlock()
-            latest_block_height = latestBlock['latestBlock']['height']
+            latest_block = self.get_latest_block()
+            latest_block_height = latest_block['latestBlock']['height']
         except:
             logging.error('Insight: Unable to retrieve latest block')
             self.error = 'Unable to retrieve latest block'
 
-        UTXOs = []
-        url = self.url +  '/addrs/' + addresses + '/utxo'
+        utxos = []
+        url = self.url + '/addrs/' + addresses + '/utxo'
         data = {}
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
@@ -290,10 +277,9 @@ class API:
             self.error = 'Unable to retrieve utxos'
 
         for i in range(0, len(data)):
-            utxo = {}
-            utxo['address'] = data[i]['address']
+            utxo = {'address': data[i]['address']}
 
-            url = self.url +  '/tx/' + data[i]['txid']
+            url = self.url + '/tx/' + data[i]['txid']
             tx = {}
             try:
                 ret = urllib2.urlopen(urllib2.Request(url))
@@ -310,11 +296,11 @@ class API:
             utxo['value'] = int(data[i]['satoshis'])
 
             if utxo['confirmations'] >= confirmations:
-                UTXOs.append(utxo)
+                utxos.append(utxo)
 
         if self.error == '':
             response['success'] = 1
-            response['UTXOs'] = UTXOs
+            response['UTXOs'] = utxos
         else:
             response['error'] = self.error
 
