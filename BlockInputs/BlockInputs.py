@@ -42,12 +42,12 @@ def txs_2_sil(txs, block=0):
         if tx['receiving'] is True and (block == 0 or tx['block_height'] <= block) and tx['block_height'] is not None:
             recurring = False
             for i in range(0, len(sil)):
-                if sil[i][0] == tx['primeInputAddress']:
+                if sil[i][0] == tx['prime_input_address']:
                     sil[i][1] += tx['receivedValue']
                     recurring = True
 
             if not recurring:
-                sil.append([tx['primeInputAddress'], tx['receivedValue'], 0, tx['block_height']])
+                sil.append([tx['prime_input_address'], tx['receivedValue'], 0, tx['block_height']])
 
     total = float(total_received(sil))
 

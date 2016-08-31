@@ -41,7 +41,7 @@ def txs_to_profile(txs, address, block_height=0):
         if (block_height == 0 or tx['block_height'] <= block_height) and tx['block_height'] is not None:
             for output in tx['outputs']:
                 if 'OP_RETURN' in output:
-                    prime_input_address = tx['primeInputAddress']
+                    prime_input_address = tx['prime_input_address']
                     block_height = tx['block_height']
                     profile[prime_input_address] = {'lastUpdate': block_height}
                     message = output['OP_RETURN']

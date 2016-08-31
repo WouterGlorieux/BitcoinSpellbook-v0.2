@@ -60,7 +60,7 @@ class TX():
 
     def to_dict(self, address):
         tx_dict = {"txid": self.txid,
-                   "primeInputAddress": self.prime_input_address(),
+                   "prime_input_address": self.prime_input_address(),
                    "inputs": self.inputs,
                    "outputs": self.outputs,
                    "block_height": self.block_height,

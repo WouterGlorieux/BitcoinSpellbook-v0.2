@@ -84,7 +84,7 @@ for i in range(0, len(providerNames)):
 compare_data(latestBlockData)
 
 
-print '===============primeInputAddress======================'
+print '===============prime_input_address======================'
 primeInputAddressData = []
 for i in range(0, len(providerNames)):
     data = api.prime_input_address(txid, providerNames[i])

@@ -117,7 +117,7 @@ class BlockDataWrapper():
                       'provider': provider}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/data/primeInputAddress?" + query_string
+        url = self.url + "/data/prime_input_address?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

@@ -1215,7 +1215,7 @@ app = webapp2.WSGIApplication([
     ('/data/getProviders', GetProviders),
     ('/data/block', Block),
     ('/data/latestBlock', LatestBlock),
-    ('/data/primeInputAddress', PrimeInputAddress),
+    ('/data/prime_input_address', PrimeInputAddress),
     ('/data/transactions', Transactions),
     ('/data/balances', Balances),
     ('/data/utxos', Utxos),

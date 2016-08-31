@@ -20,7 +20,7 @@ handlers:
 - url: /data/latestBlock
   script: BitcoinSpellbook.app
 
-- url: /data/primeInputAddress
+- url: /data/prime_input_address
   script: BitcoinSpellbook.app
 
 - url: /data/transactions

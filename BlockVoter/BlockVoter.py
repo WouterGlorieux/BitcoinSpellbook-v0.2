@@ -181,7 +181,7 @@ class BlockVoter():
         if self.error == '':
             for i in range(0, len(txs)):
                 if txs[i]['block_height'] <= block_height and txs[i]['receiving'] is True:
-                    voter = txs[i]['primeInputAddress']
+                    voter = txs[i]['prime_input_address']
                     vote = str(txs[i]['receivedValue'])[-significant_digits:]
                     value = txs[i]['receivedValue'] - int(vote)
 
