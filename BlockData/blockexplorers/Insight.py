@@ -8,7 +8,6 @@ from decimal import *
 import logging
 
 API_URL = 'https://blockexplorer.com/api'
-#API_URL = 'https://insight.bitpay.com/api/' #don't use
 
 
 class API:
@@ -147,8 +146,8 @@ class API:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except:
-            logging.error('Insight: unable to retrieve block ' + str(height))
-            self.eror = 'unable to retrieve block ' + str(height)
+            logging.error('Insight: unable to retrieve block {0}'.format(str(height)))
+            self.eror = 'unable to retrieve block {0}'.format(str(height))
 
         if 'blockHash' in data:
             block['height'] = height
@@ -167,7 +166,7 @@ class API:
                 block['merkleroot'] = data['merkleroot']
                 block['size'] = data['size']
         else:
-            self.error = 'Unable to retrieve block '+ str(height)
+            self.error = 'Unable to retrieve block {0}'.format(str(height))
 
         if self.error == '':
             response['success'] = 1
@@ -290,7 +289,7 @@ class API:
 
             if 'txid' in tx and tx['txid'] == data[i]['txid']:
                 utxo['confirmations'] = int(tx['confirmations'])
-                utxo['block_height'] = latest_block_height - utxo['confirmations'] +1
+                utxo['block_height'] = latest_block_height - utxo['confirmations'] + 1
 
             utxo['output'] = data[i]['txid'] + ":" + str(data[i]['vout'])
             utxo['value'] = int(data[i]['satoshis'])
