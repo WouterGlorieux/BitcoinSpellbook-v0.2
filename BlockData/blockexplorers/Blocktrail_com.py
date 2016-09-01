@@ -3,12 +3,13 @@
 
 import urllib2
 import json
-import binascii
-from BlockData import TX as TX
-import TxFactory.TxFactory as TxFactory
 import time
 import datetime
 import logging
+
+from BlockData import TX as TX
+import TxFactory.TxFactory as TxFactory
+
 API_URL = 'https://api.blocktrail.com/'
 API_VERSION = 'v1'
 

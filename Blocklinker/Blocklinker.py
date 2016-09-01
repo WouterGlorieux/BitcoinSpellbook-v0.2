@@ -3,9 +3,7 @@
 
 from BlockData import BlockData
 from BlockInputs import BlockInputs
-import bitcoin
 from BIP44 import BIP44 as BIP44
-
 from validators import validators as validator
 
 
