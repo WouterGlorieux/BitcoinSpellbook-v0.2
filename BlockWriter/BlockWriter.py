@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from validators import validators as validator
-from BIP44 import BIP44 as BIP44
-import BlockData.BlockData as BlockData
-
-import datastore.datastore as datastore
-import TxFactory.TxFactory as TxFactory
 
 import time
-import bitcoin
 import logging
 import datetime
+
+import bitcoin
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 urlfetch.set_default_fetch_deadline(60)
+
+from validators import validators as validator
+import BlockData.BlockData as BlockData
+import datastore.datastore as datastore
+import TxFactory.TxFactory as TxFactory
 
 
 REQUIRED_CONFIRMATIONS = 3  # must be at least 3
