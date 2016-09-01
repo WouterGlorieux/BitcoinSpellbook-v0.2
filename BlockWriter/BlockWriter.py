@@ -56,8 +56,8 @@ def check_active_addresses():
         wallet_address = datastore.WalletAddress.get_by_id(u'BlockWriter_{0:d}'.format(writer.wallet_index),
                                                            parent=datastore.address_key())
         if wallet_address and wallet_address.status != 'InUse':
-            logging.warning("Found active writer with address not InUse status! {0:d} {1:s}".format(wallet_address.i,
-                                                                                                    wallet_address.address))
+            logging.warning("active writer with address not InUse status! {0:d} {1:s}".format(wallet_address.i,
+                                                                                              wallet_address.address))
             wallet_address.status = 'InUse'
             wallet_address.put()
 
@@ -365,7 +365,8 @@ class DoWriting():
             if total_input_value > writer.total_amount:
                 extra_value = total_input_value - writer.total_amount
                 total_output_value += extra_value
-                logging.info('Extra value detected: ' + str(extra_value) + ', sending it to ' + writer.extra_value_address)
+                logging.info('Extra value detected: {0}, sending it to {1}'.format(str(extra_value),
+                                                                                   str(writer.extra_value_address)))
                 outputs.append({'address': writer.extra_value_address, 'value': extra_value})
 
             logging.info("outputs: " + str(outputs))
@@ -378,7 +379,9 @@ class DoWriting():
             elif writer.address_type == 'BIP44':
                 private_keys = datastore.get_service_private_key(datastore.Services.blockwriter, writer.wallet_index)
 
-            logging.info("Sending " + str(total_input_value) + ' Satoshis to ' + str(len(outputs)) + ' recipients with a total fee of ' + str(transaction_fee) + ' with OP_RETURN message: ' + writer.message)
+            logging.info(
+                "Sending {0} Satoshis to {1} recipients with a total fee of {2} with OP_RETURN message: {3}".format(
+                    str(total_input_value), str(len(outputs)), str(transaction_fee), str(writer.message)))
             tx = TxFactory.makeCustomTransaction(private_keys, utxos, outputs, transaction_fee, writer.message)
             if tx is not None:
                 success = TxFactory.sendTransaction(tx)
@@ -387,7 +390,8 @@ class DoWriting():
                 logging.info("Success")
                 writer.status = 'Complete'
                 writer.put()
-                wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index, parent=datastore.address_key())
+                wallet_address = datastore.WalletAddress.get_by_id('BlockWriter_%i' % writer.wallet_index,
+                                                                   parent=datastore.address_key())
                 if wallet_address:
                     wallet_address.status = 'Cooldown'
                     wallet_address.cooldown_end = datetime.datetime.now() + datetime.timedelta(days=7)

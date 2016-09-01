@@ -23,7 +23,8 @@ class API:
         limit = 200  # max 200 for Blocktrail.com
         pages = 0
         response = {'success': 0}
-        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&limit=' + str(limit) + '&sort_dir=asc'
+        url = 'https://api.blocktrail.com/{0}/btc/address/{1}/transactions?api_key={2}&limit={3}&sort_dir=asc'.format(
+            str(API_VERSION), str(address), str(self.key), str(limit))
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             json_obj = json.loads(ret.read())
@@ -71,7 +72,8 @@ class API:
                 txs.append(tx.to_dict(address))
 
             if page < pages:
-                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/transactions?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(limit) + '&sort_dir=asc'
+                url = 'https://api.blocktrail.com/{0}/btc/address/{1}/transactions?api_key={2}&page={3}&limit={4}&sort_dir=asc'.format(
+                    str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     json_obj = json.loads(ret.read())
@@ -82,8 +84,11 @@ class API:
                     self.error = 'Unable to retrieve page ' + str(page)
 
         if n_tx != len(txs):
-            logging.warning('Blocktrail.com: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx))
-            response['error'] = 'Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx)
+            logging.warning(
+                'Blocktrail.com: Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)),
+                                                                                                 str(n_tx)))
+            response['error'] = 'Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)),
+                                                                                                 str(n_tx))
         elif self.error == '':
             response = {'success': 1, 'TXS': txs}
         else:
@@ -129,7 +134,8 @@ class API:
         if 'height' in data:
             block['height'] = data['height']
             block['hash'] = data['hash']
-            block['time'] = int(time.mktime(datetime.datetime.strptime(data['block_time'], "%Y-%m-%dT%H:%M:%S+0000").timetuple()))
+            block['time'] = int(time.mktime(datetime.datetime.strptime(data['block_time'],
+                                                                       "%Y-%m-%dT%H:%M:%S+0000").timetuple()))
             block['merkleroot'] = data['merkleroot']
             block['size'] = data['byte_size']
             response = {'success': 1, 'block': block}
@@ -187,7 +193,8 @@ class API:
             unconfirmed_counter = 0
             for address in addresses.split('|'):
                 response['success'] = 0
-                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&limit=' + str(limit) + '&sort_dir=asc'
+                url = 'https://api.blocktrail.com/{0}/btc/address/{1}/unspent-outputs?api_key={2}&limit={3}&sort_dir=asc'.format(
+                    str(API_VERSION), str(address), str(self.key), str(limit))
                 n_utxo = 0
                 pages = 1
                 try:
@@ -226,7 +233,8 @@ class API:
                             unconfirmed_counter += 1
 
                     if page < pages:
-                        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '/unspent-outputs?api_key=' + self.key + '&page=' + str(page+1) + '&limit=' + str(limit) + '&sort_dir=asc'
+                        url = 'https://api.blocktrail.com/{0}/btc/address/{1}/unspent-outputs?api_key={2}&page={3}&limit={4}&sort_dir=asc'.format(
+                            str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
                         try:
                             ret = urllib2.urlopen(urllib2.Request(url))
                             json_obj = json.loads(ret.read())
@@ -237,8 +245,10 @@ class API:
                             self.error = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
 
                 if n_utxo != len(utxos)-counter + unconfirmed_counter:
-                    logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! ' + str(len(utxos)-counter) + ' of ' + str(n_utxo))
-                    self.error = 'Warning: not all utxos are retrieved! ' + str(len(utxos)-counter) + ' of ' + str(n_utxo)
+                    logging.warning('Blocktrail.com: Warning: not all utxos are retrieved! {0} of {1}'.format(
+                        str(len(utxos) - counter), str(n_utxo)))
+                    self.error = 'Warning: not all utxos are retrieved! {0} of {1}'.format(str(len(utxos) - counter),
+                                                                                           str(n_utxo))
                 else:
                     counter += n_utxo
 

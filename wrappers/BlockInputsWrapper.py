@@ -7,6 +7,7 @@ import json
 import urllib
 import logging
 
+
 class BlockInputsWrapper():
     def __init__(self, url):
         self.url = url

@@ -17,7 +17,9 @@ secret = 'EI5IJJBTVL6YGWNE'
 address = '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8'
 xpub = 'xpub6CUvzHsNLcxthhGJesNDPSh2gicdHLPAAeyucP2KW1vBKEMxvDWCYRJZzM4g7mNiQ4Zb9nG4y25884SnYAr1P674yQipYLU8pP5z8AmahmD'
 txid = '39bb5f5d50882227f93b980df15ea676414f0363770a0174a13c8f55c877b598'
-addresses = ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', '1SansacmMr38bdzGkzruDVajEsZuiZHx9', '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8']
+addresses = ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y',
+             '1SansacmMr38bdzGkzruDVajEsZuiZHx9',
+             '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8']
 
 
 def compare_data(data):

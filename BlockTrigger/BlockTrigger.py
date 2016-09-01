@@ -303,7 +303,9 @@ class CheckTriggers():
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
                     latest_block_height = latest_block_data['latestBlock']['height']
                     if trigger.block_height + trigger.confirmations <= latest_block_height:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: current block_height:' + str(latest_block_height))
+                        logging.info('{0}: {1} activated: current block_height:{2}'.format(str(trigger.key.id()),
+                                                                                           str(trigger.trigger_type),
+                                                                                           str(latest_block_height)))
                         trigger.triggered = True
                         trigger.put()
                         self.activate(trigger)
@@ -324,7 +326,9 @@ class CheckTriggers():
                         value = balances['sent']
 
                     if trigger.amount <= value:
-                        logging.info(str(trigger.key.id()) + ': ' + str(trigger.trigger_type) + ' activated: current value:' + str(value))
+                        logging.info('{0}: {1} activated: current value:{2}'.format(str(trigger.key.id()),
+                                                                                    str(trigger.trigger_type),
+                                                                                    str(value)))
                         trigger.triggered = True
                         trigger.put()
                 else:

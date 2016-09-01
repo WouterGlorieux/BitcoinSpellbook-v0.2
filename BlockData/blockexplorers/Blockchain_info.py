@@ -44,7 +44,9 @@ class API:
             n_tx = data['n_tx']
             if n_tx > limit:
                 for i in range(1, int(n_tx/limit)+1):
-                    url = 'https://blockchain.info/address/' + address + '?format=json&limit=' + str(limit) + '&offset=' + str(limit*i)
+                    url = 'https://blockchain.info/address/{0}?format=json&limit={1}&offset={2}'.format(str(address),
+                                                                                                        str(limit),
+                                                                                                        str(limit * i))
                     try:
                         ret = urllib2.urlopen(urllib2.Request(url))
                         data = json.loads(ret.read())
@@ -88,8 +90,11 @@ class API:
             txs.insert(0, tx.to_dict(address))
 
         if n_tx != len(txs):
-            logging.warning('Blockchain.info: Warning: not all transactions are retrieved! ' + str(len(txs)) + ' of ' + str(n_tx))
-            response = {'success': 0, 'error': 'Not all transactions are retrieved ' + str(len(txs)) + ' of ' + str(n_tx)}
+            logging.warning(
+                'Blockchain.info: Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)),
+                                                                                                  str(n_tx)))
+            response = {'success': 0, 'error': 'Not all transactions are retrieved {0} of {1}'.format(str(len(txs)),
+                                                                                                      str(n_tx))}
         else:
             response = {'success': 1, 'TXS': txs}
 

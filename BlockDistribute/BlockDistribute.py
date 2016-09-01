@@ -277,7 +277,8 @@ class Distributer():
             if distributer:
                 distribution = distributer.distribution
                 if distributer.distribution_source == 'SIL':
-                    sil_data = BlockInputs.get_sil(distributer.registration_address, distributer.registration_block_height)
+                    sil_data = BlockInputs.get_sil(distributer.registration_address,
+                                                   distributer.registration_block_height)
                     if 'success' in sil_data and sil_data['success'] == 1:
                         distribution = sil_data['SIL']
                     else:
