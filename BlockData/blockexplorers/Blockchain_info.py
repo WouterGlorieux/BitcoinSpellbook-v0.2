@@ -4,10 +4,9 @@
 import urllib2
 import json
 import logging
+
 import TxFactory.TxFactory as TxFactory
 from BlockData import TX as TX
-
-from pprint import pprint
 
 API_VERSION = 'v1'
 

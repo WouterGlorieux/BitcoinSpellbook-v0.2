@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-from validators import validators as validator
-import BlockData.BlockData as BlockData
-import datastore.datastore as datastore
-
 import time
 import logging
 import urllib2
 import json
-import urllib
 
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 from google.appengine.api import mail
 urlfetch.set_default_fetch_deadline(60)
+
+from validators import validators as validator
+import BlockData.BlockData as BlockData
+import datastore.datastore as datastore
 
 
 REQUIRED_CONFIRMATIONS = 3  # must be at least 3

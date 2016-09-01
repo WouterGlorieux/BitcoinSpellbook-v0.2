@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
+from google.appengine.api import urlfetch
+urlfetch.set_default_fetch_deadline(60)
+
 import datastore.datastore as datastore
 import blockexplorers.Blocktrail_com as Blocktrail_com
 import blockexplorers.Blockchain_info as Blockchain_info
 import blockexplorers.Insight as Insight
 from validators import validators as validator
-
-from google.appengine.ext import ndb
-from google.appengine.api import urlfetch
-urlfetch.set_default_fetch_deadline(60)
 
 
 def get_provider_api(name):
