@@ -5,7 +5,7 @@
 import urllib2
 import json
 import urllib
-
+import logging
 
 class BlockInputsWrapper():
     def __init__(self, url):
@@ -22,7 +22,8 @@ class BlockInputsWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve sil'
 
         return response

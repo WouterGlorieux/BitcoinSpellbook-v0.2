@@ -8,6 +8,7 @@ import urllib
 import hashlib
 import hmac
 import base64
+import logging
 
 
 class BlockWriterWrapper():
@@ -24,7 +25,8 @@ class BlockWriterWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve writers'
 
         return response
@@ -39,7 +41,8 @@ class BlockWriterWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve writer'
 
         return response
@@ -66,7 +69,8 @@ class BlockWriterWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to save writer'
 
         return response
@@ -91,7 +95,8 @@ class BlockWriterWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to delete writer'
 
         return response
@@ -106,7 +111,8 @@ class BlockWriterWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to do writing'
 
         return response

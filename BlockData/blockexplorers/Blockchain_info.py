@@ -24,7 +24,8 @@ class API:
         latest_block_height = -1
         try:
             latest_block_height = self.get_latest_block()['latestBlock']['height']
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             logging.warning('Blockchain.info: unable to retrieve latest block')
             response = {'success': 0, 'error': 'unable to retrieve latest block'}
 
@@ -32,7 +33,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             data = {}
 
         transactions = data['txs']
@@ -47,8 +49,8 @@ class API:
                         ret = urllib2.urlopen(urllib2.Request(url))
                         data = json.loads(ret.read())
                         transactions += data['txs']
-                    except:
-                        logging.warning('Blockchain.info: unable to retrieve next page')
+                    except Exception as ex:
+                        logging.warning(str(ex))
                         response = {'success': 0, 'error': 'unable to retrieve next page '}
 
         txs = []
@@ -102,8 +104,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blockchain.info: unable to retrieve latest block')
+        except Exception as ex:
+            logging.warning(str(ex))
             response = {'success': 0, 'error': 'unable to retrieve latest block'}
 
         if 'height' in data:
@@ -116,8 +118,8 @@ class API:
             try:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 data = json.loads(ret.read())
-            except:
-                logging.warning('Blockchain.info: unable to retrieve block ' + str(latest_block['height']))
+            except Exception as ex:
+                logging.warning(str(ex))
                 response = {'success': 0, 'error': 'unable to retrieve block ' + str(latest_block['height'])}
 
             if 'hash' in data and data['hash'] == latest_block['hash']:
@@ -137,8 +139,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blockchain.info: unable to retrieve block ' + str(height))
+        except Exception as ex:
+            logging.warning(str(ex))
             response = {'success': 0, 'error': 'unable to retrieve block ' + str(height)}
 
         if 'blocks' in data:
@@ -166,8 +168,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blockchain.info: unable to retrieve data for addresses ' + addresses)
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve data for addresses ' + addresses
 
         if 'addresses' in data:
@@ -217,8 +219,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blockchain.info: unable to retrieve prime input address of tx ' + txid)
+        except Exception as ex:
+            logging.warning(str(ex))
             response = {'success': 0, 'error': 'unable to retrieve prime input address of tx ' + txid}
 
         if 'hash' in data and data['hash'] == txid:
@@ -245,8 +247,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blockchain.info: unable to retrieve utxos')
+        except Exception as ex:
+            logging.warning(str(ex))
             response = {'success': 0, 'error': 'unable to retrieve utxos'}
 
         if 'unspent_outputs' in data:
@@ -264,8 +266,8 @@ class API:
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     tx = json.loads(ret.read())
-                except:
-                    logging.warning('Blockchain.info: unable to retrieve utxos')
+                except Exception as ex:
+                    logging.warning(str(ex))
                     response = {'success': 0, 'error': 'unable to retrieve utxos'}
 
                 if 'block_height' in tx and 'hash' in tx and tx['hash'] == data['unspent_outputs'][i]['tx_hash_big_endian']:

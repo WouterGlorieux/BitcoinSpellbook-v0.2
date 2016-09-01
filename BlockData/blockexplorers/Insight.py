@@ -28,7 +28,8 @@ class API:
         try:
             latest_block = self.get_latest_block()
             latest_block_height = latest_block['latestBlock']['height']
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             logging.error('Insight: Unable to retrieve latest block')
             self.error = 'Unable to retrieve latest block'
 
@@ -36,8 +37,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.error('Insight: Unable to retrieve transactions')
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve transactions'
 
         if 'totalItems' in data:
@@ -51,8 +52,8 @@ class API:
                         ret = urllib2.urlopen(urllib2.Request(url))
                         data = json.loads(ret.read())
                         transactions += data['items']
-                    except:
-                        logging.error('Insight: Unable to retrieve next page')
+                    except Exception as ex:
+                        logging.warning(str(ex))
                         self.error = 'Unable to retrieve next page'
 
         for transaction in transactions:
@@ -109,8 +110,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.error('Insight: Unable to retrieve latest block')
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve latest block'
 
         if 'info' in data:
@@ -118,8 +119,8 @@ class API:
             data = {}
             try:
                 data = self.get_block(latest_block['height'])
-            except:
-                logging.warning('Insight: Unable to retrieve block')
+            except Exception as ex:
+                logging.warning(str(ex))
                 self.error = 'Unable to retrieve block'
 
             if 'success' in data and data['success'] == 1:
@@ -148,8 +149,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.error('Insight: unable to retrieve block {0}'.format(str(height)))
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'unable to retrieve block {0}'.format(str(height))
 
         if 'blockHash' in data:
@@ -160,8 +161,8 @@ class API:
             try:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 data = json.loads(ret.read())
-            except:
-                logging.error('Insight: Unable to retrieve block ' + block['hash'])
+            except Exception as ex:
+                logging.warning(str(ex))
                 self.error = 'Unable to retrieve block ' + block['hash']
 
             if 'hash' in data and data['hash'] == block['hash']:
@@ -193,8 +194,8 @@ class API:
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     data = json.loads(ret.read())
-                except:
-                    logging.error('Insight: Unable to retrieve data for addresses ' + addresses)
+                except Exception as ex:
+                    logging.warning(str(ex))
                     self.error = 'Unable to retrieve data for addresses ' + addresses
 
                 if 'addrStr' in data and data['addrStr'] == address:
@@ -232,8 +233,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.error('Insight: Unable to retrieve prime input address of tx ' + txid)
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve prime input address of tx ' + txid
 
         if 'txid' in data and data['txid'] == txid:
@@ -264,8 +265,8 @@ class API:
         try:
             latest_block = self.get_latest_block()
             latest_block_height = latest_block['latestBlock']['height']
-        except:
-            logging.error('Insight: Unable to retrieve latest block')
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve latest block'
 
         utxos = []
@@ -274,8 +275,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.error('Insight: Unable to retrieve utxos')
+        except Exception as ex:
+            logging.warning(str(ex))
             self.error = 'Unable to retrieve utxos'
 
         for i in range(0, len(data)):
@@ -286,8 +287,8 @@ class API:
             try:
                 ret = urllib2.urlopen(urllib2.Request(url))
                 tx = json.loads(ret.read())
-            except:
-                logging.error('Insight: Unable to retrieve tx' + data[i]['txid'])
+            except Exception as ex:
+                logging.warning(str(ex))
                 self.error = 'Unable to retrieve tx' + data[i]['txid']
 
             if 'txid' in tx and tx['txid'] == data[i]['txid']:

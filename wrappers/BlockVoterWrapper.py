@@ -5,6 +5,7 @@
 import urllib2
 import json
 import urllib
+import logging
 
 
 class BlockVoterWrapper():
@@ -48,7 +49,8 @@ class BlockVoterWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve proposal'
 
         return response
@@ -95,7 +97,8 @@ class BlockVoterWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve results'
 
         return response

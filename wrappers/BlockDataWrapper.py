@@ -8,6 +8,7 @@ import urllib
 import hashlib
 import hmac
 import base64
+import logging
 
 
 class BlockDataWrapper():
@@ -34,7 +35,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve utxos'
 
         return response
@@ -59,7 +61,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve balances'
 
         return response
@@ -75,7 +78,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve transactions'
 
         return response
@@ -91,7 +95,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve block'
 
         return response
@@ -106,7 +111,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve latest block'
 
         return response
@@ -122,7 +128,8 @@ class BlockDataWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve prime input address'
 
         return response
@@ -152,7 +159,8 @@ class BlockDataWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to save provider'
 
         return response
@@ -177,7 +185,8 @@ class BlockDataWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to delete provider'
 
         return response
@@ -193,7 +202,8 @@ class BlockDataWrapper():
             request = urllib2.Request(url=url)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to get providers'
 
         return response

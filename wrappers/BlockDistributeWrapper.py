@@ -8,6 +8,7 @@ import urllib
 import hashlib
 import hmac
 import base64
+import logging
 
 
 class BlockDistributeWrapper():
@@ -24,7 +25,8 @@ class BlockDistributeWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve distributers'
 
         return response
@@ -39,7 +41,8 @@ class BlockDistributeWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve distributer'
 
         return response
@@ -55,7 +58,8 @@ class BlockDistributeWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve distributer'
 
         return response
@@ -82,7 +86,8 @@ class BlockDistributeWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to save distributer'
 
         return response
@@ -107,7 +112,8 @@ class BlockDistributeWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to delete distributer'
 
         return response
@@ -132,7 +138,8 @@ class BlockDistributeWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to update distribution'
 
         return response
@@ -147,7 +154,8 @@ class BlockDistributeWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to do distributing'
 
         return response

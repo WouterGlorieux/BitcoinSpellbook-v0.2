@@ -5,6 +5,7 @@
 import urllib2
 import json
 import urllib
+import logging
 
 
 class BlockLinkerWrapper():
@@ -23,7 +24,8 @@ class BlockLinkerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve LBL'
 
         return response
@@ -40,7 +42,8 @@ class BlockLinkerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve LRL'
 
         return response
@@ -57,7 +60,8 @@ class BlockLinkerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve LSL'
 
         return response
@@ -74,7 +78,8 @@ class BlockLinkerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve LAL'
 
         return response

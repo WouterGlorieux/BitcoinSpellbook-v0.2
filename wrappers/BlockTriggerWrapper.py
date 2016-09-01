@@ -8,6 +8,7 @@ import urllib
 import hashlib
 import hmac
 import base64
+import logging
 
 
 class BlockTriggerWrapper():
@@ -24,7 +25,8 @@ class BlockTriggerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve triggers'
 
         return response
@@ -39,7 +41,8 @@ class BlockTriggerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve trigger'
 
         return response
@@ -66,7 +69,8 @@ class BlockTriggerWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to save trigger'
 
         return response
@@ -91,7 +95,8 @@ class BlockTriggerWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to delete trigger'
 
         return response
@@ -119,7 +124,8 @@ class BlockTriggerWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to save action'
 
         return response
@@ -145,7 +151,8 @@ class BlockTriggerWrapper():
             request = urllib2.Request(url=url, data=postdata, headers=headers)
             data = urllib2.urlopen(request).read()
             response = json.loads(data)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to delete action'
 
         return response
@@ -160,7 +167,8 @@ class BlockTriggerWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to check triggers'
 
         return response

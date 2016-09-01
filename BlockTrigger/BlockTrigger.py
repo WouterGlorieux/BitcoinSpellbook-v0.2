@@ -351,7 +351,8 @@ class CheckTriggers():
                             action.mail_sent = True
                             action.put()
                             logging.info('Mail sent successfully.')
-                        except:
+                        except Exception as ex:
+                            logging.warning(str(ex))
                             logging.error("Failed to send mail")
                     else:
                         logging.error("Invalid email address: " + action.mail_to)
@@ -368,5 +369,6 @@ class CheckTriggers():
                             logging.info('webhook executed, response: ' + str(response))
                             action.webhook_activated = True
                             action.put()
-                        except:
+                        except Exception as ex:
+                            logging.warning(str(ex))
                             logging.error = "Unable to execute webhook"

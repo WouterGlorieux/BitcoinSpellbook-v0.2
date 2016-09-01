@@ -146,7 +146,8 @@ class Writer():
 
         try:
             self.name = int(name)
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             self.name = name
 
         if isinstance(self.name, (str, unicode)) and len(name) > 0:

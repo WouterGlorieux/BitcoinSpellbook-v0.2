@@ -5,7 +5,7 @@
 import urllib2
 import json
 import urllib
-
+import logging
 
 class BlockRandomWrapper():
     def __init__(self, url):
@@ -21,7 +21,8 @@ class BlockRandomWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve random number from block'
 
         return response
@@ -39,7 +40,8 @@ class BlockRandomWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve random address from sil'
 
         return response
@@ -58,7 +60,8 @@ class BlockRandomWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve random address from LBL'
 
         return response
@@ -77,7 +80,8 @@ class BlockRandomWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve random address from LRL'
 
         return response
@@ -96,7 +100,8 @@ class BlockRandomWrapper():
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             response = json.loads(ret.read())
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve random address from LSL'
 
         return response

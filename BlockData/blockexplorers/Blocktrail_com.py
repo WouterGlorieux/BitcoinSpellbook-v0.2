@@ -35,10 +35,10 @@ class API:
             else:
                 pages = int((n_tx-1) / json_obj['per_page'])+1
 
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             data = []
             n_tx = 0
-            logging.warning('Blocktrail.com: unable to retrieve transactions')
             self.error = 'Unable to retrieve transactions'
 
         txs = []
@@ -76,9 +76,9 @@ class API:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     json_obj = json.loads(ret.read())
                     data = json_obj['data']
-                except:
+                except Exception as ex:
+                    logging.warning(str(ex))
                     data = []
-                    logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page))
                     self.error = 'Unable to retrieve page ' + str(page)
 
         if n_tx != len(txs):
@@ -99,8 +99,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blocktrail.com: Unable to retrieve latest block')
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve latest block'
 
         if 'height' in data:
@@ -122,8 +122,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blocktrail.com: unable to retrieve block ' + str(height))
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'unable to retrieve block ' + str(height)
 
         if 'height' in data:
@@ -149,8 +149,8 @@ class API:
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     data = json.loads(ret.read())
-                except:
-                    logging.warning('Blocktrail.com: Unable to retrieve data for address ' + address)
+                except Exception as ex:
+                    logging.warning(str(ex))
                     self.error = 'Unable to retrieve data for address ' + address
 
                 response['success'] = 0
@@ -179,8 +179,8 @@ class API:
 
             try:
                 latest_block = self.get_latest_block()['latestBlock']['height']
-            except:
-                logging.warning('Blocktrail.com: Unable to retrieve latest block')
+            except Exception as ex:
+                logging.warning(str(ex))
                 self.error = 'Unable to retrieve latest block'
 
             counter = 0
@@ -201,9 +201,9 @@ class API:
                     else:
                         pages = int((n_utxo-1) / json_obj['per_page'])+1
 
-                except:
+                except Exception as ex:
+                    logging.warning(str(ex))
                     data = []
-                    logging.warning('Blocktrail.com: Unable to retrieve UTXOs')
                     self.error = 'Unable to retrieve UTXOs'
 
                 for page in range(1, pages+1):
@@ -231,9 +231,9 @@ class API:
                             ret = urllib2.urlopen(urllib2.Request(url))
                             json_obj = json.loads(ret.read())
                             data = json_obj['data']
-                        except:
+                        except Exception as ex:
+                            logging.warning(str(ex))
                             data = []
-                            logging.warning('Blocktrail.com: Unable to retrieve page ' + str(page) + ' of UTXOs')
                             self.error = 'Unable to retrieve page ' + str(page) + ' of UTXOs'
 
                 if n_utxo != len(utxos)-counter + unconfirmed_counter:
@@ -257,8 +257,8 @@ class API:
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
-        except:
-            logging.warning('Blocktrail.com: Unable to retrieve prime input address of tx ' + str(txid))
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve prime input address of tx ' + str(txid)
 
         if 'inputs' in data:

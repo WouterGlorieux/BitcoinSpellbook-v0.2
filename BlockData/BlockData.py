@@ -73,7 +73,8 @@ def save_provider(name, priority, provider_type, param=''):
     try:
         provider.put()
         return True
-    except Exception:
+    except Exception as ex:
+        logging.warning(str(ex))
         return False
 
 
@@ -82,7 +83,8 @@ def delete_provider(name):
         provider = datastore.Providers.get_by_id(name)
         provider.key.delete()
         return True
-    except:
+    except Exception as ex:
+        logging.warning(str(ex))
         return False
 
 
