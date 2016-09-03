@@ -37,9 +37,15 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'])
 
 
-def authenticate(headers, body):
-    response = {'success': 0}
+class AuthenticationStatus(object):
+    OK = 'OK'
+    INVALID_API_KEY = 'Invalid API key'
+    NO_API_KEY = 'No API key supplied'
+    INVALID_SIGNATURE = 'Invalid signature'
+    NO_SIGNATURE = 'No signature supplied'
 
+
+def is_authenticated(headers, body):
     if 'API_Key' in headers:
         api_key = headers['API_Key']
 
@@ -55,18 +61,15 @@ def authenticate(headers, body):
                 if signature != base64.b64encode(hmac.new(base64.b64decode(authentication.api_secret),
                                                           message,
                                                           hashlib.sha512).digest()):
-                    response['error'] = 'Invalid signature'
+                    return AuthenticationStatus.INVALID_SIGNATURE
                 else:
-                    response['success'] = 1
+                    return AuthenticationStatus.OK
             else:
-                response['error'] = 'No signature supplied'
+                return AuthenticationStatus.NO_SIGNATURE
         else:
-            response['error'] = 'Invalid API_key'
-
+            return AuthenticationStatus.INVALID_API_KEY
     else:
-        response['error'] = 'No API_key supplied'
-
-    return response
+        return AuthenticationStatus.NO_API_KEY
 
 
 class MainPage(webapp2.RequestHandler):
@@ -172,13 +175,8 @@ class Utxos(webapp2.RequestHandler):
 class SaveProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name') and self.request.get('priority') \
                     and self.request.get('provider_type') in ['Blocktrail.com', 'Blockchain.info', 'Insight']:
                 name = self.request.get('name')
@@ -198,7 +196,7 @@ class SaveProvider(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -207,12 +205,8 @@ class DeleteProvider(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
 
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 if BlockData.delete_provider(name):
@@ -221,7 +215,7 @@ class DeleteProvider(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -581,13 +575,8 @@ class CheckForwarderAddress(webapp2.RequestHandler):
 class SaveForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -652,7 +641,7 @@ class SaveForwarder(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -660,18 +649,13 @@ class SaveForwarder(webapp2.RequestHandler):
 class DeleteForwarder(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockForward.BlockForward(name).delete_forwarder()
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -722,13 +706,8 @@ class CheckDistributerAddress(webapp2.RequestHandler):
 class SaveDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -814,7 +793,7 @@ class SaveDistributer(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -822,18 +801,13 @@ class SaveDistributer(webapp2.RequestHandler):
 class DeleteDistributer(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockDistribute.Distributer(name).delete_distributer()
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -841,18 +815,13 @@ class DeleteDistributer(webapp2.RequestHandler):
 class UpdateDistribution(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockDistribute.Distributer(name).update_distribution()
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -888,13 +857,8 @@ class GetTrigger(webapp2.RequestHandler):
 class SaveTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -946,7 +910,7 @@ class SaveTrigger(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -954,18 +918,13 @@ class SaveTrigger(webapp2.RequestHandler):
 class DeleteTrigger(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockTrigger.BlockTrigger(name).delete_trigger()
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -973,13 +932,8 @@ class DeleteTrigger(webapp2.RequestHandler):
 class SaveAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('trigger_name') and self.request.get('action_name'):
                 trigger_name = self.request.get('trigger_name')
                 action_name = self.request.get('action_name')
@@ -1022,7 +976,7 @@ class SaveAction(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -1030,20 +984,15 @@ class SaveAction(webapp2.RequestHandler):
 class DeleteAction(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('trigger_name') and self.request.get('action_name'):
                 trigger_name = self.request.get('trigger_name')
                 action_name = self.request.get('action_name')
 
                 response = BlockTrigger.BlockTrigger(trigger_name).delete_action(action_name)
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -1079,13 +1028,8 @@ class GetWriter(webapp2.RequestHandler):
 class SaveWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
 
@@ -1147,7 +1091,7 @@ class SaveWriter(webapp2.RequestHandler):
             else:
                 response['error'] = 'Invalid parameters'
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
@@ -1155,18 +1099,13 @@ class SaveWriter(webapp2.RequestHandler):
 class DeleteWriter(webapp2.RequestHandler):
     def post(self):
         response = {'success': 0}
-
-        authentication_ok = False
-        authentication = authenticate(self.request.headers, self.request.body)
-        if 'success' in authentication and authentication['success'] == 1:
-            authentication_ok = True
-
-        if authentication_ok:
+        authentication_status = is_authenticated(self.request.headers, self.request.body)
+        if authentication_status == AuthenticationStatus.OK:
             if self.request.get('name'):
                 name = self.request.get('name')
                 response = BlockWriter.Writer(name).delete_writer()
         else:
-            response['error'] = authentication['error']
+            response['error'] = 'Authentication error: %s' % authentication_status
 
         self.response.write(json.dumps(response, sort_keys=True))
 
