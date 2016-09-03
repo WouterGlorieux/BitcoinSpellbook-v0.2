@@ -61,7 +61,7 @@ class API:
                     tx_out = {'address': tx_output['address'],
                               'value': tx_output['value']}
                     if tx_output['script_hex'][:2] == '6a':
-                        tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(tx_output['script_hex'])
+                        tx_out['op_return'] = TxFactory.decode_op_return(tx_output['script_hex'])
 
                     if tx_output['spent_hash'] is None:
                         tx_out['spent'] = False

@@ -43,11 +43,11 @@ def txs_to_profile(txs, address, block_height=0):
     for tx in sorted_txs:
         if (block_height == 0 or tx['block_height'] <= block_height) and tx['block_height'] is not None:
             for output in tx['outputs']:
-                if 'OP_RETURN' in output:
+                if 'op_return' in output:
                     prime_input_address = tx['prime_input_address']
                     block_height = tx['block_height']
                     profile[prime_input_address] = {'lastUpdate': block_height}
-                    message = output['OP_RETURN']
+                    message = output['op_return']
                     if validator.valid_op_return(message) and validator.valid_blockprofile_message(message):
                         for message_part in message.split("|"):
                             (from_index, to_index, variable_name, variable_value) = components(message_part)

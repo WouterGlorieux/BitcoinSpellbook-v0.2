@@ -81,7 +81,7 @@ class API:
                 else:
                     tx_out['address'] = None
                     if out['script'][:2] == '6a':
-                        tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(out['script'])
+                        tx_out['op_return'] = TxFactory.decode_op_return(out['script'])
 
                 tx_out['value'] = out['value']
                 tx_out['spent'] = out['spent']

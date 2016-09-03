@@ -77,7 +77,7 @@ class API:
                 else:
                     tx_out['address'] = None
                     if out['scriptPubKey']['hex'][:2] == '6a':
-                        tx_out['OP_RETURN'] = TxFactory.decodeOP_RETURN(out['scriptPubKey']['hex'])
+                        tx_out['op_return'] = TxFactory.decode_op_return(out['scriptPubKey']['hex'])
 
                 tx_out['value'] = int(Decimal(out['value']) * Decimal(1e8))
                 if 'spentTxId' in out and out['spentTxId'] is not None:
