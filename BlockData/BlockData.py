@@ -105,7 +105,7 @@ def query(query_type, param='', provider=''):
             if query_type == 'block':
                 data = provider_api.get_block(param)
             elif query_type == 'latest_block':
-                data = provider_api.get_latest_block
+                data = provider_api.get_latest_block()
             elif query_type == 'prime_input_address':
                 data = provider_api.get_prime_input_address(param)
             elif query_type == 'balances':
