@@ -25,8 +25,6 @@ def get_provider_api(name):
     else:
         provider_api = None
 
-    logging.info(str(provider_api))
-
     return provider_api
 
 
