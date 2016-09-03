@@ -106,7 +106,7 @@ transactionsData = []
 for i in range(0, len(providerNames)):
     data = api.transactions(address, providerNames[i])
     if 'success' in data and data['success'] == 1:
-        transactionsData.append(data['TXS'])
+        transactionsData.append(data['txs'])
         print transactionsData[i]
     else:
         print providerNames[i] + ' failed!!'

@@ -22,7 +22,7 @@ def get_profile(address, block=0):
 
         txs_data = BlockData.transactions(address)
         if 'success' in txs_data and txs_data['success'] == 1:
-            txs = txs_data['TXS']
+            txs = txs_data['txs']
             profile = txs_to_profile(txs, address, block)
         else:
             response['error'] = 'Unable to retrieve transactions'

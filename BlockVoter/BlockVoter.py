@@ -145,7 +145,7 @@ class BlockVoter():
         txs_data = BlockData.transactions(self.address)
 
         if 'success' in txs_data and txs_data['success'] == 1:
-            txs = txs_data['TXS']
+            txs = txs_data['txs']
         else:
             self.error = 'Unable to retrieve transactions for address ' + self.address
 

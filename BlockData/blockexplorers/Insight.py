@@ -95,7 +95,7 @@ class API:
 
         if self.error == '':
             response['success'] = 1
-            response['TXS'] = txs
+            response['txs'] = txs
         else:
             response['error'] = self.error
 
@@ -205,7 +205,7 @@ class API:
                     received = 0
                     sent = 0
                     if 'success' in txs and txs['success'] == 1:
-                        for tx in txs['TXS']:
+                        for tx in txs['txs']:
                             if tx['receiving'] is True and tx['confirmations'] > 0:
                                 received += tx['receivedValue']
 

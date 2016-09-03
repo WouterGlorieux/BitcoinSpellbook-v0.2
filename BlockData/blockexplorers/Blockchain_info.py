@@ -96,7 +96,7 @@ class API:
             response = {'success': 0, 'error': 'Not all transactions are retrieved {0} of {1}'.format(str(len(txs)),
                                                                                                       str(n_tx))}
         else:
-            response = {'success': 1, 'TXS': txs}
+            response = {'success': 1, 'txs': txs}
 
         return response
 

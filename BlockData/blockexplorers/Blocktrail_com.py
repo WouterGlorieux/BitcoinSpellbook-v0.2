@@ -91,7 +91,7 @@ class API:
             response['error'] = 'Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)),
                                                                                                  str(n_tx))
         elif self.error == '':
-            response = {'success': 1, 'TXS': txs}
+            response = {'success': 1, 'txs': txs}
         else:
             response['error'] = self.error
 
