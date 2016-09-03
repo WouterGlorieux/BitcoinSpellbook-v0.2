@@ -22,28 +22,28 @@ addresses = ['1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y',
              '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8']
 
 
-def compare_data(data):
-    if len(data) >= 2:
+def compare_data(response_list):
+    if len(response_list) >= 2:
         result = 'OK'
-        baseline = data[0]
+        baseline = response_list[0]
 
-        for i in range(1, len(data)):
-            if baseline != data[i]:
+        for response in response_list:
+            if baseline != response:
                 result = 'Not OK !!!!!!!!!!!!!!'
-                difference(baseline, data[i])
+                difference(baseline, response)
 
         print result
 
 
 def difference(a, b):
     print('{} => {}'.format(a, b))
-    for i, s in enumerate(difflib.ndiff(str(a), str(b))):
+    for counter, s in enumerate(difflib.ndiff(str(a), str(b))):
         if s[0] == ' ':
             continue
         elif s[0] == '-':
-            print(u'Delete "{}" from position {}'.format(s[-1], i))
+            print(u'Delete "{}" from position {}'.format(s[-1], counter))
         elif s[0] == '+':
-            print(u'Add "{}" to position {}'.format(s[-1], i))
+            print(u'Add "{}" to position {}'.format(s[-1], counter))
 
 
 api = SpellbookWrapper.SpellbookWrapper(url).blockdata()
