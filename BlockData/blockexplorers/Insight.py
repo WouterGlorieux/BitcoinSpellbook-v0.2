@@ -17,7 +17,6 @@ class API:
     def __init__(self, url=API_URL):
         self.url = url
         self.error = ''
-        pass
 
     def get_txs(self, address):
         response = {'success': 0}
