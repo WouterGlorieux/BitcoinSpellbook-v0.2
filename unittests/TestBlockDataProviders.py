@@ -130,7 +130,7 @@ utxosData = []
 for i in range(0, len(providerNames)):
     data = api.utxos(addresses, providerNames[i])
     if 'success' in data and data['success'] == 1:
-        utxosData.append(data['UTXOs'])
+        utxosData.append(data['utxos'])
         print utxosData[i]
     else:
         print providerNames[i] + ' failed!!'

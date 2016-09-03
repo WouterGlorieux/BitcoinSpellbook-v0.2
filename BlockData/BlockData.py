@@ -189,7 +189,7 @@ def utxos(addresses, provider=''):
         response['error'] = 'Invalid addresses'
 
     if 'success' in response and response['success'] == 1:
-        response['UTXOs'] = sorted(response['UTXOs'], key=lambda k: (k['address'], k['block_height'], k['output']))
+        response['utxos'] = sorted(response['utxos'], key=lambda k: (k['address'], k['block_height'], k['output']))
 
     return response
 

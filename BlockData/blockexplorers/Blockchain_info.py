@@ -298,7 +298,7 @@ class API:
 
         if self.error == '':
             response['success'] = 1
-            response['UTXOs'] = utxos
+            response['utxos'] = utxos
         else:
             response['error'] = self.error
 

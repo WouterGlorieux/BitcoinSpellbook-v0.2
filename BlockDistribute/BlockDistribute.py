@@ -338,7 +338,7 @@ class DoDistributing():
         utxos = []
         utxos_data = BlockData.utxos(distributer.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
-            utxos = utxos_data['UTXOs']
+            utxos = utxos_data['utxos']
         else:
             self.error = 'Unable to retrieve UTXOs'
 
