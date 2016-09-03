@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from validators import validators as validator
+from validators import validators
 from BlockData import BlockData
 from BlockInputs import BlockInputs
 from BlockLinker import BlockLinker
@@ -13,7 +13,7 @@ class Random():
         self.address = ''
         self.xpub = ''
 
-        if address != '' and not validator.valid_address(address):
+        if address != '' and not validators.valid_address(address):
             self.error = 'Invalid address: ' + address
         else:
             self.address = address
@@ -23,7 +23,7 @@ class Random():
         else:
             self.error = 'block_height must be an integer greater than or equal to zero'
 
-        if xpub != '' and not validator.valid_xpub(xpub):
+        if xpub != '' and not validators.valid_xpub(xpub):
             self.error = 'Invalid xpub: ' + xpub
         else:
             self.xpub = xpub
