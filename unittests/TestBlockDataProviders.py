@@ -36,14 +36,12 @@ def compare_data(response_list):
 
 
 def difference(a, b):
-    print('{} => {}'.format(a, b))
     for counter, s in enumerate(difflib.ndiff(str(a), str(b))):
         if s[0] == ' ':
             continue
-        elif s[0] == '-':
-            print(u'Delete "{}" from position {}'.format(s[-1], counter))
-        elif s[0] == '+':
-            print(u'Add "{}" to position {}'.format(s[-1], counter))
+        else:
+            print str(a)[counter:counter+20], '<>', str(b)[counter:counter+20]
+            break
 
 
 api = SpellbookWrapper.SpellbookWrapper(url).blockdata()
