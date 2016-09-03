@@ -53,7 +53,7 @@ class BlockLinker():
             for row in lbl:
                 row.append(row[1]/total)
 
-            response['lbl'] = lbl
+            response['LBL'] = lbl
             response['success'] = 1
         else:
             response['error'] = self.error
@@ -71,7 +71,7 @@ class BlockLinker():
             for row in lrl:
                 row.append(row[1]/total)
 
-            response['lrl'] = lrl
+            response['LRL'] = lrl
             response['success'] = 1
         else:
             response['error'] = self.error
@@ -89,7 +89,7 @@ class BlockLinker():
             for row in lsl:
                 row.append(row[1]/total)
 
-            response['lsl'] = lsl
+            response['LSL'] = lsl
             response['success'] = 1
         else:
             response['error'] = self.error
@@ -103,7 +103,7 @@ class BlockLinker():
             for i in range(0, len(self.sil)):
                 lal.append([self.sil[i][0], self.address_list[i]])
 
-            response['lal'] = lal
+            response['LAL'] = lal
             response['success'] = 1
         else:
             response['error'] = self.error
