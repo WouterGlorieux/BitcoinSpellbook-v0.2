@@ -210,21 +210,25 @@ class API:
                     balances[data['addrStr']] = {}
                     balances[data['addrStr']]['balance'] = data['balanceSat']
 
-                    txs = self.get_txs(address)
+                    txs_data = self.get_txs(address)
                     received = 0
                     sent = 0
-                    if 'success' in txs and txs['success'] == 1:
-                        for tx in txs['txs']:
-                            if tx['receiving'] is True and tx['confirmations'] > 0:
-                                received += tx['receivedValue']
+                    if 'success' in txs_data and txs_data['success'] == 1:
+                        txs = txs_data['txs']
+                        if isinstance(txs, list):
+                            for tx in txs:
+                                if tx['receiving'] is True and tx['confirmations'] > 0:
+                                    received += tx['receivedValue']
 
-                            elif tx['receiving'] is False and tx['confirmations'] > 0:
-                                sent += tx['sentValue']
+                                elif tx['receiving'] is False and tx['confirmations'] > 0:
+                                    sent += tx['sentValue']
+                        else:
+                            self.error = 'txs is not a list of transactions'
 
                         balances[data['addrStr']]['received'] = received
                         balances[data['addrStr']]['sent'] = sent
                     else:
-                        self.error = txs['error']
+                        self.error = txs_data['error']
 
         if self.error == '':
             response['success'] = 1
