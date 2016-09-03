@@ -227,15 +227,16 @@ class API:
         return response
 
     def get_prime_input_address(self, txid):
+        response = {'success': 0}
         url = 'https://blockchain.info/nl/rawtx/' + str(txid)
         data = {}
-        response = {'success': 0}
+
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
         except Exception as ex:
             logging.warning(str(ex))
-            response = {'success': 0, 'error': 'unable to retrieve prime input address of tx ' + txid}
+            self.error = 'unable to retrieve prime input address of tx ' + txid
 
         if 'hash' in data and data['hash'] == txid:
             tx_inputs = data['inputs']
@@ -248,7 +249,11 @@ class API:
             if len(input_addresses) > 0:
                 prime_input_address = sorted(input_addresses)[0]
 
-            response = {'success': 1, 'PrimeInputAddress': prime_input_address}
+        if self.error == '':
+            response['success'] = 1
+            response['PrimeInputAddress'] = prime_input_address
+        else:
+            response['error'] = self.error
 
         return response
 
