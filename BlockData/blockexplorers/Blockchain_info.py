@@ -268,7 +268,7 @@ class API:
             data = json.loads(ret.read())
         except Exception as ex:
             logging.warning(str(ex))
-            response = {'success': 0, 'error': 'unable to retrieve utxos'}
+            self.error = 'unable to retrieve utxos'
 
         if 'unspent_outputs' in data:
             for i in range(0, len(data['unspent_outputs'])):
@@ -287,7 +287,7 @@ class API:
                     tx = json.loads(ret.read())
                 except Exception as ex:
                     logging.warning(str(ex))
-                    response = {'success': 0, 'error': 'unable to retrieve utxos'}
+                    self.error = 'unable to retrieve utxos'
 
                 if 'block_height' in tx and 'hash' in tx and tx['hash'] == data['unspent_outputs'][i]['tx_hash_big_endian']:
                     utxo['block_height'] = tx['block_height']
@@ -295,5 +295,10 @@ class API:
                         if tx_output['n'] == data['unspent_outputs'][i]['tx_output_n']:
                             utxo['address'] = tx_output['addr']
 
-            response = {'success': 1, 'UTXOs': utxos}
+        if self.error == '':
+            response['success'] = 1
+            response['UTXOs'] = utxos
+        else:
+            response['error'] = self.error
+
         return response
