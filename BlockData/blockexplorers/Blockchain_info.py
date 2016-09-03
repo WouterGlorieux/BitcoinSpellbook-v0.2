@@ -13,6 +13,7 @@ API_VERSION = 'v1'
 
 class API:
     def __init__(self, key='', secret=''):
+        self.error = ''
         self.key = key
         self.secret = secret
 
