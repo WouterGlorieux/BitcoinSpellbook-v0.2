@@ -101,6 +101,8 @@ class BlockForward():
 
             if forwarder:
                 forwarding_relation = {'relation': 'unrelated address'}
+                lal = []
+                lbl = []
                 if forwarder.address == address:
                     forwarding_relation['relation'] = 'forwarding address'
                 else:
@@ -268,6 +270,7 @@ class DoForwarding():
 
     def run(self, forwarder):
         success = False
+        utxos = []
         utxos_data = BlockData.utxos(forwarder.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
             utxos = utxos_data['UTXOs']

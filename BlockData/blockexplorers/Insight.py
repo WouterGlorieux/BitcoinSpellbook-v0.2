@@ -38,6 +38,7 @@ class API:
             self.error = 'Unable to retrieve latest block'
 
         url = self.url + '/addrs/' + address + '/txs'
+        data = {}
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
@@ -45,6 +46,8 @@ class API:
             logging.warning(str(ex))
             self.error = 'Unable to retrieve transactions'
 
+        transactions = []
+        n_tx = 0
         if 'totalItems' in data:
             transactions = data['items']
             n_tx = data['totalItems']
@@ -190,11 +193,11 @@ class API:
 
     def get_balances(self, addresses):
         response = {'success': 0}
+        balances = {}
 
         if len(addresses.split("|")) > 10:
             self.error = 'Max 10 addresses, api function for multiple address lookup not available at ' + self.url
         else:
-            balances = {}
             for address in addresses.split("|"):
                 data = {}
 
@@ -240,6 +243,7 @@ class API:
 
     def get_prime_input_address(self, txid):
         response = {'success': 0}
+        prime_input_address = ''
         url = self.url + '/tx/' + str(txid)
         data = {}
         try:

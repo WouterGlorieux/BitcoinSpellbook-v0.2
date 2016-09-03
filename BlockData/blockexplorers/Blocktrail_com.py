@@ -145,11 +145,10 @@ class API:
 
     def get_balances(self, addresses):
         response = {'success': 0}
+        balances = {}
         if len(addresses.split("|")) > 10:
             response['error'] = 'Max 10 addresses, api function for multiple address lookup not available at ' + API_URL
         else:
-            balances = {}
-
             for address in addresses.split("|"):
                 data = {}
                 url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '?api_key=' + self.key
@@ -183,7 +182,7 @@ class API:
         else:
 
             limit = 200
-
+            latest_block_height = 0
             try:
                 latest_block_data = self.get_latest_block()
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
@@ -224,7 +223,6 @@ class API:
                         utxo = {'address': data[i]['address']}
                         if data[i]['confirmations'] != 0:
                             block_height = latest_block_height - int(data[i]['confirmations']) + 1
-
                         else:
                             block_height = None
                         utxo['block_height'] = block_height

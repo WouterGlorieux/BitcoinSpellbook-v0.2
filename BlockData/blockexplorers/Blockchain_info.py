@@ -228,6 +228,7 @@ class API:
 
     def get_prime_input_address(self, txid):
         response = {'success': 0}
+        prime_input_address = ''
         url = 'https://blockchain.info/nl/rawtx/' + str(txid)
         data = {}
 

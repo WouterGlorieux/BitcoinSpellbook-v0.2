@@ -267,6 +267,7 @@ class Distributer():
 
     def update_distribution(self):
         response = {'success': 0}
+        distribution = []
 
         if self.error == '':
             distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
@@ -309,7 +310,7 @@ class Distributer():
 
         if self.error == '':
             response['success'] = 1
-            response['distribution'] = distributer.distribution
+            response['distribution'] = distribution
         else:
             response['error'] = self.error
 
@@ -334,6 +335,7 @@ class DoDistributing():
 
     def run(self, distributer):
         success = False
+        utxos = []
         utxos_data = BlockData.utxos(distributer.address)
         if 'success' in utxos_data and utxos_data['success'] == 1:
             utxos = utxos_data['UTXOs']
@@ -348,7 +350,7 @@ class DoDistributing():
             logging.info(
                 'Starting distribution of {0} Satoshis, minimum output value: {1}'.format(str(total_input_value),
                                                                                           str(distributer.minimum_amount)))
-
+            distribution = []
             if distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
                 distribution_data = Distributer(distributer.key.id()).update_distribution()
                 if 'success' in distribution_data and distribution_data['success'] == 1:
