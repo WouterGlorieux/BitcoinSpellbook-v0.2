@@ -26,7 +26,7 @@ class API:
         latest_block_height = -1
         try:
             latest_block = self.get_latest_block()
-            latest_block_height = latest_block['latestBlock']['height']
+            latest_block_height = latest_block['latest_block']['height']
         except Exception as ex:
             logging.warning(str(ex))
             logging.error('Insight: Unable to retrieve latest block')
@@ -134,7 +134,7 @@ class API:
 
         if self.error == '':
             response['success'] = 1
-            response['latestBlock'] = latest_block
+            response['latest_block'] = latest_block
         else:
             response['error'] = self.error
 
@@ -263,7 +263,7 @@ class API:
         latest_block_height = 0
         try:
             latest_block = self.get_latest_block()
-            latest_block_height = latest_block['latestBlock']['height']
+            latest_block_height = latest_block['latest_block']['height']
         except Exception as ex:
             logging.warning(str(ex))
             self.error = 'Unable to retrieve latest block'

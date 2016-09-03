@@ -75,12 +75,12 @@ for i in range(0, len(providerNames)):
 compare_data(blockData)
 
 
-print '==============latestBlock======================='
+print '==============latest_block======================='
 latestBlockData = []
 for i in range(0, len(providerNames)):
     data = api.latest_block(providerNames[i])
     if 'success' in data and data['success'] == 1:
-        latestBlockData.append(data['latestBlock'])
+        latestBlockData.append(data['latest_block'])
         print latestBlockData[i]
     else:
         print providerNames[i] + ' failed!!'

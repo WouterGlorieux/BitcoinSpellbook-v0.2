@@ -17,7 +17,7 @@ handlers:
 - url: /data/block
   script: BitcoinSpellbook.app
 
-- url: /data/latestBlock
+- url: /data/latest_block
   script: BitcoinSpellbook.app
 
 - url: /data/prime_input_address

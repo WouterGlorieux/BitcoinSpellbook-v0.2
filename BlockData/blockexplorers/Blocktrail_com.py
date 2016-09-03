@@ -116,7 +116,7 @@ class API:
                                                                               "%Y-%m-%dT%H:%M:%S+0000").timetuple()))
             latest_block['merkleroot'] = data['merkleroot']
             latest_block['size'] = data['byte_size']
-            response = {'success': 1, 'latestBlock': latest_block}
+            response = {'success': 1, 'latest_block': latest_block}
 
         return response
 
@@ -185,7 +185,7 @@ class API:
             limit = 200
 
             try:
-                latest_block = self.get_latest_block()['latestBlock']['height']
+                latest_block = self.get_latest_block()['latest_block']['height']
             except Exception as ex:
                 logging.warning(str(ex))
                 self.error = 'Unable to retrieve latest block'

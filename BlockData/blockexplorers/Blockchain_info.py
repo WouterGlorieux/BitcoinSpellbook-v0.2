@@ -23,7 +23,7 @@ class API:
 
         latest_block_height = -1
         try:
-            latest_block_height = self.get_latest_block()['latestBlock']['height']
+            latest_block_height = self.get_latest_block()['latest_block']['height']
         except Exception as ex:
             logging.warning(str(ex))
             logging.warning('Blockchain.info: unable to retrieve latest block')
@@ -131,7 +131,7 @@ class API:
                 latest_block['merkleroot'] = data['mrkl_root']
                 latest_block['size'] = data['size']
 
-            response = {'success': 1, 'latestBlock': latest_block}
+            response = {'success': 1, 'latest_block': latest_block}
 
         return response
 

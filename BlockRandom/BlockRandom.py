@@ -66,7 +66,7 @@ class Random():
             if rng_block_height != 0:
                 rng_hash = block_data['block']['hash']
             else:
-                rng_hash = block_data['latestBlock']['hash']
+                rng_hash = block_data['latest_block']['hash']
 
             int_hash = int(rng_hash, 16)
 

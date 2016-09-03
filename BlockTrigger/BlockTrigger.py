@@ -299,7 +299,7 @@ class CheckTriggers():
             if trigger.trigger_type == 'block_height':
                 latest_block_data = BlockData.latest_block()
                 if 'success' in latest_block_data and latest_block_data['success'] == 1:
-                    latest_block_height = latest_block_data['latestBlock']['height']
+                    latest_block_height = latest_block_data['latest_block']['height']
                     if trigger.block_height + trigger.confirmations <= latest_block_height:
                         logging.info('{0}: {1} activated: current block_height:{2}'.format(str(trigger.key.id()),
                                                                                            str(trigger.trigger_type),

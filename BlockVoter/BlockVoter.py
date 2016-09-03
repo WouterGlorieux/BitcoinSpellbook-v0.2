@@ -115,7 +115,7 @@ class BlockVoter():
         if block_height == 0:
             latest_block_data = BlockData.latest_block()
             if 'success' in latest_block_data and latest_block_data['success'] == 1:
-                block_height = latest_block_data['latestBlock']['height']
+                block_height = latest_block_data['latest_block']['height']
             else:
                 self.error = latest_block_data['error']
 

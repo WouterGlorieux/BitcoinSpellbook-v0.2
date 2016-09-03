@@ -106,7 +106,7 @@ class BlockDataWrapper():
         parameters = {'provider': provider}
 
         query_string = urllib.urlencode(parameters)
-        url = self.url + "/data/latestBlock?" + query_string
+        url = self.url + "/data/latest_block?" + query_string
 
         try:
             ret = urllib2.urlopen(urllib2.Request(url))

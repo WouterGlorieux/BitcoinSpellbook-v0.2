@@ -15,7 +15,7 @@ def get_sil(address, block=0):
             latest_block = BlockData.latest_block()
 
             if 'success' in latest_block and latest_block['success'] == 1:
-                block = latest_block['latestBlock']['height']
+                block = latest_block['latest_block']['height']
             else:
                 response['error'] = 'Unable to retrieve latest block'
 
