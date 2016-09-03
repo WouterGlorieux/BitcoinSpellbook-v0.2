@@ -103,8 +103,7 @@ class API:
 
         return response
 
-    @staticmethod
-    def get_latest_block():
+    def get_latest_block(self):
         response = {'success': 0}
         latest_block = {}
         data = {}
@@ -114,7 +113,7 @@ class API:
             data = json.loads(ret.read())
         except Exception as ex:
             logging.warning(str(ex))
-            response = {'success': 0, 'error': 'unable to retrieve latest block'}
+            self.error = 'unable to retrieve latest block'
 
         if 'height' in data:
             latest_block['height'] = data['height']
@@ -128,13 +127,17 @@ class API:
                 data = json.loads(ret.read())
             except Exception as ex:
                 logging.warning(str(ex))
-                response = {'success': 0, 'error': 'unable to retrieve block ' + str(latest_block['height'])}
+                self.error = 'unable to retrieve block ' + str(latest_block['height'])
 
             if 'hash' in data and data['hash'] == latest_block['hash']:
                 latest_block['merkleroot'] = data['mrkl_root']
                 latest_block['size'] = data['size']
 
-            response = {'success': 1, 'latest_block': latest_block}
+        if self.error == '':
+            response['success'] = 1
+            response['latest_block'] = latest_block
+        else:
+            response['error'] = self.error
 
         return response
 
