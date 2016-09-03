@@ -25,8 +25,13 @@ class API:
 
         latest_block_height = -1
         try:
-            latest_block = self.get_latest_block()
-            latest_block_height = latest_block['latest_block']['height']
+            latest_block_data = self.get_latest_block()
+            if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                latest_block = latest_block_data['latest_block']
+                if isinstance(latest_block, dict):
+                    latest_block_height = latest_block['height']
+                else:
+                    self.error = "latest_block is not a dictionary"
         except Exception as ex:
             logging.warning(str(ex))
             logging.error('Insight: Unable to retrieve latest block')
@@ -115,18 +120,22 @@ class API:
 
         if 'info' in data:
             latest_block['height'] = data['info']['blocks']
-            data = {}
+            block_data = {}
             try:
-                data = self.get_block(latest_block['height'])
+                block_data = self.get_block(latest_block['height'])
             except Exception as ex:
                 logging.warning(str(ex))
                 self.error = 'Unable to retrieve block'
 
-            if 'success' in data and data['success'] == 1:
-                latest_block['hash'] = data['block']['hash']
-                latest_block['time'] = data['block']['time']
-                latest_block['merkleroot'] = data['block']['merkleroot']
-                latest_block['size'] = data['block']['size']
+            if 'success' in block_data and block_data['success'] == 1:
+                block = block_data['block']
+                if isinstance(block, dict):
+                    latest_block['hash'] = block['hash']
+                    latest_block['time'] = block['time']
+                    latest_block['merkleroot'] = block['merkleroot']
+                    latest_block['size'] = block['size']
+                else:
+                    self.error = "block is not a dictionary"
             else:
                 self.error = 'Unable to retrieve block'
         else:
@@ -262,8 +271,13 @@ class API:
 
         latest_block_height = 0
         try:
-            latest_block = self.get_latest_block()
-            latest_block_height = latest_block['latest_block']['height']
+            latest_block_data = self.get_latest_block()
+            if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                latest_block = latest_block_data['latest_block']
+                if isinstance(latest_block, dict):
+                    latest_block_height = latest_block['height']
+                else:
+                    self.error = 'latest_block is not a dictionary'
         except Exception as ex:
             logging.warning(str(ex))
             self.error = 'Unable to retrieve latest block'

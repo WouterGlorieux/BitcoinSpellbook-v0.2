@@ -23,11 +23,14 @@ class API:
 
         latest_block_height = -1
         try:
-            latest_block_height = self.get_latest_block()['latest_block']['height']
+            latest_block_data = self.get_latest_block()
+            if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                latest_block = latest_block_data['latest_block']
+                if isinstance(latest_block, dict):
+                    latest_block_height = latest_block['height']
         except Exception as ex:
             logging.warning(str(ex))
-            logging.warning('Blockchain.info: unable to retrieve latest block')
-            response = {'success': 0, 'error': 'unable to retrieve latest block'}
+            self.error = 'Unable to retrieve latest block'
 
         url = 'https://blockchain.info/address/' + address + '?format=json&limit=' + str(limit)
         try:
@@ -90,13 +93,13 @@ class API:
             txs.insert(0, tx.to_dict(address))
 
         if n_tx != len(txs):
-            logging.warning(
-                'Blockchain.info: Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)),
-                                                                                                  str(n_tx)))
-            response = {'success': 0, 'error': 'Not all transactions are retrieved {0} of {1}'.format(str(len(txs)),
-                                                                                                      str(n_tx))}
+            self.error = 'Blockchain.info: Warning: not all transactions are retrieved! {0} of {1}'.format(str(len(txs)), str(n_tx))
+
+        if self.error == '':
+            response['success'] = 1
+            response['txs'] = txs
         else:
-            response = {'success': 1, 'txs': txs}
+            response['error'] = self.error
 
         return response
 

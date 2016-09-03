@@ -185,7 +185,11 @@ class API:
             limit = 200
 
             try:
-                latest_block = self.get_latest_block()['latest_block']['height']
+                latest_block_data = self.get_latest_block()
+                if 'success' in latest_block_data and latest_block_data['success'] == 1:
+                    latest_block = latest_block_data['latest_block']
+                    if isinstance(latest_block, dict):
+                        latest_block_height = latest_block['height']
             except Exception as ex:
                 logging.warning(str(ex))
                 self.error = 'Unable to retrieve latest block'
@@ -219,7 +223,7 @@ class API:
                     for i in range(0, len(data)):
                         utxo = {'address': data[i]['address']}
                         if data[i]['confirmations'] != 0:
-                            block_height = latest_block - int(data[i]['confirmations']) + 1
+                            block_height = latest_block_height - int(data[i]['confirmations']) + 1
 
                         else:
                             block_height = None
