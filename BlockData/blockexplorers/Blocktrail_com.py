@@ -287,6 +287,6 @@ class API:
             if len(input_addresses) > 0:
                 prime_input_address = sorted(input_addresses)[0]
 
-            response = {'success': 1, 'PrimeInputAddress': prime_input_address}
+            response = {'success': 1, 'prime_input_address': prime_input_address}
 
         return response

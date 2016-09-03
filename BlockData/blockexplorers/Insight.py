@@ -262,7 +262,7 @@ class API:
 
         if self.error == '':
             response['success'] = 1
-            response['PrimeInputAddress'] = prime_input_address
+            response['prime_input_address'] = prime_input_address
         else:
             response['error'] = self.error
 

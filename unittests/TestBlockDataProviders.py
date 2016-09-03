@@ -91,7 +91,7 @@ primeInputAddressData = []
 for i in range(0, len(providerNames)):
     data = api.prime_input_address(txid, providerNames[i])
     if 'success' in data and data['success'] == 1:
-        primeInputAddressData.append(data['PrimeInputAddress'])
+        primeInputAddressData.append(data['prime_input_address'])
         print primeInputAddressData[i]
     else:
         print providerNames[i] + ' failed!!'

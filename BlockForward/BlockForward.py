@@ -280,7 +280,7 @@ class DoForwarding():
 
             prime_input_address_data = BlockData.prime_input_address(utxo['output'].split(":")[0])
             if 'success' in prime_input_address_data and prime_input_address_data['success'] == 1:
-                prime_input_address = prime_input_address_data['PrimeInputAddress']
+                prime_input_address = prime_input_address_data['prime_input_address']
                 if prime_input_address != forwarder.address:
 
                     linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
