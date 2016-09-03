@@ -226,7 +226,8 @@ class GetProviders(webapp2.RequestHandler):
         try:
             response['providersList'] = BlockData.get_providers()
             response['success'] = 1
-        except:
+        except Exception as ex:
+            logging.warning(str(ex))
             response['error'] = 'Unable to retrieve providers.'
 
         self.response.write(json.dumps(response, sort_keys=True))
@@ -261,8 +262,8 @@ class UpdateRecommendedFee(webapp2.RequestHandler):
         url = 'https://api.blocktrail.com/v1/BTC/fee-per-kb?api_key=' + blocktrail_key
         try:
             fee_data = json.loads(urllib2.urlopen(urllib2.Request(url)).read())
-        except:
-            logging.error('Failed to update optimal fee per KB from Blocktrail.com')
+        except Exception as ex:
+            logging.warning(str(ex))
 
         if 'optimal' in fee_data:
             parameters.optimal_fee_per_kb = fee_data['optimal']
