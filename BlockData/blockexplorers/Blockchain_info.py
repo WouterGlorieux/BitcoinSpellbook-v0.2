@@ -141,8 +141,7 @@ class API:
 
         return response
 
-    @staticmethod
-    def get_block(height):
+    def get_block(self, height):
         response = {'success': 0}
         block = {}
         data = {}
@@ -152,7 +151,7 @@ class API:
             data = json.loads(ret.read())
         except Exception as ex:
             logging.warning(str(ex))
-            response = {'success': 0, 'error': 'unable to retrieve block ' + str(height)}
+            self.error = 'unable to retrieve block ' + str(height)
 
         if 'blocks' in data:
             blocks = data['blocks']
@@ -165,7 +164,11 @@ class API:
                     block['merkleroot'] = blocks[i]['mrkl_root']
                     block['size'] = blocks[i]['size']
 
-            response = {'success': 1, 'block': block}
+        if self.error == '':
+            response['success'] = 1
+            response['block'] = block
+        else:
+            response['error'] = self.error
 
         return response
 
