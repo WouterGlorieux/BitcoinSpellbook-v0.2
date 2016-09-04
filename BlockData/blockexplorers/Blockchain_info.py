@@ -13,7 +13,7 @@ from ProviderAPI import ProviderAPI
 API_VERSION = 'v1'
 
 
-class Blockchain_info_API(ProviderAPI):
+class BlockchainInfoAPI(ProviderAPI):
 
     def get_txs(self, address):
         response = {'success': 0}

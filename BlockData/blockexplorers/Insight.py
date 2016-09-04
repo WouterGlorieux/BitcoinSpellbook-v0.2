@@ -14,7 +14,7 @@ from ProviderAPI import ProviderAPI
 API_URL = 'https://blockexplorer.com/api'
 
 
-class Insight_API(ProviderAPI):
+class InsightAPI(ProviderAPI):
 
     def get_txs(self, address):
         response = {'success': 0}

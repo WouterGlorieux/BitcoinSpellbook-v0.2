@@ -16,14 +16,14 @@ API_URL = 'https://api.blocktrail.com'
 API_VERSION = 'v1'
 
 
-class Blocktrail_com_API(ProviderAPI):
+class BlocktrailComAPI(ProviderAPI):
 
     def get_txs(self, address):
         limit = 200  # max 200 for Blocktrail.com
         pages = 0
         response = {'success': 0}
-        url = 'https://api.blocktrail.com/{0}/btc/address/{1}/transactions?api_key={2}&limit={3}&sort_dir=asc'.format(
-            str(API_VERSION), str(address), str(self.key), str(limit))
+        url = '{0}/{1}/btc/address/{2}/transactions?api_key={3}&limit={4}&sort_dir=asc'.format(
+            str(API_URL), str(API_VERSION), str(address), str(self.key), str(limit))
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             json_obj = json.loads(ret.read())
@@ -71,8 +71,8 @@ class Blocktrail_com_API(ProviderAPI):
                 txs.append(tx.to_dict(address))
 
             if page < pages:
-                url = 'https://api.blocktrail.com/{0}/btc/address/{1}/transactions?api_key={2}&page={3}&limit={4}&sort_dir=asc'.format(
-                    str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
+                url = '{0}/{1}/btc/address/{2}/transactions?api_key={3}&page={4}&limit={5}&sort_dir=asc'.format(
+                    str(API_URL), str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     json_obj = json.loads(ret.read())
@@ -99,7 +99,7 @@ class Blocktrail_com_API(ProviderAPI):
         response = {'success': 0}
         latest_block = {}
         data = {}
-        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/block/latest?api_key=' + self.key
+        url = '{0}/{1}/btc/block/latest?api_key={2}'.format(str(API_URL), str(API_VERSION), str(self.key))
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
@@ -122,7 +122,7 @@ class Blocktrail_com_API(ProviderAPI):
         response = {'success': 0}
         block = {}
         data = {}
-        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/block/' + str(height) + '?api_key=' + self.key
+        url = '{0}/{1}/btc/block/{2}?api_key={3}'.format(str(API_URL), str(API_VERSION), str(height), str(self.key))
         try:
             ret = urllib2.urlopen(urllib2.Request(url))
             data = json.loads(ret.read())
@@ -149,7 +149,7 @@ class Blocktrail_com_API(ProviderAPI):
         else:
             for address in addresses.split("|"):
                 data = {}
-                url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/address/' + address + '?api_key=' + self.key
+                url = '{0}/{1}/btc/address/{2}?api_key={3}'.format(str(API_URL), str(API_VERSION), str(address), str(self.key))
                 try:
                     ret = urllib2.urlopen(urllib2.Request(url))
                     data = json.loads(ret.read())
@@ -195,8 +195,8 @@ class Blocktrail_com_API(ProviderAPI):
             unconfirmed_counter = 0
             for address in addresses.split('|'):
                 response['success'] = 0
-                url = 'https://api.blocktrail.com/{0}/btc/address/{1}/unspent-outputs?api_key={2}&limit={3}&sort_dir=asc'.format(
-                    str(API_VERSION), str(address), str(self.key), str(limit))
+                url = '{0}/{1}/btc/address/{2}/unspent-outputs?api_key={3}&limit={4}&sort_dir=asc'.format(
+                    str(API_URL), str(API_VERSION), str(address), str(self.key), str(limit))
                 n_utxo = 0
                 pages = 1
                 try:
@@ -234,8 +234,8 @@ class Blocktrail_com_API(ProviderAPI):
                             unconfirmed_counter += 1
 
                     if page < pages:
-                        url = 'https://api.blocktrail.com/{0}/btc/address/{1}/unspent-outputs?api_key={2}&page={3}&limit={4}&sort_dir=asc'.format(
-                            str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
+                        url = '{0}/{1}/btc/address/{2}/unspent-outputs?api_key={3}&page={4}&limit={5}&sort_dir=asc'.format(
+                            str(API_URL), str(API_VERSION), str(address), str(self.key), str(page + 1), str(limit))
                         try:
                             ret = urllib2.urlopen(urllib2.Request(url))
                             json_obj = json.loads(ret.read())
@@ -262,7 +262,7 @@ class Blocktrail_com_API(ProviderAPI):
         return response
 
     def get_prime_input_address(self, txid):
-        url = 'https://api.blocktrail.com/' + API_VERSION + '/btc/transaction/' + str(txid) + '?api_key=' + self.key
+        url = '{0}/{1}/btc/transaction/{2}?api_key={3}'.format(str(API_URL), str(API_VERSION), str(txid), str(self.key))
         data = {}
         response = {'success': 0}
         try:
