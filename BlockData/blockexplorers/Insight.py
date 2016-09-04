@@ -8,15 +8,13 @@ import logging
 
 import TxFactory.TxFactory as TxFactory
 from BlockData import TX
+from ProviderAPI import ProviderAPI
 
 
 API_URL = 'https://blockexplorer.com/api'
 
 
-class API:
-    def __init__(self, url=API_URL):
-        self.url = url
-        self.error = ''
+class Insight_API(ProviderAPI):
 
     def get_txs(self, address):
         response = {'success': 0}

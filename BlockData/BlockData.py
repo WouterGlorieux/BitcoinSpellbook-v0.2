@@ -17,11 +17,11 @@ def get_provider_api(name):
     provider = datastore.Providers.get_by_id(name)
 
     if provider and provider.provider_type == 'Blocktrail.com':
-        provider_api = Blocktrail_com.API(key=provider.blocktrail_key)
+        provider_api = Blocktrail_com.Blocktrail_com_API(key=provider.blocktrail_key)
     elif provider and provider.provider_type == 'Blockchain.info':
-        provider_api = Blockchain_info.API()
+        provider_api = Blockchain_info.Blockchain_info_API()
     elif provider and provider.provider_type == 'Insight':
-        provider_api = Insight.API(url=provider.insight_url)
+        provider_api = Insight.Insight_API(url=provider.insight_url)
     else:
         provider_api = None
 

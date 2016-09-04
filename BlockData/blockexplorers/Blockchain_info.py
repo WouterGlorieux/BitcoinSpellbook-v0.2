@@ -7,15 +7,13 @@ import logging
 
 import TxFactory.TxFactory as TxFactory
 from BlockData import TX as TX
+from ProviderAPI import ProviderAPI
+
 
 API_VERSION = 'v1'
 
 
-class API:
-    def __init__(self, key='', secret=''):
-        self.error = ''
-        self.key = key
-        self.secret = secret
+class Blockchain_info_API(ProviderAPI):
 
     def get_txs(self, address):
         response = {'success': 0}

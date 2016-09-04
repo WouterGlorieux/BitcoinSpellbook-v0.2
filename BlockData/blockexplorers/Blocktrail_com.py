@@ -9,16 +9,14 @@ import logging
 
 from BlockData import TX as TX
 import TxFactory.TxFactory as TxFactory
+from ProviderAPI import ProviderAPI
 
-API_URL = 'https://api.blocktrail.com/'
+
+API_URL = 'https://api.blocktrail.com'
 API_VERSION = 'v1'
 
 
-class API:
-    def __init__(self, key='', secret=''):
-        self.error = ''
-        self.key = key
-        self.secret = secret
+class Blocktrail_com_API(ProviderAPI):
 
     def get_txs(self, address):
         limit = 200  # max 200 for Blocktrail.com
