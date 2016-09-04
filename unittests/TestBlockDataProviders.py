@@ -3,15 +3,16 @@
 
 import sys
 from os import path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from wrappers import SpellbookWrapper as SpellbookWrapper
 import difflib
 
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from wrappers import SpellbookWrapper as SpellbookWrapper
+import testconfig
 
-#local parameters, these will need to be changed
-url = 'http://localhost:34080'
-key = 'GW8S1SV40FG4TPDI'
-secret = 'EI5IJJBTVL6YGWNE'
+
+url = testconfig.url
+key = testconfig.key
+secret = testconfig.secret
 
 #test parameters
 address = '1BAZ9hiAsMdSyw8CMeUoH4LeBnj7u6D7o8'
