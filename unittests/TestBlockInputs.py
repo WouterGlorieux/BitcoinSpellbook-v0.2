@@ -18,10 +18,10 @@ secret = testconfig.secret
 address = '1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y'
 block_height = 400000
 
-api = SpellbookWrapper.SpellbookWrapper(url).blockinputs()
+blockinputs = SpellbookWrapper.SpellbookWrapper(url).blockinputs()
 
 #Test most recent SIL
-pprint(api.get_sil(address))
+pprint(blockinputs.get_sil(address))
 
 #Test SIL at specified block_height
-pprint(api.get_sil(address, block_height))
+pprint(blockinputs.get_sil(address, block_height))
