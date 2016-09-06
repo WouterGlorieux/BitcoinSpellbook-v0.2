@@ -123,6 +123,11 @@ class BlockTrigger():
             elif 'address' in settings:
                 self.error = 'Invalid address'
 
+            if 'block_height' in settings and validator.valid_block_height(settings['block_height']):
+                trigger.block_height = settings['block_height']
+            elif 'block_height' in settings:
+                self.error = 'block_height must be an integer greater than 0'
+
             if 'amount' in settings and validator.valid_amount(settings['amount']):
                 trigger.amount = settings['amount']
             elif 'amount' in settings:

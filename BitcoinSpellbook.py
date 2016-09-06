@@ -868,6 +868,12 @@ class SaveTrigger(webapp2.RequestHandler):
                 if self.request.get('trigger_type'):
                     settings['trigger_type'] = self.request.get('trigger_type')
 
+                if self.request.get('block_height'):
+                    try:
+                        settings['block_height'] = int(self.request.get('block_height'))
+                    except ValueError:
+                        response['error'] = 'block_height must be a positive integer'
+
                 if self.request.get('address', None) is not None:
                     settings['address'] = self.request.get('address')
 
