@@ -168,7 +168,7 @@ class Distributer():
                 self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'threshold' in settings and validator.valid_amount(settings['threshold']):
-                distributer.minimum_amount = settings['threshold']
+                distributer.threshold = settings['threshold']
             elif 'threshold' in settings:
                 self.error = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
 
