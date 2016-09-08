@@ -40,7 +40,7 @@ def get_available_address_index():
         else:
             index = 1
 
-        address = datastore.initializeWalletAddress('BlockWriter', index)
+        address = datastore.get_service_address(datastore.Services.blockwriter, index)
         logging.info("Initializing new wallet address for module BlockWriter: %i %s" % (index, address))
 
     return index
@@ -130,7 +130,7 @@ def estimate_tx_size(outputs, message):
 
     private_keys = {'1C7X7j98ge3mMkGLwpxaVfChuNoMMCERP7': 'L2i45ALZv9Zpx2Mvmz27ASpMWzNY5877f6cLCkbcymXPYvbfs2cA'}
     fee = dummy_inputs[0]['value'] - total_output_value
-    tx = TxFactory.makeCustomTransaction(private_keys, dummy_inputs, dummy_outputs, fee, message)
+    tx = TxFactory.make_custom_tx(private_keys, dummy_inputs, dummy_outputs, fee, message)
 
     tx_size = 0
     if tx is not None:
@@ -279,7 +279,7 @@ class Writer():
             else:
                 writer.extra_value_address = writer.address
 
-            if not datastore.consistencyCheck('BlockWriter'):
+            if not datastore.consistency_check('BlockWriter'):
                 self.error = 'Unable to assign address.'
 
             if self.error == '':
@@ -382,9 +382,9 @@ class DoWriting():
             logging.info(
                 "Sending {0} Satoshis to {1} recipients with a total fee of {2} with OP_RETURN message: {3}".format(
                     str(total_input_value), str(len(outputs)), str(transaction_fee), str(writer.message)))
-            tx = TxFactory.makeCustomTransaction(private_keys, utxos, outputs, transaction_fee, writer.message)
+            tx = TxFactory.make_custom_tx(private_keys, utxos, outputs, transaction_fee, writer.message)
             if tx is not None:
-                success = TxFactory.sendTransaction(tx)
+                success = TxFactory.send_tx(tx)
 
             if success:
                 logging.info("Success")
