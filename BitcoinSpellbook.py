@@ -28,7 +28,6 @@ import BlockForward.BlockForward as BlockForward
 import BlockDistribute.BlockDistribute as BlockDistribute
 import BlockTrigger.BlockTrigger as BlockTrigger
 import BlockWriter.BlockWriter as BlockWriter
-import BlockProfile.BlockProfile as BlockProfile
 import datastore.datastore as datastore
 
 
@@ -285,6 +284,28 @@ class SIL(webapp2.RequestHandler):
 
             else:
                 response = BlockInputs.get_sil(address)
+
+        else:
+            response['error'] = 'You must provide an address.'
+
+        self.response.write(json.dumps(response, sort_keys=True))
+
+
+class Profile(webapp2.RequestHandler):
+    def get(self):
+        response = {'success': 0}
+        if self.request.get('address'):
+            address = self.request.get('address')
+
+            if self.request.get('block_height'):
+                try:
+                    block_height = int(self.request.get('block_height'))
+                    response = BlockInputs.get_profile(address, block_height)
+                except ValueError:
+                    response['error'] = 'block_height must be a positive integer.'
+
+            else:
+                response = BlockInputs.get_profile(address)
 
         else:
             response['error'] = 'You must provide an address.'
@@ -1129,28 +1150,6 @@ class DoWriting(webapp2.RequestHandler):
         self.response.write(json.dumps(response, sort_keys=True))
 
 
-class Profile(webapp2.RequestHandler):
-    def get(self):
-        response = {'success': 0}
-        if self.request.get('address'):
-            address = self.request.get('address')
-
-            if self.request.get('block_height'):
-                try:
-                    block_height = int(self.request.get('block_height'))
-                    response = BlockProfile.get_profile(address, block_height)
-                except ValueError:
-                    response['error'] = 'block_height must be a positive integer.'
-
-            else:
-                response = BlockProfile.get_profile(address)
-
-        else:
-            response['error'] = 'You must provide an address.'
-
-        self.response.write(json.dumps(response, sort_keys=True))
-
-
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/admin/initialize', Initialize),
@@ -1167,6 +1166,7 @@ app = webapp2.WSGIApplication([
     ('/data/utxos', Utxos),
 
     ('/inputs/SIL', SIL),
+    ('/inputs/profile', Profile),
 
     ('/linker/LBL', LBL),
     ('/linker/LRL', LRL),
@@ -1207,7 +1207,4 @@ app = webapp2.WSGIApplication([
     ('/writer/save_writer', SaveWriter),
     ('/writer/delete_writer', DeleteWriter),
     ('/writer/do_writing', DoWriting),
-
-    ('/profile/profile', Profile),
-
 ], debug=True)

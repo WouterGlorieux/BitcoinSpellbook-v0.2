@@ -53,6 +53,9 @@ handlers:
 - url: /inputs/SIL
   script: BitcoinSpellbook.app
 
+- url: /inputs/profile
+  script: BitcoinSpellbook.app
+
 - url: /linker/LBL
   script: BitcoinSpellbook.app
 
@@ -161,9 +164,6 @@ handlers:
 - url: /writer/do_writing
   script: BitcoinSpellbook.app
   login: admin
-
-- url: /profile/profile
-  script: BitcoinSpellbook.app
 
 - url: /
   script: BitcoinSpellbook.app

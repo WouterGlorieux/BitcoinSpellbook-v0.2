@@ -11,7 +11,6 @@ from BlockForwardWrapper import BlockForwardWrapper
 from BlockDistributeWrapper import BlockDistributeWrapper
 from BlockTriggerWrapper import BlockTriggerWrapper
 from BlockWriterWrapper import BlockWriterWrapper
-from BlockProfileWrapper import BlockProfileWrapper
 
 
 class SpellbookWrapper():
@@ -45,6 +44,3 @@ class SpellbookWrapper():
 
     def blockwriter(self):
         return BlockWriterWrapper(self.url)
-
-    def blockprofile(self):
-        return BlockProfileWrapper(self.url)

@@ -16,7 +16,10 @@ secret = testconfig.secret
 
 #test parameters
 address = '1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y'
-block_height = 400000
+block_height = 425026
+
+blockdata = SpellbookWrapper.SpellbookWrapper(url).blockdata()
+pprint(blockdata.transactions(address))
 
 blockinputs = SpellbookWrapper.SpellbookWrapper(url).blockinputs()
 
@@ -25,3 +28,10 @@ pprint(blockinputs.get_sil(address))
 
 #Test SIL at specified block_height
 pprint(blockinputs.get_sil(address, block_height))
+
+
+#Test most recent profile
+pprint(blockinputs.get_profile(address))
+
+#Test profile at specified block_height
+pprint(blockinputs.get_profile(address, block_height))

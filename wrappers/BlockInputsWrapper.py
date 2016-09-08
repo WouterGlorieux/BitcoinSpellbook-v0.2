@@ -28,3 +28,20 @@ class BlockInputsWrapper():
             response['error'] = 'Unable to retrieve sil'
 
         return response
+
+    def get_profile(self, address, block_height=0):
+        response = {'success': 0}
+        parameters = {'address': address,
+                      'block_height': str(block_height)}
+
+        query_string = urllib.urlencode(parameters)
+        url = self.url + "/inputs/profile?" + query_string
+
+        try:
+            ret = urllib2.urlopen(urllib2.Request(url))
+            response = json.loads(ret.read())
+        except Exception as ex:
+            logging.warning(str(ex))
+            response['error'] = 'Unable to retrieve profile'
+
+        return response
