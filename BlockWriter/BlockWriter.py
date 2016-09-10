@@ -73,7 +73,8 @@ def writer_to_dict(writer):
                    'transaction_fee': writer.transaction_fee,
                    'total_amount': writer.total_amount,
                    'status': writer.status,
-                   'visibility': writer.visibility}
+                   'visibility': writer.visibility,
+                   'date': int(time.mktime(writer.date.timetuple()))}
 
     if writer.description:
         writer_dict['description'] = writer.description
@@ -92,8 +93,6 @@ def writer_to_dict(writer):
 
     if writer.fee_percentage:
         writer_dict['fee_percentage'] = writer.fee_percentage
-
-    writer_dict['date'] = int(time.mktime(writer.date.timetuple()))
 
     return writer_dict
 
