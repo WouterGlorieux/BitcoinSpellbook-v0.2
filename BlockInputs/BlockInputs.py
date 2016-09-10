@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-import logging
 from BlockData import BlockData
 from validators import validators as validator
 
