@@ -4,6 +4,7 @@
 import time
 import logging
 import datetime
+import re
 
 import bitcoin
 from google.appengine.ext import ndb
@@ -22,7 +23,7 @@ TRANSACTION_FEE = 10000  # in Satoshis
 
 def get_available_address_index():
     check_active_addresses()
-    wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.module == 'BlockWriter',
+    wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.service_name == 'BlockWriter',
                                                          datastore.WalletAddress.status == 'Available',
                                                          ancestor=datastore.address_key()).order(datastore.WalletAddress.i)
     wallet_address = wallet_address_query.fetch(limit=1)
@@ -32,7 +33,7 @@ def get_available_address_index():
         wallet_address[0].status = 'InUse'
         wallet_address[0].put()
     else:
-        wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.module == 'BlockWriter',
+        wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.service_name == 'BlockWriter',
                                                              ancestor=datastore.address_key()).order(-datastore.WalletAddress.i)
         wallet_address = wallet_address_query.fetch(limit=1)
         if len(wallet_address) == 1:
@@ -40,8 +41,9 @@ def get_available_address_index():
         else:
             index = 1
 
-        address = datastore.get_service_address(datastore.Services.blockwriter, index)
-        logging.info("Initializing new wallet address for module BlockWriter: %i %s" % (index, address))
+        wallet_address = datastore.initialize_wallet_address(datastore.Services.blockwriter, index)
+        if wallet_address:
+            logging.info("Initialized new wallet address for module BlockWriter: %i %s" % (index, wallet_address.address))
 
     return index
 
@@ -142,32 +144,33 @@ class Writer():
     @ndb.transactional(xg=True)
     def __init__(self, name):
         self.error = ''
+        self.writer = None
+        self.name = ''
 
-        try:
+        if re.match('^[0-9]+$', name):
             self.name = int(name)
-        except Exception as ex:
-            logging.warning(str(ex))
+            self.writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
+            logging.info('numeric name found: %s' % self.name)
+        elif name:
             self.name = name
+            self.writer = datastore.Writer.get_or_insert(self.name, parent=datastore.writers_key())
+            logging.info('string name found: %s' % self.name)
+        elif name == '':
+            self.writer = datastore.Writer(parent=datastore.writers_key())
+            self.writer.put()
+            self.name = self.writer.key.id()
+            logging.info('empty name found, created new writer: %s' % self.name)
 
-        if isinstance(self.name, (str, unicode)) and len(name) > 0:
-            logging.info('string name found')
-        elif isinstance(self.name, (int, long)) and self.name > 0:
-            logging.info('numeric name found')
-        else:
-            writer = datastore.Writer(parent=datastore.writers_key())
-            writer.put()
-            self.name = writer.key.id()
+        if not self.writer:
+            self.error = 'Unable to initialize writer'
 
     def get(self):
         response = {'success': 0}
         if self.error == '':
-            writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
-
-            if writer:
-                response['writer'] = writer_to_dict(writer)
-                response['success'] = 1
-            else:
-                response['error'] = 'No writer with that name found.'
+            response['writer'] = writer_to_dict(self.writer)
+            response['success'] = 1
+        else:
+            response['error'] = self.error
 
         return response
 
@@ -176,116 +179,113 @@ class Writer():
             settings = {}
         response = {'success': 0}
 
-        if self.error == '':
-            parameters = datastore.Parameters.get_by_id('DefaultConfig')
-            writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
-
+        if self.writer and self.error == '':
             if 'message' in settings and validator.valid_op_return(settings['message']):
-                writer.message = settings['message']
+                self.writer.message = settings['message']
             elif 'message' in settings:
                 self.error = 'Invalid message'
 
             if 'outputs' in settings and validator.valid_outputs(eval(settings['outputs'])):
-                writer.outputs = eval(settings['outputs'])
+                self.writer.outputs = eval(settings['outputs'])
 
                 total_output_value = 0
-                for output in writer.outputs:
+                for output in self.writer.outputs:
                     total_output_value += output[1]
 
-                writer.amount = total_output_value
-                writer.recommended_fee = int((estimate_tx_size(writer.outputs, writer.message)/1000.0) * parameters.optimal_fee_per_kb)
+                self.writer.amount = total_output_value
+                parameters = datastore.Parameters.get_by_id('DefaultConfig')
+                self.writer.recommended_fee = int((estimate_tx_size(self.writer.outputs, self.writer.message)/1000.0) * parameters.optimal_fee_per_kb)
 
-                if writer.recommended_fee > writer.maximum_transaction_fee:
-                    writer.transaction_fee = writer.maximum_transaction_fee
+                if self.writer.recommended_fee > self.writer.maximum_transaction_fee:
+                    self.writer.transaction_fee = self.writer.maximum_transaction_fee
                 else:
-                    writer.transaction_fee = writer.recommended_fee
+                    self.writer.transaction_fee = self.writer.recommended_fee
 
-                writer.total_amount = writer.amount + writer.transaction_fee
+                self.writer.total_amount = self.writer.amount + self.writer.transaction_fee
 
             elif 'outputs' in settings:
                 self.error = 'Invalid outputs: ' + settings['outputs'] + ' (must be a list of address-value tuples)'
 
             if 'status' in settings and settings['status'] in ['Pending', 'Active', 'Disabled', 'Cooldown']:
-                writer.status = settings['status']
+                self.writer.status = settings['status']
             elif 'status' in settings:
                 self.error = 'status must be Pending, Active or Disabled'
 
             if 'visibility' in settings and settings['visibility'] in ['Public', 'Private']:
-                writer.visibility = settings['visibility']
+                self.writer.visibility = settings['visibility']
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
 
             if 'description' in settings and validator.valid_description(settings['description']):
-                writer.description = settings['description']
+                self.writer.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
             if 'creator' in settings and validator.valid_creator(settings['creator']):
-                writer.creator = settings['creator']
+                self.writer.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
             if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
-                writer.creator_email = settings['creator_email']
+                self.writer.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
-                writer.youtube = settings['youtube']
+                self.writer.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
             if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
-                writer.fee_percentage = settings['fee_percentage']
+                self.writer.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
             if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
-                writer.fee_address = settings['fee_address']
+                self.writer.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
             if 'maximum_transaction_fee' in settings and validator.valid_amount(settings['maximum_transaction_fee']):
-                writer.maximum_transaction_fee = settings['maximum_transaction_fee']
+                self.writer.maximum_transaction_fee = settings['maximum_transaction_fee']
             elif 'maximum_transaction_fee' in settings:
                 self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
-                writer.address_type = settings['address_type']
+                self.writer.address_type = settings['address_type']
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
             if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
-                writer.wallet_index = settings['wallet_index']
+                self.writer.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
-                writer.private_key = settings['private_key']
+                self.writer.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
 
-            if writer.address_type == 'PrivKey' and writer.private_key != '':
-                writer.address = bitcoin.privtoaddr(writer.private_key)
+            if self.writer.address_type == 'PrivKey' and self.writer.private_key != '':
+                self.writer.address = bitcoin.privtoaddr(self.writer.private_key)
 
-            elif writer.address_type == 'BIP44':
-                if writer.wallet_index == 0:
-                    writer.wallet_index = get_available_address_index()
-                writer.address = datastore.get_service_address(datastore.Services.blockwriter, writer.wallet_index)
+            elif self.writer.address_type == 'BIP44':
+                if self.writer.wallet_index == 0:
+                    self.writer.wallet_index = get_available_address_index()
+                self.writer.address = datastore.get_service_address(datastore.Services.blockwriter, self.writer.wallet_index)
 
-            if not validator.valid_address(writer.address):
+            if not validator.valid_address(self.writer.address):
                 self.error = 'Unable to get address for writer'
             else:
-                writer.extra_value_address = writer.address
+                self.writer.extra_value_address = self.writer.address
 
             if not datastore.consistency_check('BlockWriter'):
                 self.error = 'Unable to assign address.'
 
             if self.error == '':
-                writer.put()
-                response['writer'] = writer_to_dict(writer)
+                self.writer.put()
+                response['writer'] = writer_to_dict(self.writer)
                 response['success'] = 1
-
             else:
                 response['error'] = self.error
 
@@ -294,14 +294,19 @@ class Writer():
     def delete_writer(self):
         response = {'success': 0}
 
-        if self.error == '':
-            writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
+        if self.writer:
+            try:
+                self.writer.key.delete()
+            except Exception as ex:
+                logging.warning(str(ex))
+                self.error = 'Unable to delete writer'
+        else:
+            self.error = "No writer initialized"
 
-            if writer:
-                writer.key.delete()
-                response['success'] = 1
-            else:
-                response['error'] = 'No writer with that name found.'
+        if self.error == '':
+            response['success'] = 1
+        else:
+            response['error'] = self.error
 
         return response
 

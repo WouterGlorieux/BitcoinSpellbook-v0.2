@@ -38,7 +38,15 @@ settings = {'outputs': [('1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', 50000), ('1Sansacm
             'maximum_transaction_fee': 15000,
             'address_type': 'BIP44'}
 
+# Test with specific name
+pprint(blockwriter.save_writer('testWriter1', settings, key, secret))
+pprint(blockwriter.get_writer('testWriter1'))
 
-#pprint(blockwriter.save_writer('testWriter1', settings, key, secret))
+# Test with automatically generated name
+new_writer = blockwriter.get_writer()
+new_writer_name = str(new_writer['writer']['name'])
+print 'new writer name:', new_writer_name
+pprint(blockwriter.save_writer(new_writer_name, settings, key, secret))
 
-pprint(blockwriter.save_writer(blockwriter.get_writer()['writer']['name'], settings, key, secret))
+# Test saving without name given
+pprint(blockwriter.save_writer('', settings, key, secret))

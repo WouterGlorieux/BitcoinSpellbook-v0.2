@@ -1058,66 +1058,63 @@ class SaveWriter(webapp2.RequestHandler):
         response = {'success': 0}
         authentication_status = is_authenticated(self.request.headers, self.request.body)
         if authentication_status == AuthenticationStatus.OK:
+            settings = {}
+            name = ''
             if self.request.get('name'):
                 name = self.request.get('name')
 
-                settings = {}
+            if self.request.get('outputs', None) is not None:
+                settings['outputs'] = self.request.get('outputs')
 
-                if self.request.get('outputs', None) is not None:
-                    settings['outputs'] = self.request.get('outputs')
+            if self.request.get('message', None) is not None:
+                settings['message'] = self.request.get('message')
 
-                if self.request.get('message', None) is not None:
-                    settings['message'] = self.request.get('message')
+            if self.request.get('visibility'):
+                settings['visibility'] = self.request.get('visibility')
 
-                if self.request.get('visibility'):
-                    settings['visibility'] = self.request.get('visibility')
+            if self.request.get('status'):
+                settings['status'] = self.request.get('status')
 
-                if self.request.get('status'):
-                    settings['status'] = self.request.get('status')
+            if self.request.get('description', None) is not None:
+                settings['description'] = self.request.get('description')
 
-                if self.request.get('description', None) is not None:
-                    settings['description'] = self.request.get('description')
+            if self.request.get('creator', None) is not None:
+                settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creator', None) is not None:
-                    settings['creator'] = self.request.get('creator')
+            if self.request.get('creator_email', None) is not None:
+                settings['creator_email'] = self.request.get('creator_email')
 
-                if self.request.get('creator_email', None) is not None:
-                    settings['creator_email'] = self.request.get('creator_email')
+            if self.request.get('youtube', None) is not None:
+                settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('youtube', None) is not None:
-                    settings['youtube'] = self.request.get('youtube')
+            if self.request.get('fee_percentage'):
+                try:
+                    settings['fee_percentage'] = float(self.request.get('fee_percentage'))
+                except ValueError:
+                    response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('fee_percentage'):
-                    try:
-                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
-                    except ValueError:
-                        response['error'] = 'Incorrect fee_percentage'
+            if self.request.get('fee_address', None) is not None:
+                settings['fee_address'] = self.request.get('fee_address')
 
-                if self.request.get('fee_address', None) is not None:
-                    settings['fee_address'] = self.request.get('fee_address')
+            if self.request.get('maximum_transaction_fee'):
+                try:
+                    settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
+                except ValueError:
+                    response['error'] = 'maximum_transaction_fee must be greater than or equal to 0 (in Satoshis)'
 
-                if self.request.get('maximum_transaction_fee'):
-                    try:
-                        settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
-                    except ValueError:
-                        response['error'] = 'maximum_transaction_fee must be greater than or equal to 0 (in Satoshis)'
+            if self.request.get('address_type'):
+                settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('address_type'):
-                    settings['address_type'] = self.request.get('address_type')
+            if self.request.get('wallet_index'):
+                try:
+                    settings['wallet_index'] = int(self.request.get('wallet_index'))
+                except ValueError:
+                    response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('wallet_index'):
-                    try:
-                        settings['wallet_index'] = int(self.request.get('wallet_index'))
-                    except ValueError:
-                        response['error'] = 'wallet_index must be a positive integer'
+            if self.request.get('private_key', None) is not None:
+                settings['private_key'] = self.request.get('private_key')
 
-                if self.request.get('private_key', None) is not None:
-                    settings['private_key'] = self.request.get('private_key')
-
-                response = BlockWriter.Writer(name).save_writer(settings)
-
-            else:
-                response['error'] = 'Invalid parameters'
+            response = BlockWriter.Writer(name).save_writer(settings)
         else:
             response['error'] = 'Authentication error: %s' % authentication_status
 

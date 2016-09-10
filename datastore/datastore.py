@@ -10,14 +10,22 @@ import logging
 MAX_TRANSACTION_FEE = 10000  # in Satoshis
 
 
-class Services:
-    def __init__(self):
-        pass
-
+class Services(object):
     blockforward = 1
     blockdistribute = 2
     blockwriter = 3
     blocktrigger = 4
+
+    @staticmethod
+    def service_name(service):
+        if service == Services.blockforward:
+            return 'BlockForwarder'
+        elif service == Services.blockdistribute:
+            return 'BlockDistribute'
+        elif service == Services.blockwriter:
+            return 'BlockWriter'
+        elif service == Services.blocktrigger:
+            return 'BlockTrigger'
 
 
 class APIKeys(ndb.Model):
@@ -170,12 +178,14 @@ def writers_key():
 
 
 class WalletAddress(ndb.Model):
-    module = ndb.StringProperty(indexed=True, choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'],
-                                default=None)
+    service_name = ndb.StringProperty(indexed=True,
+                                      choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'],
+                                      default=None)
     address = ndb.StringProperty(indexed=True)
     i = ndb.IntegerProperty(indexed=True)
     k = ndb.IntegerProperty(indexed=True, default=0)
-    status = ndb.StringProperty(indexed=True, choices=['Available', 'InUse', 'Cooldown', 'Unavailable'],
+    status = ndb.StringProperty(indexed=True,
+                                choices=['Available', 'InUse', 'Cooldown', 'Unavailable'],
                                 default='InUse')
     balance = ndb.IntegerProperty(default=0)
     received = ndb.IntegerProperty(default=0)
@@ -232,3 +242,20 @@ def get_service_private_key(service, index):
         private_key = BIP44.get_private_key(xpriv_key, index)
 
     return private_key
+
+
+def initialize_wallet_address(service, i):
+    wallet_address = None
+    if service in [Services.blockwriter, Services.blockforward, Services.blockdistribute] and isinstance(i, (int, long)) and i >= 0:
+        wallet_address = WalletAddress.get_or_insert("%s_%i" % (Services.service_name(service), i), parent=address_key())
+        wallet_address.service_name = Services.service_name(service)
+        wallet_address.address = get_service_address(service, i)
+        wallet_address.i = i
+        wallet_address.k = 0
+
+        # Don't allow index 0 to be used
+        if i == 0:
+            wallet_address.status = 'Unavailable'
+        wallet_address.put()
+
+    return wallet_address

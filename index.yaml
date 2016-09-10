@@ -67,6 +67,20 @@ indexes:
   - name: status
   - name: i
 
+- kind: WalletAddress
+  ancestor: yes
+  properties:
+  - name: service_name
+  - name: i
+    direction: desc
+
+- kind: WalletAddress
+  ancestor: yes
+  properties:
+  - name: service_name
+  - name: status
+  - name: i
+
 - kind: Writer
   ancestor: yes
   properties:
