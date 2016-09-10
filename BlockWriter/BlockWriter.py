@@ -166,11 +166,11 @@ class Writer():
 
     def get(self):
         response = {'success': 0}
-        if self.error == '':
+        if self.writer:
             response['writer'] = writer_to_dict(self.writer)
             response['success'] = 1
         else:
-            response['error'] = self.error
+            response['error'] = "No writer initialized"
 
         return response
 
@@ -179,7 +179,7 @@ class Writer():
             settings = {}
         response = {'success': 0}
 
-        if self.writer and self.error == '':
+        if self.writer:
             if 'message' in settings and validator.valid_op_return(settings['message']):
                 self.writer.message = settings['message']
             elif 'message' in settings:
@@ -281,13 +281,15 @@ class Writer():
 
             if not datastore.consistency_check('BlockWriter'):
                 self.error = 'Unable to assign address.'
+        else:
+            self.error = 'No writer initialized'
 
-            if self.error == '':
-                self.writer.put()
-                response['writer'] = writer_to_dict(self.writer)
-                response['success'] = 1
-            else:
-                response['error'] = self.error
+        if self.error == '':
+            self.writer.put()
+            response['writer'] = writer_to_dict(self.writer)
+            response['success'] = 1
+        else:
+            response['error'] = self.error
 
         return response
 
