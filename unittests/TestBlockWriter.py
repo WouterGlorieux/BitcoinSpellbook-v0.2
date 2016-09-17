@@ -36,7 +36,8 @@ settings = {'outputs': [('1Robbk6PuJst6ot6ay2DcVugv8nxfJh5y', 50000), ('1Sansacm
             'fee_address': '1Woutere8RCF82AgbPCc5F4KuYVvS4meW',
             'fee_percentage': 1.0,
             'maximum_transaction_fee': 15000,
-            'address_type': 'BIP44'}
+            'address_type': 'BIP44',
+            }
 
 # Test with specific name
 pprint(blockwriter.save_writer('testWriter1', settings, key, secret))
@@ -47,6 +48,11 @@ new_writer = blockwriter.get_writer()
 new_writer_name = str(new_writer['writer']['name'])
 print 'new writer name:', new_writer_name
 pprint(blockwriter.save_writer(new_writer_name, settings, key, secret))
+
+# Test saving with wallet index
+pprint(blockwriter.save_writer('5', settings, key, secret))
+pprint(blockwriter.get_writer('4'))
+pprint(blockwriter.get_writer('5'))
 
 # Test saving without name given
 pprint(blockwriter.save_writer('', settings, key, secret))

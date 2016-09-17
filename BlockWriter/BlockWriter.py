@@ -21,33 +21,6 @@ REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 TRANSACTION_FEE = 10000  # in Satoshis
 
 
-def get_available_address_index():
-    check_active_addresses()
-    wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.service_name == 'BlockWriter',
-                                                         datastore.WalletAddress.status == 'Available',
-                                                         ancestor=datastore.address_key()).order(datastore.WalletAddress.i)
-    wallet_address = wallet_address_query.fetch(limit=1)
-
-    if len(wallet_address) == 1:
-        index = wallet_address[0].i
-        wallet_address[0].status = 'InUse'
-        wallet_address[0].put()
-    else:
-        wallet_address_query = datastore.WalletAddress.query(datastore.WalletAddress.service_name == 'BlockWriter',
-                                                             ancestor=datastore.address_key()).order(-datastore.WalletAddress.i)
-        wallet_address = wallet_address_query.fetch(limit=1)
-        if len(wallet_address) == 1:
-            index = wallet_address[0].i+1
-        else:
-            index = 1
-
-        wallet_address = datastore.initialize_wallet_address(datastore.Services.blockwriter, index)
-        if wallet_address:
-            logging.info("Initialized new wallet address for module BlockWriter: %i %s" % (index, wallet_address.address))
-
-    return index
-
-
 def check_active_addresses():
     writers_query = datastore.Writer.query(datastore.Writer.address_type == 'BIP44',
                                            datastore.Writer.status == 'Active',
@@ -147,19 +120,30 @@ class Writer():
         self.writer = None
         self.name = ''
 
-        if re.match('^[0-9]+$', name):
+        if re.match('^[0-9]{16}$', name):
             self.name = int(name)
             self.writer = datastore.Writer.get_by_id(self.name, parent=datastore.writers_key())
-            logging.info('numeric name found: %s' % self.name)
+            logging.info('Initialized writer by numeric name: %s' % self.name)
+        elif re.match('^[0-9]{1,15}$', name):
+            self.name = name
+            self.writer = datastore.Writer.get_or_insert(self.name, parent=datastore.writers_key())
+            index = int(name)
+            wallet_address = datastore.initialize_wallet_address(datastore.Services.blockwriter_by_index, index)
+            if self.writer.wallet_index != index and wallet_address:
+                self.writer.wallet_index = index
+                self.writer.address = wallet_address.address
+                self.writer.id_type = 'index'
+                self.writer.put()
+            logging.info('Initialized writer by wallet index: %s' % self.name)
         elif name:
             self.name = name
             self.writer = datastore.Writer.get_or_insert(self.name, parent=datastore.writers_key())
-            logging.info('string name found: %s' % self.name)
+            logging.info('Initialized writer by string name: %s' % self.name)
         elif name == '':
             self.writer = datastore.Writer(parent=datastore.writers_key())
             self.writer.put()
             self.name = self.writer.key.id()
-            logging.info('empty name found, created new writer: %s' % self.name)
+            logging.info('Initialized new writer: %s' % self.name)
 
         if not self.writer:
             self.error = 'Unable to initialize writer'
@@ -256,7 +240,7 @@ class Writer():
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']) and self.writer.id_type == 'name':
                 self.writer.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
@@ -268,19 +252,19 @@ class Writer():
 
             if self.writer.address_type == 'PrivKey' and self.writer.private_key != '':
                 self.writer.address = bitcoin.privtoaddr(self.writer.private_key)
-
             elif self.writer.address_type == 'BIP44':
-                if self.writer.wallet_index == 0:
-                    self.writer.wallet_index = get_available_address_index()
-                self.writer.address = datastore.get_service_address(datastore.Services.blockwriter, self.writer.wallet_index)
+                if self.writer.wallet_index == 0 and self.writer.id_type == 'name':
+                    self.writer.wallet_index = datastore.get_available_address_index(datastore.Services.blockwriter_by_name)
+                if self.writer.id_type == 'name':
+                    self.writer.address = datastore.get_service_address(datastore.Services.blockwriter_by_name, self.writer.wallet_index)
 
             if not validator.valid_address(self.writer.address):
                 self.error = 'Unable to get address for writer'
             else:
                 self.writer.extra_value_address = self.writer.address
 
-            if not datastore.consistency_check('BlockWriter'):
-                self.error = 'Unable to assign address.'
+            # if not datastore.consistency_check('BlockWriter'):
+            #     self.error = 'Unable to assign address.'
         else:
             self.error = 'No writer initialized'
 
@@ -298,6 +282,7 @@ class Writer():
 
         if self.writer:
             try:
+                datastore.cooldown_address(self.writer.address)
                 self.writer.key.delete()
             except Exception as ex:
                 logging.warning(str(ex))
@@ -382,8 +367,10 @@ class DoWriting():
             private_keys = {}
             if writer.address_type == 'PrivKey':
                 private_keys = {writer.address: writer.private_key}
-            elif writer.address_type == 'BIP44':
-                private_keys = datastore.get_service_private_key(datastore.Services.blockwriter, writer.wallet_index)
+            elif writer.address_type == 'BIP44' and writer.id_type == 'name':
+                private_keys = datastore.get_service_private_key(datastore.Services.blockwriter_by_name, writer.wallet_index)
+            elif writer.address_type == 'BIP44' and writer.id_type == 'index':
+                private_keys = datastore.get_service_private_key(datastore.Services.blockwriter_by_index, writer.wallet_index)
 
             logging.info(
                 "Sending {0} Satoshis to {1} recipients with a total fee of {2} with OP_RETURN message: {3}".format(

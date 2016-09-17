@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 import time
 import logging
 
@@ -74,65 +75,86 @@ class BlockForward():
     @ndb.transactional(xg=True)
     def __init__(self, name):
         self.error = ''
-        if isinstance(name, (str, unicode)) and len(name) > 0:
+        self.forwarder = None
+        self.name = ''
+
+        if re.match('^[0-9]{16}$', name):
+            self.name = int(name)
+            self.forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
+            logging.info('Initialized forwarder by numeric name: %s' % self.name)
+        elif re.match('^[0-9]{1,15}$', name):
             self.name = name
-        else:
-            self.error = 'Name cannot be empty'
+            self.forwarder = datastore.Forwarder.get_or_insert(self.name, parent=datastore.forwarders_key())
+            index = int(name)
+            wallet_address = datastore.initialize_wallet_address(datastore.Services.blockforward_by_index, index)
+            if self.forwarder.wallet_index != index and wallet_address:
+                self.forwarder.wallet_index = index
+                self.forwarder.address = wallet_address.address
+                self.forwarder.id_type = 'index'
+                self.forwarder.put()
+            logging.info('Initialized forwarder by wallet index: %s' % self.name)
+        elif name:
+            self.name = name
+            self.forwarder = datastore.Forwarder.get_or_insert(self.name, parent=datastore.forwarders_key())
+            logging.info('Initialized forwarder by string name: %s' % self.name)
+        elif name == '':
+            self.forwarder = datastore.Forwarder(parent=datastore.forwarders_key())
+            self.forwarder.put()
+            self.name = self.forwarder.key.id()
+            logging.info('Initialized new forwarder: %s' % self.name)
+
+        if not self.forwarder:
+            self.error = 'Unable to initialize forwarder'
 
     def get(self):
         response = {'success': 0}
-        if self.error == '':
-            forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
-
-            if forwarder:
-                response['forwarder'] = forwarder_to_dict(forwarder)
-                response['success'] = 1
-            else:
-                response['error'] = 'No forwarder with that name found.'
+        if self.forwarder:
+            response['forwarder'] = forwarder_to_dict(self.forwarder)
+            response['success'] = 1
+        else:
+            response['error'] = 'No forwarder initialized.'
 
         return response
 
     def check_address(self, address):
         response = {'success': 0}
-        if self.error == '':
-            forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
 
-            if forwarder:
-                forwarding_relation = {'relation': 'unrelated address'}
-                lal = []
-                lbl = []
-                if forwarder.address == address:
-                    forwarding_relation['relation'] = 'forwarding address'
-                else:
-                    linker = BlockLinker.BlockLinker(forwarder.address, forwarder.xpub)
-                    lal_data = linker.get_lal()
-                    if 'success' in lal_data and lal_data['success'] == 1:
-                        lal = lal_data['LAL']
-
-                    lbl_data = linker.get_lbl()
-                    if 'success' in lbl_data and lbl_data['success'] == 1:
-                        lbl = lbl_data['LBL']
-
-                    for i in range(0, len(lal)):
-                        if lal[i][0] == address:
-                            forwarding_relation['relation'] = 'sending address'
-                            forwarding_relation['sentTo'] = lal[i][1]
-                            forwarding_relation['balance'] = lbl[i][1]
-                            forwarding_relation['share'] = lbl[i][2]
-                            break
-
-                        elif lal[i][1] == address:
-                            forwarding_relation['relation'] = 'receiving address'
-                            forwarding_relation['sentFrom'] = lal[i][0]
-                            forwarding_relation['balance'] = lbl[i][1]
-                            forwarding_relation['share'] = lbl[i][2]
-                            break
-
-                response[address] = forwarding_relation
-                response['success'] = 1
-
+        if self.forwarder:
+            forwarding_relation = {'relation': 'unrelated address'}
+            lal = []
+            lbl = []
+            if self.forwarder.address == address:
+                forwarding_relation['relation'] = 'forwarding address'
             else:
-                response['error'] = 'No forwarder with that name found.'
+                linker = BlockLinker.BlockLinker(self.forwarder.address, self.forwarder.xpub)
+                lal_data = linker.get_lal()
+                if 'success' in lal_data and lal_data['success'] == 1:
+                    lal = lal_data['LAL']
+
+                lbl_data = linker.get_lbl()
+                if 'success' in lbl_data and lbl_data['success'] == 1:
+                    lbl = lbl_data['LBL']
+
+                for i in range(0, len(lal)):
+                    if lal[i][0] == address:
+                        forwarding_relation['relation'] = 'sending address'
+                        forwarding_relation['sentTo'] = lal[i][1]
+                        forwarding_relation['balance'] = lbl[i][1]
+                        forwarding_relation['share'] = lbl[i][2]
+                        break
+
+                    elif lal[i][1] == address:
+                        forwarding_relation['relation'] = 'receiving address'
+                        forwarding_relation['sentFrom'] = lal[i][0]
+                        forwarding_relation['balance'] = lbl[i][1]
+                        forwarding_relation['share'] = lbl[i][2]
+                        break
+
+            response[address] = forwarding_relation
+            response['success'] = 1
+
+        else:
+            response['error'] = 'No forwarder initialized.'
 
         return response
 
@@ -141,111 +163,115 @@ class BlockForward():
             settings = {}
         response = {'success': 0}
 
-        if self.error == '':
-            forwarder = datastore.Forwarder.get_or_insert(self.name, parent=datastore.forwarders_key())
+        if self.forwarder:
 
             if 'xpub' in settings and validator.valid_xpub(settings['xpub']):
-                forwarder.xpub = settings['xpub']
+                self.forwarder.xpub = settings['xpub']
             elif 'xpub' in settings:
                 self.error = 'Invalid xpub key'
 
             if 'description' in settings and validator.valid_description(settings['description']):
-                forwarder.description = settings['description']
+                self.forwarder.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
             if 'creator' in settings and validator.valid_creator(settings['creator']):
-                forwarder.creator = settings['creator']
+                self.forwarder.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
             if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
-                forwarder.creator_email = settings['creator_email']
+                self.forwarder.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'minimum_amount' in settings and validator.valid_amount(settings['minimum_amount']):
-                forwarder.minimum_amount = settings['minimum_amount']
+                self.forwarder.minimum_amount = settings['minimum_amount']
             elif 'minimum_amount' in settings:
                 self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
-                forwarder.youtube = settings['youtube']
+                self.forwarder.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
             if 'visibility' in settings and settings['visibility'] in ['Public', 'Private']:
-                forwarder.visibility = settings['visibility']
+                self.forwarder.visibility = settings['visibility']
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
 
             if 'status' in settings and settings['status'] in ['Pending', 'Active', 'Disabled']:
-                forwarder.status = settings['status']
+                self.forwarder.status = settings['status']
             elif 'status' in settings:
                 self.error = 'status must be Pending, Active or Disabled'
 
             if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
-                forwarder.fee_percentage = settings['fee_percentage']
+                self.forwarder.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
             if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
-                forwarder.fee_address = settings['fee_address']
+                self.forwarder.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
             if 'confirm_amount' in settings and validator.valid_amount(settings['confirm_amount']):
-                forwarder.confirm_amount = settings['confirm_amount']
+                self.forwarder.confirm_amount = settings['confirm_amount']
             elif 'confirm_amount' in settings:
                 self.error = 'confirm_amount must be greater than or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
-                forwarder.address_type = settings['address_type']
+                self.forwarder.address_type = settings['address_type']
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
-                forwarder.wallet_index = settings['wallet_index']
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']) and self.forwarder.id_type == 'name':
+                self.forwarder.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
-                forwarder.private_key = settings['private_key']
+                self.forwarder.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
 
-            if forwarder.address_type == 'PrivKey' and forwarder.private_key != '':
-                forwarder.address = bitcoin.privtoaddr(forwarder.private_key)
-            elif forwarder.address_type == 'BIP44':
-                if forwarder.wallet_index == 0:
-                    forwarder.wallet_index = get_next_index()
-                forwarder.address = datastore.get_service_address(datastore.Services.blockforward,
-                                                                  forwarder.wallet_index)
+            if self.forwarder.address_type == 'PrivKey' and self.forwarder.private_key != '':
+                self.forwarder.address = bitcoin.privtoaddr(self.forwarder.private_key)
+            elif self.forwarder.address_type == 'BIP44':
+                if self.forwarder.wallet_index == 0 and self.forwarder.id_type == 'name':
+                    self.forwarder.wallet_index = datastore.get_available_address_index(datastore.Services.blockforward_by_name)
+                if self.forwarder.id_type == 'name':
+                    self.forwarder.address = datastore.get_service_address(datastore.Services.blockforward_by_name,
+                                                                           self.forwarder.wallet_index)
 
-            if not validator.valid_address(forwarder.address):
+            if not validator.valid_address(self.forwarder.address):
                 self.error = 'Unable to get address for forwarder'
 
             if self.error == '':
-                forwarder.put()
-                response['forwarder'] = forwarder_to_dict(forwarder)
+                self.forwarder.put()
+                response['forwarder'] = forwarder_to_dict(self.forwarder)
                 response['success'] = 1
 
             else:
                 response['error'] = self.error
+        else:
+            response['error'] = 'No forwarder initialized'
 
         return response
 
     def delete_forwarder(self):
         response = {'success': 0}
 
-        if self.error == '':
-            forwarder = datastore.Forwarder.get_by_id(self.name, parent=datastore.forwarders_key())
-
-            if forwarder:
-                forwarder.key.delete()
+        if self.forwarder:
+            try:
+                datastore.cooldown_address(self.forwarder.address)
+                self.forwarder.key.delete()
                 response['success'] = 1
-            else:
-                response['error'] = 'No forwarder with that name found.'
+            except Exception as ex:
+                logging.warning(str(ex))
+                self.error = 'Unable to delete forwarder'
+        else:
+            response['error'] = 'No forwarder initialized.'
 
         return response
 
@@ -302,9 +328,10 @@ class DoForwarding():
                     private_keys = {}
                     if forwarder.address_type == 'PrivKey':
                         private_keys = {forwarder.address: forwarder.private_key}
-                    elif forwarder.address_type == 'BIP44':
-                        private_keys = datastore.get_service_private_key(datastore.Services.blockforward,
-                                                                         forwarder.wallet_index)
+                    elif forwarder.address_type == 'BIP44' and forwarder.id_type == 'name':
+                        private_keys = datastore.get_service_private_key(datastore.Services.blockforward_by_name, forwarder.wallet_index)
+                    elif forwarder.address_type == 'BIP44' and forwarder.id_type == 'index':
+                        private_keys = datastore.get_service_private_key(datastore.Services.blockforward_by_index, forwarder.wallet_index)
 
                     if len(amounts) > 0 and forwarder.minimum_amount > 0 and amounts[0] < forwarder.minimum_amount + TRANSACTION_FEE:
                         logging.warning(

@@ -599,69 +599,68 @@ class SaveForwarder(webapp2.RequestHandler):
         response = {'success': 0}
         authentication_status = is_authenticated(self.request.headers, self.request.body)
         if authentication_status == AuthenticationStatus.OK:
+            name = ''
             if self.request.get('name'):
                 name = self.request.get('name')
 
-                settings = {}
+            settings = {}
 
-                if self.request.get('xpub'):
-                    settings['xpub'] = self.request.get('xpub')
+            if self.request.get('xpub'):
+                settings['xpub'] = self.request.get('xpub')
 
-                if self.request.get('description', None) is not None:
-                    settings['description'] = self.request.get('description')
+            if self.request.get('description', None) is not None:
+                settings['description'] = self.request.get('description')
 
-                if self.request.get('creator', None) is not None:
-                    settings['creator'] = self.request.get('creator')
+            if self.request.get('creator', None) is not None:
+                settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creator_email', None) is not None:
-                    settings['creator_email'] = self.request.get('creator_email')
+            if self.request.get('creator_email', None) is not None:
+                settings['creator_email'] = self.request.get('creator_email')
 
-                if self.request.get('minimum_amount'):
-                    try:
-                        settings['minimum_amount'] = int(self.request.get('minimum_amount'))
-                    except ValueError:
-                        response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
+            if self.request.get('minimum_amount'):
+                try:
+                    settings['minimum_amount'] = int(self.request.get('minimum_amount'))
+                except ValueError:
+                    response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('youtube', None) is not None:
-                    settings['youtube'] = self.request.get('youtube')
+            if self.request.get('youtube', None) is not None:
+                settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('visibility'):
-                    settings['visibility'] = self.request.get('visibility')
+            if self.request.get('visibility'):
+                settings['visibility'] = self.request.get('visibility')
 
-                if self.request.get('status'):
-                    settings['status'] = self.request.get('status')
+            if self.request.get('status'):
+                settings['status'] = self.request.get('status')
 
-                if self.request.get('fee_percentage'):
-                    try:
-                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
-                    except ValueError:
-                        response['error'] = 'Incorrect fee_percentage'
+            if self.request.get('fee_percentage'):
+                try:
+                    settings['fee_percentage'] = float(self.request.get('fee_percentage'))
+                except ValueError:
+                    response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('fee_address', None) is not None:
-                    settings['fee_address'] = self.request.get('fee_address')
+            if self.request.get('fee_address', None) is not None:
+                settings['fee_address'] = self.request.get('fee_address')
 
-                if self.request.get('confirm_amount'):
-                    try:
-                        settings['confirm_amount'] = int(self.request.get('confirm_amount'))
-                    except ValueError:
-                        response['error'] = 'confirm_amount must be a positive integer or equal to 0 (in Satoshis)'
+            if self.request.get('confirm_amount'):
+                try:
+                    settings['confirm_amount'] = int(self.request.get('confirm_amount'))
+                except ValueError:
+                    response['error'] = 'confirm_amount must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('address_type'):
-                    settings['address_type'] = self.request.get('address_type')
+            if self.request.get('address_type'):
+                settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('wallet_index'):
-                    try:
-                        settings['wallet_index'] = int(self.request.get('wallet_index'))
-                    except ValueError:
-                        response['error'] = 'wallet_index must be a positive integer'
+            if self.request.get('wallet_index'):
+                try:
+                    settings['wallet_index'] = int(self.request.get('wallet_index'))
+                except ValueError:
+                    response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('private_key', None) is not None:
-                    settings['private_key'] = self.request.get('private_key')
+            if self.request.get('private_key', None) is not None:
+                settings['private_key'] = self.request.get('private_key')
 
-                response = BlockForward.BlockForward(name).save_forwarder(settings)
+            response = BlockForward.BlockForward(name).save_forwarder(settings)
 
-            else:
-                response['error'] = 'Invalid parameters'
         else:
             response['error'] = 'Authentication error: %s' % authentication_status
 
@@ -730,90 +729,89 @@ class SaveDistributer(webapp2.RequestHandler):
         response = {'success': 0}
         authentication_status = is_authenticated(self.request.headers, self.request.body)
         if authentication_status == AuthenticationStatus.OK:
+            name = ''
             if self.request.get('name'):
                 name = self.request.get('name')
 
-                settings = {}
+            settings = {}
 
-                if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
-                    settings['distribution_source'] = self.request.get('distribution_source')
+            if self.request.get('distribution_source') in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
+                settings['distribution_source'] = self.request.get('distribution_source')
 
-                if self.request.get('registration_address', None) is not None:
-                    settings['registration_address'] = self.request.get('registration_address')
+            if self.request.get('registration_address', None) is not None:
+                settings['registration_address'] = self.request.get('registration_address')
 
-                if self.request.get('registration_xpub', None) is not None:
-                    settings['registration_xpub'] = self.request.get('registration_xpub')
+            if self.request.get('registration_xpub', None) is not None:
+                settings['registration_xpub'] = self.request.get('registration_xpub')
 
-                if self.request.get('registration_block_height'):
-                    try:
-                        settings['registration_block_height'] = int(self.request.get('registration_block_height'))
-                    except ValueError:
-                        response['error'] = 'registration_block_height must be a positive integer or equal to 0'
+            if self.request.get('registration_block_height'):
+                try:
+                    settings['registration_block_height'] = int(self.request.get('registration_block_height'))
+                except ValueError:
+                    response['error'] = 'registration_block_height must be a positive integer or equal to 0'
 
-                if self.request.get('distribution', None) is not None:
-                    settings['distribution'] = self.request.get('distribution')
+            if self.request.get('distribution', None) is not None:
+                settings['distribution'] = self.request.get('distribution')
 
-                if self.request.get('minimum_amount'):
-                    try:
-                        settings['minimum_amount'] = int(self.request.get('minimum_amount'))
-                    except ValueError:
-                        response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
+            if self.request.get('minimum_amount'):
+                try:
+                    settings['minimum_amount'] = int(self.request.get('minimum_amount'))
+                except ValueError:
+                    response['error'] = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('threshold'):
-                    try:
-                        settings['threshold'] = int(self.request.get('threshold'))
-                    except ValueError:
-                        response['error'] = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
+            if self.request.get('threshold'):
+                try:
+                    settings['threshold'] = int(self.request.get('threshold'))
+                except ValueError:
+                    response['error'] = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('visibility'):
-                    settings['visibility'] = self.request.get('visibility')
+            if self.request.get('visibility'):
+                settings['visibility'] = self.request.get('visibility')
 
-                if self.request.get('status'):
-                    settings['status'] = self.request.get('status')
+            if self.request.get('status'):
+                settings['status'] = self.request.get('status')
 
-                if self.request.get('description', None) is not None:
-                    settings['description'] = self.request.get('description')
+            if self.request.get('description', None) is not None:
+                settings['description'] = self.request.get('description')
 
-                if self.request.get('creator', None) is not None:
-                    settings['creator'] = self.request.get('creator')
+            if self.request.get('creator', None) is not None:
+                settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creator_email', None) is not None:
-                    settings['creator_email'] = self.request.get('creator_email')
+            if self.request.get('creator_email', None) is not None:
+                settings['creator_email'] = self.request.get('creator_email')
 
-                if self.request.get('youtube', None) is not None:
-                    settings['youtube'] = self.request.get('youtube')
+            if self.request.get('youtube', None) is not None:
+                settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('fee_percentage'):
-                    try:
-                        settings['fee_percentage'] = float(self.request.get('fee_percentage'))
-                    except ValueError:
-                        response['error'] = 'Incorrect fee_percentage'
+            if self.request.get('fee_percentage'):
+                try:
+                    settings['fee_percentage'] = float(self.request.get('fee_percentage'))
+                except ValueError:
+                    response['error'] = 'Incorrect fee_percentage'
 
-                if self.request.get('fee_address', None) is not None:
-                    settings['fee_address'] = self.request.get('fee_address')
+            if self.request.get('fee_address', None) is not None:
+                settings['fee_address'] = self.request.get('fee_address')
 
-                if self.request.get('maximum_transaction_fee'):
-                    try:
-                        settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
-                    except ValueError:
-                        response['error'] = 'maximum_transaction_fee must be a greater than or equal to 0 (in Satoshis)'
+            if self.request.get('maximum_transaction_fee'):
+                try:
+                    settings['maximum_transaction_fee'] = int(self.request.get('maximum_transaction_fee'))
+                except ValueError:
+                    response['error'] = 'maximum_transaction_fee must be a greater than or equal to 0 (in Satoshis)'
 
-                if self.request.get('address_type'):
-                    settings['address_type'] = self.request.get('address_type')
+            if self.request.get('address_type'):
+                settings['address_type'] = self.request.get('address_type')
 
-                if self.request.get('wallet_index'):
-                    try:
-                        settings['wallet_index'] = int(self.request.get('wallet_index'))
-                    except ValueError:
-                        response['error'] = 'wallet_index must be a positive integer'
+            if self.request.get('wallet_index'):
+                try:
+                    settings['wallet_index'] = int(self.request.get('wallet_index'))
+                except ValueError:
+                    response['error'] = 'wallet_index must be a positive integer'
 
-                if self.request.get('private_key', None) is not None:
-                    settings['private_key'] = self.request.get('private_key')
+            if self.request.get('private_key', None) is not None:
+                settings['private_key'] = self.request.get('private_key')
 
-                response = BlockDistribute.Distributer(name).save_distributer(settings)
+            response = BlockDistribute.Distributer(name).save_distributer(settings)
 
-            else:
-                response['error'] = 'Invalid parameters'
         else:
             response['error'] = 'Authentication error: %s' % authentication_status
 

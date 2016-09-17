@@ -55,6 +55,10 @@ settings = {'distribution_source': 'LBL',
 
 pprint(blockdistribute.save_distributer('testDistributer1', settings, key, secret))
 
+pprint(blockdistribute.save_distributer('', settings, key, secret))
+
+pprint(blockdistribute.save_distributer('1', settings, key, secret))
+
 pprint(blockdistribute.update_distribution('testDistributer1', key, secret))
 
 pprint(blockdistribute.get_distributer('testDistributer1'))

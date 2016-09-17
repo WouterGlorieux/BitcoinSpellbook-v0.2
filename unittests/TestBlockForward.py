@@ -41,6 +41,10 @@ settings = {'xpub': xpub,
 
 pprint(blockforward.save_forwarder('testForwarder1', settings, key, secret))
 
+pprint(blockforward.save_forwarder('', settings, key, secret))
+
+pprint(blockforward.save_forwarder('1', settings, key, secret))
+
 pprint(blockforward.check_address('testForwarder1', '1Woutere8RCF82AgbPCc5F4KuYVvS4meW'))
 
 #pprint(blockforward.do_forwarding('testForwarder1'))

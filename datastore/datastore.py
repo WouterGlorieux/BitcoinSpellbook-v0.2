@@ -11,21 +11,21 @@ MAX_TRANSACTION_FEE = 10000  # in Satoshis
 
 
 class Services(object):
-    blockforward = 1
-    blockdistribute = 2
-    blockwriter = 3
-    blocktrigger = 4
+    default = 0
+    blockforward_by_name = 1
+    blockforward_by_index = 2
+    blockdistribute_by_name = 3
+    blockdistribute_by_index = 4
+    blockwriter_by_name = 5
+    blockwriter_by_index = 6
+    blocktrigger_by_name = 7
+    blocktrigger_by_index = 8
 
-    @staticmethod
-    def service_name(service):
-        if service == Services.blockforward:
-            return 'BlockForwarder'
-        elif service == Services.blockdistribute:
-            return 'BlockDistribute'
-        elif service == Services.blockwriter:
-            return 'BlockWriter'
-        elif service == Services.blocktrigger:
-            return 'BlockTrigger'
+    names = ['Default',
+             'NamedForward', 'IndexedForward',
+             'NamedDistribute', 'IndexedDistribute',
+             'NamedWriter', 'IndexedWriter',
+             'NamedTrigger', 'IndexedTrigger']
 
 
 class APIKeys(ndb.Model):
@@ -50,6 +50,7 @@ class Providers(ndb.Model):
 
 
 class Forwarder(ndb.Model):
+    id_type = ndb.StringProperty(choices=['name', 'index'], default='name')
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     private_key = ndb.StringProperty(indexed=False, default='')
@@ -75,6 +76,7 @@ def forwarders_key():
 
 
 class Distributer(ndb.Model):
+    id_type = ndb.StringProperty(choices=['name', 'index'], default='name')
     address_type = ndb.StringProperty(choices=['BIP44', 'PrivKey'], default='BIP44')
     wallet_index = ndb.IntegerProperty(indexed=True, default=0)
     private_key = ndb.StringProperty(indexed=False, default='')
@@ -146,6 +148,7 @@ def trigger_key(trigger):
 
 
 class Writer(ndb.Model):
+    id_type = ndb.StringProperty(choices=['name', 'index'], default='name')
     message = ndb.StringProperty(default='')
     outputs = ndb.JsonProperty(default=[])
     amount = ndb.IntegerProperty(default=0)
@@ -178,8 +181,9 @@ def writers_key():
 
 
 class WalletAddress(ndb.Model):
+    service_account = ndb.IntegerProperty(indexed=True, default=None)
     service_name = ndb.StringProperty(indexed=True,
-                                      choices=[None, 'BlockWriter', 'BlockForwarder', 'BlockDistributer'],
+                                      choices=Services.names,
                                       default=None)
     address = ndb.StringProperty(indexed=True)
     i = ndb.IntegerProperty(indexed=True)
@@ -246,9 +250,12 @@ def get_service_private_key(service, index):
 
 def initialize_wallet_address(service, i):
     wallet_address = None
-    if service in [Services.blockwriter, Services.blockforward, Services.blockdistribute] and isinstance(i, (int, long)) and i >= 0:
-        wallet_address = WalletAddress.get_or_insert("%s_%i" % (Services.service_name(service), i), parent=address_key())
-        wallet_address.service_name = Services.service_name(service)
+    if service in [Services.blockwriter_by_name, Services.blockwriter_by_index,
+                   Services.blockforward_by_name, Services.blockforward_by_index,
+                   Services.blockdistribute_by_name, Services.blockdistribute_by_index] and isinstance(i, (int, long)) and i >= 0:
+        wallet_address = WalletAddress.get_or_insert("%s_%i" % (Services.names[service], i), parent=address_key())
+        wallet_address.service_account = service
+        wallet_address.service_name = Services.names[service]
         wallet_address.address = get_service_address(service, i)
         wallet_address.i = i
         wallet_address.k = 0
@@ -259,3 +266,42 @@ def initialize_wallet_address(service, i):
         wallet_address.put()
 
     return wallet_address
+
+
+def get_available_address_index(service):
+    #check_active_addresses()
+    wallet_address_query = WalletAddress.query(WalletAddress.service_name == Services.names[service],
+                                               WalletAddress.status == 'Available',
+                                               ancestor=address_key()).order(WalletAddress.i)
+    wallet_address = wallet_address_query.fetch(limit=1)
+
+    if len(wallet_address) == 1:
+        index = wallet_address[0].i
+        wallet_address[0].status = 'InUse'
+        wallet_address[0].put()
+    else:
+        wallet_address_query = WalletAddress.query(WalletAddress.service_name == Services.names[service],
+                                                   ancestor=address_key()).order(-WalletAddress.i)
+        wallet_address = wallet_address_query.fetch(limit=1)
+        if len(wallet_address) == 1:
+            index = wallet_address[0].i+1
+        else:
+            index = 1
+
+        wallet_address = initialize_wallet_address(service, index)
+        if wallet_address:
+            logging.info("Initialized new wallet address for service %s: %i %s" % (Services.names[service], index, wallet_address.address))
+
+    return index
+
+
+def cooldown_address(address):
+    success = False
+    wallet_address_query = WalletAddress.query(WalletAddress.address == address, ancestor=address_key())
+    wallet_address = wallet_address_query.fetch(limit=1)
+    if wallet_address:
+        wallet_address[0].status = 'Cooldown'
+        wallet_address[0].put()
+        success = True
+
+    return success

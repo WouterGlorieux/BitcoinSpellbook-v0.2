@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 import time
 import logging
 
@@ -19,18 +20,6 @@ import TxFactory.TxFactory as TxFactory
 
 REQUIRED_CONFIRMATIONS = 3  # must be at least 3
 TRANSACTION_FEE = 10000  # in Satoshis
-
-
-def get_next_index():
-    distributers_query = datastore.Distributer.query(ancestor=datastore.distributers_key()).order(-datastore.Distributer.wallet_index)
-    distributers = distributers_query.fetch()
-
-    if len(distributers) > 0:
-        i = distributers[0].wallet_index + 1
-    else:
-        i = 1
-
-    return i
 
 
 def distributer_to_dict(distributer):
@@ -78,52 +67,72 @@ class Distributer():
     @ndb.transactional(xg=True)
     def __init__(self, name):
         self.error = ''
-        if isinstance(name, (str, unicode)) and len(name) > 0:
+        self.distributer = None
+        self.name = ''
+
+        if re.match('^[0-9]{16}$', name):
+            self.name = int(name)
+            self.distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
+            logging.info('Initialized distributer by numeric name: %s' % self.name)
+        elif re.match('^[0-9]{1,15}$', name):
             self.name = name
-        else:
-            self.error = 'Name cannot be empty'
+            self.distributer = datastore.Distributer.get_or_insert(self.name, parent=datastore.distributers_key())
+            index = int(name)
+            wallet_address = datastore.initialize_wallet_address(datastore.Services.blockdistribute_by_index, index)
+            if self.distributer.wallet_index != index and wallet_address:
+                self.distributer.wallet_index = index
+                self.distributer.address = wallet_address.address
+                self.distributer.id_type = 'index'
+                self.distributer.put()
+            logging.info('Initialized distributer by wallet index: %s' % self.name)
+        elif name:
+            self.name = name
+            self.distributer = datastore.Distributer.get_or_insert(self.name, parent=datastore.distributers_key())
+            logging.info('Initialized distributer by string name: %s' % self.name)
+        elif name == '':
+            self.distributer = datastore.Distributer(parent=datastore.distributers_key())
+            self.distributer.put()
+            self.name = self.distributer.key.id()
+            logging.info('Initialized new distributer: %s' % self.name)
+
+        if not self.distributer:
+            self.error = 'Unable to initialize distributer'
 
     def get(self):
         response = {'success': 0}
-        if self.error == '':
-            distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
-
-            if distributer:
-                response['distributer'] = distributer_to_dict(distributer)
-                response['success'] = 1
-            else:
-                response['error'] = 'No distributer with that name found.'
+        if self.distributer:
+            response['distributer'] = distributer_to_dict(self.distributer)
+            response['success'] = 1
+        else:
+            response['error'] = 'No distributer initialized.'
 
         return response
 
     def check_address(self, address):
         response = {'success': 0}
-        if self.error == '':
-            distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
-
-            if distributer:
-                distributing_relation = {'relation': 'unrelated address'}
-                if distributer.address == address:
-                    distributing_relation['relation'] = 'distributing address'
-                else:
-                    share = 0
-                    for recipient in distributer.distribution:
-                        if recipient[0] == address:
-                            distributing_relation['relation'] = 'receiving address'
-                            if len(recipient) >= 3:
-                                share += recipient[2]
-
-                    if distributing_relation['relation'] == 'receiving address':
-                        distributing_relation['share'] = share
-
-                    if distributer.registration_address == address and distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
-                        distributing_relation['relation'] = 'registration address'
-
-                response[address] = distributing_relation
-                response['success'] = 1
-
+        if self.distributer:
+            distributing_relation = {'relation': 'unrelated address'}
+            if self.distributer.address == address:
+                distributing_relation['relation'] = 'distributing address'
             else:
-                response['error'] = 'No distributer with that name found.'
+                share = 0
+                for recipient in self.distributer.distribution:
+                    if recipient[0] == address:
+                        distributing_relation['relation'] = 'receiving address'
+                        if len(recipient) >= 3:
+                            share += recipient[2]
+
+                if distributing_relation['relation'] == 'receiving address':
+                    distributing_relation['share'] = share
+
+                if self.distributer.registration_address == address and self.distributer.distribution_source in ['SIL', 'LBL', 'LRL', 'LSL']:
+                    distributing_relation['relation'] = 'registration address'
+
+            response[address] = distributing_relation
+            response['success'] = 1
+
+        else:
+            response['error'] = 'No distributer initialized.'
 
         return response
 
@@ -132,136 +141,139 @@ class Distributer():
             settings = {}
         response = {'success': 0}
 
-        if self.error == '':
-            distributer = datastore.Distributer.get_or_insert(self.name, parent=datastore.distributers_key())
-
+        if self.distributer:
             if 'distribution_source' in settings and settings['distribution_source'] in ['LBL', 'LRL', 'LSL', 'SIL', 'Custom']:
-                distributer.distribution_source = settings['distribution_source']
+                self.distributer.distribution_source = settings['distribution_source']
             elif 'distribution_source' in settings:
                 self.error = 'Invalid distribution_source'
 
             if 'registration_address' in settings and (validator.valid_address(settings['registration_address']) or settings['registration_address'] == ''):
-                distributer.registration_address = settings['registration_address']
+                self.distributer.registration_address = settings['registration_address']
             elif 'registration_address' in settings:
                 self.error = 'Invalid registration_address'
 
             if 'registration_xpub' in settings and (validator.valid_xpub(settings['registration_xpub']) or settings['registration_xpub'] == ''):
-                distributer.registration_xpub = settings['registration_xpub']
+                self.distributer.registration_xpub = settings['registration_xpub']
             elif 'registration_xpub' in settings:
                 self.error = 'Invalid registration_xpub'
 
             if 'registration_block_height' in settings and (validator.valid_block_height(settings['registration_block_height'])):
-                distributer.registration_block_height = settings['registration_block_height']
+                self.distributer.registration_block_height = settings['registration_block_height']
             elif 'registration_block_height' in settings:
                 self.error = 'Invalid registration_block_height: ' + str(settings['registration_block_height'])
 
             if 'distribution' in settings and validator.valid_distribution(eval(settings['distribution'])):
-                distributer.distribution = eval(settings['distribution'])
+                self.distributer.distribution = eval(settings['distribution'])
             elif 'distribution' in settings and settings['distribution'] == u'[]':
-                distributer.distribution = []
+                self.distributer.distribution = []
             elif 'distribution' in settings:
                 self.error = 'Invalid distribution: ' + settings['distribution']
 
             if 'minimum_amount' in settings and validator.valid_amount(settings['minimum_amount']):
-                distributer.minimum_amount = settings['minimum_amount']
+                self.distributer.minimum_amount = settings['minimum_amount']
             elif 'minimum_amount' in settings:
                 self.error = 'minimum_amount must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'threshold' in settings and validator.valid_amount(settings['threshold']):
-                distributer.threshold = settings['threshold']
+                self.distributer.threshold = settings['threshold']
             elif 'threshold' in settings:
                 self.error = 'threshold must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'status' in settings and settings['status'] in ['Pending', 'Active', 'Disabled']:
-                distributer.status = settings['status']
+                self.distributer.status = settings['status']
             elif 'status' in settings:
                 self.error = 'status must be Pending, Active or Disabled'
 
             if 'visibility' in settings and settings['visibility'] in ['Public', 'Private']:
-                distributer.visibility = settings['visibility']
+                self.distributer.visibility = settings['visibility']
             elif 'visibility' in settings:
                 self.error = 'visibility must be Public or Private'
 
             if 'description' in settings and validator.valid_description(settings['description']):
-                distributer.description = settings['description']
+                self.distributer.description = settings['description']
             elif 'description' in settings:
                 self.error = 'Invalid description'
 
             if 'creator' in settings and validator.valid_creator(settings['creator']):
-                distributer.creator = settings['creator']
+                self.distributer.creator = settings['creator']
             elif 'creator' in settings:
                 self.error = 'Invalid creator'
 
             if 'creator_email' in settings and validator.valid_email(settings['creator_email']):
-                distributer.creator_email = settings['creator_email']
+                self.distributer.creator_email = settings['creator_email']
             elif 'creator_email' in settings:
                 self.error = 'Invalid email address'
 
             if 'youtube' in settings and validator.valid_youtube_id(settings['youtube']):
-                distributer.youtube = settings['youtube']
+                self.distributer.youtube = settings['youtube']
             elif 'youtube' in settings:
                 self.error = 'Invalid youtube video ID'
 
             if 'fee_percentage' in settings and validator.valid_percentage(settings['fee_percentage']):
-                distributer.fee_percentage = settings['fee_percentage']
+                self.distributer.fee_percentage = settings['fee_percentage']
             elif 'fee_percentage' in settings:
                 self.error = 'fee_percentage must be greater than or equal to 0'
 
             if 'fee_address' in settings and (validator.valid_address(settings['fee_address']) or settings['fee_address'] == ''):
-                distributer.fee_address = settings['fee_address']
+                self.distributer.fee_address = settings['fee_address']
             elif 'fee_address' in settings:
                 self.error = 'Invalid fee_address'
 
             if 'maximum_transaction_fee' in settings and validator.valid_amount(settings['maximum_transaction_fee']):
-                distributer.maximum_transaction_fee = settings['maximum_transaction_fee']
+                self.distributer.maximum_transaction_fee = settings['maximum_transaction_fee']
             elif 'maximum_transaction_fee' in settings:
                 self.error = 'maximum_transaction_fee must be a positive integer or equal to 0 (in Satoshis)'
 
             if 'address_type' in settings and settings['address_type'] in ['PrivKey', 'BIP44']:
-                distributer.address_type = settings['address_type']
+                self.distributer.address_type = settings['address_type']
             elif 'address_type' in settings:
                 self.error = 'address_type must be BIP44 or PrivKey'
 
-            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']):
-                distributer.wallet_index = settings['wallet_index']
+            if 'wallet_index' in settings and validator.valid_amount(settings['wallet_index']) and self.distributer.id_type == 'name':
+                self.distributer.wallet_index = settings['wallet_index']
             elif 'wallet_index' in settings:
                 self.error = 'wallet_index must be greater than or equal to 0'
 
             if 'private_key' in settings and validator.valid_private_key(settings['private_key']):
-                distributer.private_key = settings['private_key']
+                self.distributer.private_key = settings['private_key']
             elif 'private_key' in settings:
                 self.error = 'Invalid private_key'
 
-            if distributer.address_type == 'PrivKey' and distributer.private_key != '':
-                distributer.address = bitcoin.privtoaddr(distributer.private_key)
-            elif distributer.address_type == 'BIP44':
-                if distributer.wallet_index == 0:
-                    distributer.wallet_index = get_next_index()
-                distributer.address = datastore.get_service_address(datastore.Services.blockdistribute, distributer.wallet_index)
+            if self.distributer.address_type == 'PrivKey' and self.distributer.private_key != '':
+                self.distributer.address = bitcoin.privtoaddr(self.distributer.private_key)
+            elif self.distributer.address_type == 'BIP44':
+                if self.distributer.wallet_index == 0 and self.distributer.id_type == 'name':
+                    self.distributer.wallet_index = datastore.get_available_address_index(datastore.Services.blockdistribute_by_name)
+                if self.distributer.id_type == 'name':
+                    self.distributer.address = datastore.get_service_address(datastore.Services.blockdistribute_by_name, self.distributer.wallet_index)
 
-            if not validator.valid_address(distributer.address):
+            if not validator.valid_address(self.distributer.address):
                 self.error = 'Unable to get address for distributer'
 
             if self.error == '':
-                distributer.put()
-                response['distributer'] = distributer_to_dict(distributer)
+                self.distributer.put()
+                response['distributer'] = distributer_to_dict(self.distributer)
                 response['success'] = 1
             else:
                 response['error'] = self.error
+        else:
+            response['error'] = 'No distributer initialized.'
 
         return response
 
     def delete_distributer(self):
         response = {'success': 0}
 
-        if self.error == '':
-            distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
-
-            if distributer:
-                distributer.key.delete()
+        if self.distributer:
+            try:
+                datastore.cooldown_address(self.distributer.address)
+                self.distributer.key.delete()
                 response['success'] = 1
-            else:
-                response['error'] = 'No distributer with that name found.'
+            except Exception as ex:
+                logging.warning(str(ex))
+                self.error = 'Unable to delete distributer'
+        else:
+            response['error'] = 'No distributer initialized.'
 
         return response
 
@@ -269,44 +281,41 @@ class Distributer():
         response = {'success': 0}
         distribution = []
 
-        if self.error == '':
-            distributer = datastore.Distributer.get_by_id(self.name, parent=datastore.distributers_key())
-
-            if distributer:
-                distribution = distributer.distribution
-                if distributer.distribution_source == 'SIL':
-                    sil_data = BlockInputs.get_sil(distributer.registration_address,
-                                                   distributer.registration_block_height)
-                    if 'success' in sil_data and sil_data['success'] == 1:
-                        distribution = sil_data['SIL']
-                    else:
-                        self.error = 'Unable to retrieve sil'
-
-                elif distributer.distribution_source in ['LBL', 'LRL', 'LSL']:
-                    linker = BlockLinker.BlockLinker(distributer.registration_address,
-                                                     distributer.registration_xpub,
-                                                     distributer.registration_block_height)
-                    linker_data = {}
-                    if distributer.distribution_source == 'LBL':
-                        linker_data = linker.get_lbl()
-                    elif distributer.distribution_source == 'LRL':
-                        linker_data = linker.get_lrl()
-                    elif distributer.distribution_source == 'LSL':
-                        linker_data = linker.get_lsl()
-
-                    if 'success' in linker_data and linker_data['success'] == 1:
-                        distribution = linker_data[distributer.distribution_source]
-                    else:
-                        self.error = 'Unable to retrieve ' + distributer.distribution_source
-
-                if validator.valid_distribution(distribution):
-                    distributer.distribution = distribution
-                    distributer.put()
+        if self.distributer:
+            distribution = self.distributer.distribution
+            if self.distributer.distribution_source == 'SIL':
+                sil_data = BlockInputs.get_sil(self.distributer.registration_address,
+                                               self.distributer.registration_block_height)
+                if 'success' in sil_data and sil_data['success'] == 1:
+                    distribution = sil_data['SIL']
                 else:
-                    self.error = 'Invalid distribution'
+                    self.error = 'Unable to retrieve sil'
 
+            elif self.distributer.distribution_source in ['LBL', 'LRL', 'LSL']:
+                linker = BlockLinker.BlockLinker(self.distributer.registration_address,
+                                                 self.distributer.registration_xpub,
+                                                 self.distributer.registration_block_height)
+                linker_data = {}
+                if self.distributer.distribution_source == 'LBL':
+                    linker_data = linker.get_lbl()
+                elif self.distributer.distribution_source == 'LRL':
+                    linker_data = linker.get_lrl()
+                elif self.distributer.distribution_source == 'LSL':
+                    linker_data = linker.get_lsl()
+
+                if 'success' in linker_data and linker_data['success'] == 1:
+                    distribution = linker_data[self.distributer.distribution_source]
+                else:
+                    self.error = 'Unable to retrieve ' + self.distributer.distribution_source
+
+            if validator.valid_distribution(distribution):
+                self.distributer.distribution = distribution
+                self.distributer.put()
             else:
-                response['error'] = 'No distributer with that name found.'
+                self.error = 'Invalid distribution'
+
+        else:
+            self.error = 'No distributer initialized.'
 
         if self.error == '':
             response['success'] = 1
@@ -368,9 +377,10 @@ class DoDistributing():
                 private_keys = {}
                 if distributer.address_type == 'PrivKey':
                     private_keys = {distributer.address: distributer.private_key}
-
-                elif distributer.address_type == 'BIP44':
-                    private_keys = datastore.get_service_private_key(datastore.Services.blockdistribute, distributer.wallet_index)
+                elif distributer.address_type == 'BIP44' and distributer.id_type == 'name':
+                    private_keys = datastore.get_service_private_key(datastore.Services.blockdistribute_by_name, distributer.wallet_index)
+                elif distributer.address_type == 'BIP44' and distributer.id_type == 'index':
+                    private_keys = datastore.get_service_private_key(datastore.Services.blockdistribute_by_index, distributer.wallet_index)
 
                 if distributer.distribution_source == 'SIL' and distributer.address == distributer.registration_address:
                     self.error = 'Dark magic detected! Ponzi schemes are illegal!!'
