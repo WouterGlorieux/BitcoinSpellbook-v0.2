@@ -879,62 +879,61 @@ class SaveTrigger(webapp2.RequestHandler):
         response = {'success': 0}
         authentication_status = is_authenticated(self.request.headers, self.request.body)
         if authentication_status == AuthenticationStatus.OK:
+            name = ''
             if self.request.get('name'):
                 name = self.request.get('name')
 
-                settings = {}
+            settings = {}
 
-                if self.request.get('trigger_type'):
-                    settings['trigger_type'] = self.request.get('trigger_type')
+            if self.request.get('trigger_type'):
+                settings['trigger_type'] = self.request.get('trigger_type')
 
-                if self.request.get('block_height'):
-                    try:
-                        settings['block_height'] = int(self.request.get('block_height'))
-                    except ValueError:
-                        response['error'] = 'block_height must be a positive integer'
+            if self.request.get('block_height'):
+                try:
+                    settings['block_height'] = int(self.request.get('block_height'))
+                except ValueError:
+                    response['error'] = 'block_height must be a positive integer'
 
-                if self.request.get('address', None) is not None:
-                    settings['address'] = self.request.get('address')
+            if self.request.get('address', None) is not None:
+                settings['address'] = self.request.get('address')
 
-                if self.request.get('amount'):
-                    try:
-                        settings['amount'] = int(self.request.get('amount'))
-                    except ValueError:
-                        response['error'] = 'amount must be a positive integer or equal to 0 (in Satoshis)'
+            if self.request.get('amount'):
+                try:
+                    settings['amount'] = int(self.request.get('amount'))
+                except ValueError:
+                    response['error'] = 'amount must be a positive integer or equal to 0 (in Satoshis)'
 
-                if self.request.get('confirmations'):
-                    try:
-                        settings['confirmations'] = int(self.request.get('confirmations'))
-                    except ValueError:
-                        response['error'] = 'confirmations must be a positive integer or equal to 0'
+            if self.request.get('confirmations'):
+                try:
+                    settings['confirmations'] = int(self.request.get('confirmations'))
+                except ValueError:
+                    response['error'] = 'confirmations must be a positive integer or equal to 0'
 
-                if self.request.get('triggered') == 'True':
-                    settings['triggered'] = True
-                elif self.request.get('triggered') == 'False':
-                    settings['triggered'] = False
+            if self.request.get('triggered') == 'True':
+                settings['triggered'] = True
+            elif self.request.get('triggered') == 'False':
+                settings['triggered'] = False
 
-                if self.request.get('description', None) is not None:
-                    settings['description'] = self.request.get('description')
+            if self.request.get('description', None) is not None:
+                settings['description'] = self.request.get('description')
 
-                if self.request.get('creator', None) is not None:
-                    settings['creator'] = self.request.get('creator')
+            if self.request.get('creator', None) is not None:
+                settings['creator'] = self.request.get('creator')
 
-                if self.request.get('creator_email', None) is not None:
-                    settings['creator_email'] = self.request.get('creator_email')
+            if self.request.get('creator_email', None) is not None:
+                settings['creator_email'] = self.request.get('creator_email')
 
-                if self.request.get('youtube', None) is not None:
-                    settings['youtube'] = self.request.get('youtube')
+            if self.request.get('youtube', None) is not None:
+                settings['youtube'] = self.request.get('youtube')
 
-                if self.request.get('visibility'):
-                    settings['visibility'] = self.request.get('visibility')
+            if self.request.get('visibility'):
+                settings['visibility'] = self.request.get('visibility')
 
-                if self.request.get('status'):
-                    settings['status'] = self.request.get('status')
+            if self.request.get('status'):
+                settings['status'] = self.request.get('status')
 
-                response = BlockTrigger.BlockTrigger(name).save_trigger(settings)
+            response = BlockTrigger.BlockTrigger(name).save_trigger(settings)
 
-            else:
-                response['error'] = 'Invalid parameters'
         else:
             response['error'] = 'Authentication error: %s' % authentication_status
 
@@ -960,9 +959,12 @@ class SaveAction(webapp2.RequestHandler):
         response = {'success': 0}
         authentication_status = is_authenticated(self.request.headers, self.request.body)
         if authentication_status == AuthenticationStatus.OK:
-            if self.request.get('trigger_name') and self.request.get('action_name'):
+            if self.request.get('trigger_name'):
                 trigger_name = self.request.get('trigger_name')
-                action_name = self.request.get('action_name')
+
+                action_name = ''
+                if self.request.get('action_name'):
+                    action_name = self.request.get('action_name')
 
                 settings = {}
                 if self.request.get('action_type'):
